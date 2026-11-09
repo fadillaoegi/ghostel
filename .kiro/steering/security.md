@@ -1,0 +1,23 @@
+# Security rules
+
+- The server is the authority for: positions sent to other users, room membership, passwords, turns, timers and game scores.
+- Validate every client input on the server with the schemas in `packages/shared`:
+  - Display name: NFC-normalized, trimmed, 2–20 characters, letters/numbers/space and `- _ . '` only.
+  - Chat messages (milestone 3): length limit and rate limit.
+  - Room capacity: integer 2–8.
+  - Seats, snack orders, call and presenter messages: ids and enums from the shared schemas only.
+  - Positions: finite numbers, inside building bounds, outside obstacles, max speed.
+  - Character look: enum values only.
+- Guest session: random 32-byte token in an HttpOnly, SameSite=Lax cookie (`Secure` in production). Only the SHA-256 hash of the token is stored. The token is never sent in a response body or over the WebSocket.
+- A guest can only read or change their own profile. No endpoint takes a guest ID from the client.
+- WebSocket upgrades must carry a valid session cookie and an allowed `Origin`. Mutating HTTP requests must come from an allowed `Origin`.
+- Room passwords (milestone 4): validated on the server, stored as argon2 or bcrypt hash, never sent back to any client.
+- Users who have not joined a locked room must not receive that room's chat, voice signaling or game state.
+- Calls (tables and rooms): voice, camera and screen-share signaling is relayed only between members of the same call. A table call's members are exactly the guests the server has seated at that table; a room call's members are guests inside that room. Nobody else receives a call's signaling, media offers, presenter state or slides.
+- Seats are server-authoritative: a guest can sit only on a free seat of a table on their own floor or room, within reach of the server's position for them, and one seat per connection. Standing up, moving away, changing scene or disconnecting frees the seat and ends that guest's table call.
+- Camera, microphone and screen capture start only from a user click. The browser permission prompt is never triggered automatically.
+- Presentations: only the room owner (by session) approves, refuses or stops a presenter; the server checks it. One presenter per room.
+- Presentation files: PDF only (checked by the `%PDF-` signature on the server, not by the file name or the client's type), at most 10 MB, kept in server memory only, served only to guests inside that room with `Content-Type: application/pdf`, `Content-Disposition: attachment`, `X-Content-Type-Options: nosniff` and `Cache-Control: no-store`, and deleted when the presentation ends or the room empties. The client renders them with pdf.js (latest release, 6.x: no eval path, no scripting, `enableXfa: false`, `useWasm: false` so the CSP needs no `wasm-unsafe-eval`). The response also carries `Content-Security-Policy: sandbox`.
+- Limit payload sizes and message rates on HTTP and WebSocket.
+- Secrets only in `.env` (gitignored). `.env.example` holds safe local values.
+- SQL is always parameterized.

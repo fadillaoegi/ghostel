@@ -1,0 +1,40 @@
+# 2026-11-09 07:31:28 WIB — $ pnpm test:unit
+# node v24.15.0, pnpm 11.1.3, Darwin arm64, PostgreSQL 18 (postgres:18-alpine)
+
+$ pnpm --filter @ghostel/shared test && pnpm --filter @ghostel/web test
+$ vitest run
+
+ RUN  v5.1.0 /Users/boo/Github/project/Hacketon/ghostel/packages/shared
+
+ ✓ test/trivia.test.ts (13 tests) 38ms
+ ✓ test/profile.test.ts (27 tests) 21ms
+ ✓ test/rooms.test.ts (14 tests) 85ms
+ ✓ test/movement.test.ts (11 tests) 146ms
+ ✓ test/npcs.test.ts (5 tests) 160ms
+ ✓ test/tables.test.ts (12 tests) 198ms
+ ✓ test/voice.test.ts (6 tests) 11ms
+ ✓ test/chat.test.ts (10 tests) 9ms
+ ✓ test/doors.test.ts (4 tests) 8ms
+ ✓ test/protocol.test.ts (5 tests) 6ms
+ ✓ test/floors.test.ts (9 tests) 392ms
+   ✓ floors (6)
+     ✓ floor layouts keep players inside the walls (grid sweep) 338ms
+
+ Test Files  11 passed (11)
+      Tests  116 passed (116)
+   Start at  07:31:30
+   Duration  688ms (import 45%, tests 44%, transform 8%, worker 2%)
+
+$ vitest run
+
+ RUN  v5.1.0 /Users/boo/Github/project/Hacketon/ghostel/apps/web
+
+ ✓ test/scores.test.ts (8 tests) 11ms
+
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  07:31:31
+   Duration  141ms (import 34%, tests 34%, transform 21%, worker 11%)
+
+
+# exit code: 0

@@ -1,0 +1,66 @@
+# 2026-11-09 07:53:32 WIB — $ pnpm test:server
+# node v24.15.0, pnpm 11.1.3, Darwin arm64, PostgreSQL 18 (postgres:18-alpine)
+
+$ pnpm --filter @ghostel/server test
+$ vitest run
+
+ RUN  v5.1.0 /Users/boo/Github/project/Hacketon/ghostel/apps/server
+
+ ✓ test/floors.test.ts (10 tests) 20738ms
+   ✓ floors and the elevator (2)
+     ✓ rides between floors, steps out at the elevator, and keeps floors separate 467ms
+     ✓ the elevator does not run from inside a room, and bad floors are invalid 401ms
+   ✓ candy hunt (4)
+     ✓ collects a candy when standing next to it, syncs tabs, tells the floor and persists 843ms
+     ✓ refuses candies that are far away or on another floor 4495ms
+     ✓ the Golden Crown is locked until every candy is found 1483ms
+   ✓ Ghoul's Diner (3)
+     ✓ serves a snack at the counter; everyone on the floor sees it, other floors do not 3972ms
+     ✓ refuses orders far from the counter, on other floors, too fast or off the menu 4300ms
+     ✓ the snack is gone after a minute 3889ms
+   ✓ scene changes (1)
+     ✓ drops moves that were sent for the previous scene 686ms
+ ✓ test/calls.test.ts (7 tests) 16526ms
+   ✓ seats (2)
+     ✓ needs a free chair within reach; standing puts you just outside it 3456ms
+   ✓ table calls (2)
+     ✓ contain exactly the guests at that table; signals and media stay inside 6139ms
+     ✓ closing the tab or riding the elevator frees the seat and ends the call 5140ms
+   ✓ room calls (3)
+     ✓ everyone inside a room shares one call; the long table has one chair per guest the room holds 1427ms
+ ✓ test/presentations.test.ts (4 tests) 1793ms
+   ✓ presentations (4)
+     ✓ guests ask, only the owner decides, one presenter at a time 724ms
+     ✓ a refused guest hears 'not now'; only the approved presenter may share a screen 411ms
+     ✓ PDF slides: only the approved presenter uploads; only guests inside download; gone when it ends 428ms
+ ✓ test/doors.test.ts (11 tests) 1605ms
+   ✓ room doors (10)
+     ✓ door labels reach only the guests on that floor, live 407ms
+ ✓ test/games.test.ts (6 tests) 4242ms
+   ✓ pumpkin trivia on the server (6)
+     ✓ a solo guest plays a full game against the bot without ever seeing answers early 2693ms
+     ✓ two players share questions, picks stay private until the reveal, spectators cannot answer 418ms
+     ✓ keeps game traffic inside the room 685ms
+ ✓ test/rooms.test.ts (14 tests) 2526ms
+   ✓ entering rooms (7)
+     ✓ isolates chat and movement between the lobby and rooms 374ms
+     ✓ room movement uses the room's walls 710ms
+ ✓ test/chat.test.ts (6 tests) 1846ms
+   ✓ lobby chat (6)
+     ✓ drops messages that try to pick their own sender 390ms
+     ✓ rejects empty and too-long messages with a reason and never broadcasts them 378ms
+     ✓ rate limits per guest, even across several tabs 688ms
+ ✓ test/presence.test.ts (9 tests) 1959ms
+   ✓ presence (6)
+     ✓ never lets a fake position leave the building 1225ms
+ ✓ test/session.test.ts (15 tests) 352ms
+ ✓ test/proxy.test.ts (2 tests) 171ms
+ ✓ test/house.test.ts (3 tests) 177ms
+
+ Test Files  11 passed (11)
+      Tests  87 passed (87)
+   Start at  07:53:34
+   Duration  55.82s (tests 96%, import 4%)
+
+
+# exit code: 0

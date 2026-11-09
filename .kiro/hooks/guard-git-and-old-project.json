@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Block git and the old project",
+      "trigger": "PreToolUse",
+      "description": "Enforces two steering rules: the agent never runs git (the owner handles git) and never touches the old project ghostturtle/ghost-turtle-kit. Blocks with exit 2 and logs to docs/evidence/kiro-hooks.log.",
+      "matcher": "^(execute_bash|shell|fs_write|fs_append|str_replace|delete_file)$",
+      "action": {
+        "type": "command",
+        "command": "node /Users/boo/Github/project/Hacketon/ghostel/scripts/kiro-hooks/guard.mjs",
+        "timeout": 10
+      }
+    }
+  ]
+}

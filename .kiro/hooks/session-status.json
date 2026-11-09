@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Project status at session start",
+      "trigger": "SessionStart",
+      "description": "Adds the open items from docs/HANDOFF.md and the latest check results in docs/evidence to the agent's context, and logs the run to docs/evidence/kiro-hooks.log.",
+      "action": {
+        "type": "command",
+        "command": "node /Users/boo/Github/project/Hacketon/ghostel/scripts/kiro-hooks/session-status.mjs",
+        "timeout": 10
+      }
+    }
+  ]
+}

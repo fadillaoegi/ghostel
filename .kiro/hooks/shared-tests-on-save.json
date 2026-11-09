@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Run shared domain tests on save",
+      "trigger": "PostFileSave",
+      "description": "After any TypeScript file in packages/shared is saved, run the shared unit tests (validation, movement, protocol) and show the summary.",
+      "matcher": "packages/shared/(src|test)/.*\\.ts$",
+      "action": {
+        "type": "command",
+        "command": "cd /Users/boo/Github/project/Hacketon/ghostel/packages/shared && ./node_modules/.bin/vitest run --reporter=dot 2>&1 | tail -n 8",
+        "timeout": 90
+      }
+    }
+  ]
+}

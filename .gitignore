@@ -1,0 +1,15 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+# Evidence of real Kiro hook runs; must be in the public repo.
+!docs/evidence/kiro-hooks.log
+playwright-report/
+test-results/
+apps/web/.vite/
+backups/

@@ -1,0 +1,26 @@
+# Tasks — Milestone 1: Check-in and live lobby
+
+- [x] 1. Repo foundation: steering, AGENTS.md, README, MIT license, .gitignore, .env.example, docker-compose (PostgreSQL on 5490)
+- [x] 2. Monorepo scaffold: pnpm workspace, shared tsconfig (strict), `packages/shared`, `apps/server`, `apps/web`
+- [x] 3. Shared domain
+  - [x] 3.1 Name normalisation and validation (Req 3.1, 3.2)
+  - [x] 3.2 Look enums, schema, randomiser (Req 2.1, 2.4)
+  - [x] 3.3 Lobby layout and movement rules (Req 4.4, 5.2)
+  - [x] 3.4 Wire protocol schemas (Req 5)
+  - [x] 3.5 Unit tests (43 passing)
+- [x] 4. Server
+  - [x] 4.1 Config, pool, migrations, guests repository
+  - [x] 4.2 Cookie session + `/api/me` GET/PUT with origin check and rate limit (Req 1, 3)
+  - [x] 4.3 PresenceHub over `ws` with upgrade auth, movement authority, tick, limits (Req 5)
+  - [x] 4.4 Integration tests against real PostgreSQL (24 passing)
+- [x] 5. Web
+  - [x] 5.1 Vite + R3F app shell, API client, screens
+  - [x] 5.2 Low-poly avatar and character creator with preview and randomiser (Req 2)
+  - [x] 5.3 Lobby scene with Halloween decoration (Req 4.1)
+  - [x] 5.4 Local player controls (keyboard + joystick), follow camera (Req 4.2, 4.3)
+  - [x] 5.5 Presence client, remote smoothing, name tags, HUD (Req 5)
+- [x] 6. Playwright E2E with two contexts + desktop/phone screenshots (3 passing)
+- [ ] 7. Kiro hook (`.kiro/hooks/shared-tests-on-save.json`) that runs shared unit tests on save
+  - [x] 7.1 Hook file created with the Kiro `createHook` tool; its command run by hand passes (43 tests)
+  - [ ] 7.2 Observe the hook firing in a Kiro session started from the repo root (hooks load at session start)
+- [x] 8. Evidence and docs: `docs/evidence/`, README, PROGRESS, HANDOFF, KIRO-ACTIVITY, ASSETS

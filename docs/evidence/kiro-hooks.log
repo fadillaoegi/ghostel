@@ -1,0 +1,2 @@
+2026-11-09T14:34:57.753Z	guard	PreToolUse	BLOCKED execute_bash: Blocked by Ghostel hook: git is handled by the project owner. Do not run git commands (see .kiro/steering/language-and-workflow.md).
+2026-11-09T14:56:37.075Z	session-status	SessionStart	13 open items, 7 evidence files

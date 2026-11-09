@@ -1,0 +1,22 @@
+# Keeps the Render Free instance awake during judging (it spins down after 15 minutes without traffic).
+# Does nothing until the repository variable GHOSTEL_URL is set (Settings → Secrets and variables → Actions → Variables).
+# /api/health does not touch the database, so Neon can still suspend between real visits.
+name: keep-alive
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ping:
+    if: ${{ vars.GHOSTEL_URL != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Ping /api/health
+        env:
+          GHOSTEL_URL: ${{ vars.GHOSTEL_URL }}
+        run: curl --fail --silent --show-error --max-time 90 --retry 2 "$GHOSTEL_URL/api/health"

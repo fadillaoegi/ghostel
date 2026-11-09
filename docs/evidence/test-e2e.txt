@@ -1,0 +1,37 @@
+# 2026-11-09 08:11:53 WIB — $ pnpm exec playwright test
+# node v24.15.0, pnpm 11.1.3, Darwin arm64, PostgreSQL 18 (postgres:18-alpine)
+
+[WebServer] Reset ghostel_test
+[WebServer] Ghostel server ready on http://127.0.0.1:2595
+
+Running 25 tests using 1 worker
+
+  ✓   1 [chromium] › e2e/atmosphere.spec.ts:6:1 › a solo visitor finds ghosts, a greeting and house rooms (13.2s)
+  ✓   2 [chromium] › e2e/atmosphere.spec.ts:65:1 › phone: the HUD shows the room name and ghosts are visible (4.4s)
+  ✓   3 [chromium] › e2e/chat.spec.ts:22:1 › guests chat in the lobby with speech bubbles (32.6s)
+  ✓   4 [chromium] › e2e/chat.spec.ts:70:1 › flooding the chat is stopped by the server (2.4s)
+  ✓   5 [chromium] › e2e/chat.spec.ts:84:1 › phone: chat sheet with unread badge (9.0s)
+  ✓   6 [chromium] › e2e/diner.spec.ts:35:1 › Ghoul's Diner: order a snack at the counter, a friend on the floor sees it (14.1s)
+  ✓   7 [chromium] › e2e/floors.spec.ts:22:1 › the elevator connects five floors, each with its own guests, ghosts and chat (34.2s)
+  ✓   8 [chromium] › e2e/floors.spec.ts:87:1 › the welcome candy sits next to the front doors (3.4s)
+  ✓   9 [chromium] › e2e/floors.spec.ts:100:1 › phone: floors through the elevator button (6.7s)
+  ✓  10 [chromium] › e2e/lobby.spec.ts:36:1 › two guests see each other move, rename and leave in realtime (17.7s)
+  ✓  11 [chromium] › e2e/lobby.spec.ts:87:1 › invalid names are rejected with a clear message (2.3s)
+  ✓  12 [chromium] › e2e/lobby.spec.ts:114:1 › phone layout: creator, lobby and joystick movement (10.0s)
+  ✓  13 [chromium] › e2e/lobby.spec.ts:156:1 › monster costume parts are saved by the server and shown to other guests (9.9s)
+  ✓  14 [chromium] › e2e/mobile.spec.ts:33:1 › phone portrait: stick and action button; the action button calls the elevator (2.5s)
+  ✓  15 [chromium] › e2e/mobile.spec.ts:51:1 › phone landscape: creator, lobby HUD, panels and chat all fit the short screen (12.0s)
+  ✓  16 [chromium] › e2e/mobile.spec.ts:102:1 › a physical gamepad walks the character, A does the action, B closes the panel (7.6s)
+  ✓  17 [chromium] › e2e/present.spec.ts:63:1 › a guest asks to show PDF slides, the owner allows it, everyone in the room follows the pages (9.4s)
+  ✓  18 [chromium] › e2e/present.spec.ts:100:1 › the owner shares a screen; a guest in the room sees it live (13.8s)
+  ✓  19 [chromium] › e2e/rooms.spec.ts:60:1 › password room behind door 2B: create, unlock, isolated chat, door prompt, lock, leave, delete (1.1m)
+  ✓  20 [chromium] › e2e/rooms.spec.ts:163:1 › phone: create an open ballroom and walk around inside (6.5s)
+  ✓  21 [chromium] › e2e/rooms.spec.ts:187:1 › doors on floor 3: book a vacant door with E, a friend finds it by its code (11.9s)
+  ✓  22 [chromium] › e2e/trivia.spec.ts:27:1 › solo guest plays Pumpkin Trivia against the bot to the podium (15.9s)
+  ✓  23 [chromium] › e2e/trivia.spec.ts:61:1 › two guests see the same question and each other's picks after the reveal (16.0s)
+  ✓  24 [chromium] › e2e/voice.spec.ts:49:1 › a room is one call: microphone and camera only after a click, the meeting view when seated (21.7s)
+  ✓  25 [chromium] › e2e/voice.spec.ts:119:1 › tables in Ghoul's Diner: sit down for a table call, stand up to leave it (7.7s)
+
+  25 passed (5.9m)
+
+# exit code: 0

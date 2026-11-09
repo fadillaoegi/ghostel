@@ -1,0 +1,22 @@
+# Specs
+
+One folder per milestone, each with `requirements.md`, `design.md` and `tasks.md`. Written before the code unless the spec says otherwise at the top. Milestones 1–7 come from the original brief (`.kiro/steering/product.md`); M8 onwards were requested by the owner during development.
+
+| Milestone | Folder | Status | Spec written |
+| --- | --- | --- | --- |
+| 1–2 Check-in, character creator, live lobby | `m1-check-in-and-lobby` | done | before code |
+| 3 Lobby chat | `m3-lobby-chat` | done | before code |
+| 4 Rooms with lock and password | `m4-rooms` | done | before code |
+| 5 Voice in rooms | `m5-voice` | done, voice protocol later replaced by M12 | before code |
+| 6 Pumpkin Trivia and the game system | `m6-pumpkin-trivia` | done | before code |
+| 7 Atmosphere and NPC ghosts | `m7-atmosphere` | done | before code |
+| 8 Floors, music, candy hunt | `m8-floors-and-music` | done, floors updated by M10 | before code |
+| 9 Monsters, night city, room doors | `m9-monsters-city-doors` | done | before code |
+| 10 Ghoul's Diner, rooftop on floor 5 | `m10-canteen-and-rooftop` | done | before code |
+| 11 Phone gamepad, landscape, physical gamepads | `m11-mobile-gamepad` | done | right after code |
+| 12 Seats, table calls, meeting view, room capacity | `m12-seats-and-meetings` | done | after code |
+| 13 Camera | `m13-camera` | done | after code |
+| 14 Presentations (screen share, PDF slides) | `m14-presentation` | done | after code |
+| 15 Provable Kiro workflow (hooks, steering, specs, log) | `m15-kiro-workflow` | in progress (hook verification, Devpost rules) | before code |
+
+Milestone 8 of the original brief ("a second game or proximity voice") has not been started.

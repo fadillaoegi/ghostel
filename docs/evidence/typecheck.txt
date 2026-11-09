@@ -1,0 +1,10 @@
+# 2026-11-09 21:34:27 WIB — $ pnpm typecheck
+# node v24.15.0, pnpm 11.1.3, Darwin arm64
+
+$ pnpm -r --workspace-concurrency=1 typecheck && tsc -p tsconfig.json
+Scope: 3 of 4 workspace projects
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+
+# exit code: 0

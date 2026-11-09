@@ -1,0 +1,31 @@
+# Render Blueprint for Ghostel: one Node web service that serves the web app, API and WebSocket
+# from a single origin. PostgreSQL lives on Neon (Render's free Postgres expires after 30 days).
+# Values marked `sync: false` are entered in the Render dashboard and never committed.
+services:
+  - type: web
+    name: ghostel
+    runtime: node
+    plan: free
+    region: oregon
+    # NODE_ENV=production would make pnpm skip devDependencies (Vite, esbuild), so install with development.
+    buildCommand: corepack enable && NODE_ENV=development pnpm install --frozen-lockfile && pnpm build
+    startCommand: pnpm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "24"
+      # Render terminates TLS in one proxy hop in front of the service.
+      - key: TRUST_PROXY
+        value: "1"
+      # Neon connection string, e.g. postgres://user:pass@ep-xxx.us-west-2.aws.neon.tech/ghostel?sslmode=require
+      - key: DATABASE_URL
+        sync: false
+      # The public URL of this service, e.g. https://ghostel.onrender.com
+      - key: ALLOWED_ORIGINS
+        sync: false
+      # Optional TURN/STUN servers for voice (JSON array). Empty = public Google STUN.
+      - key: VOICE_ICE_SERVERS
+        sync: false
