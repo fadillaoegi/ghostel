@@ -10,6 +10,7 @@ export * from "./candies";
 export * from "./doors";
 export * from "./tables";
 export * from "./canteen";
+export * from "./nightdesk";
 export * from "./layout";
 export * from "./movement";
 export * from "./protocol";

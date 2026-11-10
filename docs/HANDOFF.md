@@ -1,6 +1,6 @@
 # Handoff
 
-Last session: 2026-11-08/09. Milestones 1–7 and the owner's milestones M8–M14 are implemented and tested. M8 is floors and music, M9 room doors, night city and monsters, M10 Ghoul's Diner and the rooftop on floor 5, M11 phone gamepad and landscape, M12 seats, table calls and the meeting view, M13 camera, M14 presentations. Specs are in `.kiro/specs/` (`m1-check-in-and-lobby` covers milestones 1 and 2). The category report is in `docs/CATEGORY-REPORT.md`.
+Last session: 2026-11-10. Milestones 1–7, the owner's milestones M8–M14 and M16 are implemented and tested. M8 is floors and music, M9 room doors, night city and monsters, M10 Ghoul's Diner and the rooftop on floor 5, M11 phone gamepad and landscape, M12 seats, table calls and the meeting view, M13 camera, M14 presentations. Specs are in `.kiro/specs/` (`m1-check-in-and-lobby` covers milestones 1 and 2). The category report is in `docs/CATEGORY-REPORT.md`.
 
 ## Start the next session
 ```sh
@@ -36,6 +36,12 @@ Start Kiro from this folder so `.kiro/steering`, `AGENTS.md` and `.kiro/hooks` l
 8. **Room doors (M9):** the stale-room cleanup (3 days unused) is tested at repository level, not through the hourly timer. Door labels in the hub are loaded at startup and kept in sync by the room routes; a manual SQL change to `rooms` needs a server restart to show on doors.
 
 ## Things to know
+- M16 (2026-11-10):
+  - The Night Desk terminal is the `night-desk` obstacle in `layout.ts` (its box reaches into the wall on purpose). The `terminal` prompt is in front of it.
+  - The story rules are in `packages/shared/src/nightdesk.ts`, and the UI in `apps/web/src/ui/NightDesk.tsx`.
+  - The Haunted Mirror camera is `apps/web/src/ui/mirrorCam.ts`, separate from `CallClient`. The shader is in `three/floors/Gallery.tsx`.
+  - E2E is in `e2e/oddities.spec.ts`. It spies on `getUserMedia` with an init script.
+  - Skeleton Crew is still undecided (owner).
 - Ports: web 5290, server 2590, PostgreSQL 5490, E2E server 2595.
 - The server registers static files at startup: after `pnpm build`, restart it, or new asset names fall through to `index.html`. Old project ports 5178, 5179, 8098, 5478 are avoided.
 - Databases: `ghostel` (dev) and `ghostel_test` (integration + E2E), both in the `ghostel-postgres-1` container (PostgreSQL 18, `postgres:18-alpine`), volume `ghostel_ghostel_pg18` mounted at `/var/lib/postgresql` (18+ keeps data in `/var/lib/postgresql/18/docker`). The old PostgreSQL 17 volume `ghostel_ghostel_pg` was removed on 2026-11-09 at the owner's request, after a `pg_dump` to `backups/` (gitignored) that was restored into 18.

@@ -1,46 +1,124 @@
-# 2026-11-09 08:17:51 WIB — $ pnpm exec playwright test -c playwright.prod.config.ts
-# node v24.15.0, pnpm 11.1.3, Darwin arm64, PostgreSQL 18 (postgres:18-alpine)
+# 2026-11-10 09:51:14 WIB — $ pnpm test:prod
+# node v24.15.0, pnpm 11.1.3, Darwin arm64
 
+$ pnpm build && playwright test -c playwright.prod.config.ts
+$ pnpm --filter @ghostel/web build && pnpm --filter @ghostel/server build
+$ vite build
+vite v8.3.6 building client environment for production...
+transforming...
+✓ 730 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                0.68 kB │ gzip:   0.39 kB
+dist/pdfjs/standard_fonts/LICENSE_FOXIT                        1.55 kB
+dist/assets/vt323-vietnamese-400-normal-D_5Q7Vcv.woff          4.71 kB
+dist/assets/nunito-vietnamese-700-normal-Ch8EUCfz.woff2        5.96 kB
+dist/assets/nunito-vietnamese-400-normal-BHkVbP3T.woff2        6.12 kB
+dist/assets/nunito-vietnamese-800-normal-D_CZYdm9.woff2        6.22 kB
+dist/assets/vt323-vietnamese-400-normal-D0VnvwZ9.woff2         7.93 kB
+dist/assets/nunito-vietnamese-700-normal-C9SQsXvj.woff         8.07 kB
+dist/assets/nunito-vietnamese-400-normal-DtOtW02z.woff         8.24 kB
+dist/assets/nunito-vietnamese-800-normal-Dz0hZPb5.woff         8.30 kB
+dist/assets/nunito-cyrillic-400-normal-xAOo5cBP.woff2          8.46 kB
+dist/assets/nunito-cyrillic-800-normal-D3igD7Kl.woff2          8.49 kB
+dist/assets/nunito-cyrillic-700-normal-DP36NgGt.woff2          8.51 kB
+dist/assets/vt323-latin-ext-400-normal-DqOq58ri.woff           9.63 kB
+dist/assets/vt323-latin-400-normal-Dqn9ZSPj.woff               9.75 kB
+dist/assets/nunito-cyrillic-700-normal-DfHRUDv-.woff          10.40 kB
+dist/assets/nunito-cyrillic-400-normal-D1j0u8EH.woff          10.46 kB
+dist/assets/nunito-cyrillic-800-normal-DymMgApb.woff          10.46 kB
+dist/assets/nunito-cyrillic-ext-700-normal-BuR0mlCG.woff2     10.98 kB
+dist/assets/nunito-cyrillic-ext-400-normal-CuPM9foi.woff2     11.16 kB
+dist/assets/nunito-cyrillic-ext-800-normal-B-cvGohL.woff2     11.26 kB
+dist/assets/nunito-cyrillic-ext-700-normal-DfoqN4Gs.woff      13.87 kB
+dist/assets/nunito-cyrillic-ext-800-normal-pjRatrRO.woff      14.06 kB
+dist/assets/nunito-cyrillic-ext-400-normal-xaE7D4Sw.woff      14.10 kB
+dist/assets/nunito-latin-ext-700-normal-BWeMsAzO.woff2        15.82 kB
+dist/assets/nunito-latin-ext-400-normal-i-8OOpdj.woff2        15.88 kB
+dist/assets/nunito-latin-700-normal-Dort48En.woff2            16.22 kB
+dist/assets/nunito-latin-ext-800-normal-CtU8tJOV.woff2        16.28 kB
+dist/assets/nunito-latin-400-normal-r8SDr6Up.woff2            16.31 kB
+dist/assets/vt323-latin-ext-400-normal-iUdYUaX4.woff2         16.37 kB
+dist/assets/nunito-latin-800-normal-Dz8SOQK_.woff2            16.52 kB
+dist/pdfjs/standard_fonts/FoxitSymbol.pfb                     16.72 kB
+dist/pdfjs/standard_fonts/FoxitFixed.pfb                      17.59 kB
+dist/assets/vt323-latin-400-normal-wDgJuOC9.woff2             17.93 kB
+dist/pdfjs/standard_fonts/FoxitFixedBold.pfb                  18.05 kB
+dist/pdfjs/standard_fonts/FoxitFixedItalic.pfb                18.74 kB
+dist/pdfjs/standard_fonts/FoxitFixedBoldItalic.pfb            19.15 kB
+dist/pdfjs/standard_fonts/FoxitSerifBold.pfb                  19.39 kB
+dist/pdfjs/standard_fonts/FoxitSerif.pfb                      19.46 kB
+dist/assets/nunito-latin-700-normal-OcDqTBcA.woff             19.98 kB
+dist/assets/nunito-latin-400-normal-DKg4f3fz.woff             20.33 kB
+dist/assets/nunito-latin-800-normal-D-J0wlBY.woff             20.36 kB
+dist/pdfjs/standard_fonts/FoxitSerifBoldItalic.pfb            20.73 kB
+dist/assets/nunito-latin-ext-700-normal-D4woHhbd.woff         21.00 kB
+dist/pdfjs/standard_fonts/FoxitSerifItalic.pfb                21.22 kB
+dist/assets/nunito-latin-ext-400-normal-CjMJVfGn.woff         21.28 kB
+dist/assets/nunito-latin-ext-800-normal-CDcxIxx8.woff         21.42 kB
+dist/pdfjs/standard_fonts/LICENSE_LIBERATION                  22.15 kB
+dist/assets/creepster-latin-400-normal-DnKpM-ys.woff2         28.12 kB
+dist/pdfjs/standard_fonts/FoxitDingbats.pfb                   29.51 kB
+dist/assets/creepster-latin-400-normal-DFidaany.woff          32.71 kB
+dist/pdfjs/standard_fonts/LiberationSans-BoldItalic.ttf      135.12 kB
+dist/pdfjs/standard_fonts/LiberationSans-Bold.ttf            137.05 kB
+dist/pdfjs/standard_fonts/LiberationSans-Regular.ttf         139.51 kB
+dist/pdfjs/standard_fonts/LiberationSans-Italic.ttf          162.03 kB
+dist/assets/pdf.worker.min-CIqJB0yW.mjs                    1,271.91 kB
+dist/assets/index-RaNDn1lE.css                                40.03 kB │ gzip:   8.83 kB
+dist/assets/pdf.worker.min-UqOn5EDC.js                         0.06 kB │ gzip:   0.08 kB
+dist/assets/pdf-YwugTw7Y.js                                  444.23 kB │ gzip: 133.64 kB
+dist/assets/index-C93GOnJd.js                              1,472.83 kB │ gzip: 404.87 kB
+
+✓ built in 467ms
+$ node build.mjs
+
+  dist/main.js      104.4kb
+  dist/main.js.map  243.5kb
+
+⚡ Done in 21ms
 [WebServer] Reset ghostel_test
-[WebServer] {"level":30,"time":1794187073402,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","msg":"Server listening at http://127.0.0.1:2597"}
-[WebServer] {"level":30,"time":1794187073402,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","msg":"Ghostel server listening on http://127.0.0.1:2597"}
-[WebServer] {"level":30,"time":1794187073717,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-1","req":{"method":"GET","url":"/api/health","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":62797},"msg":"incoming request"}
-[WebServer] {"level":30,"time":1794187073725,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-1","res":{"statusCode":200},"responseTime":6.788083000000029,"msg":"request completed"}
+[WebServer] {"level":30,"time":1794279077323,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","msg":"Server listening at http://127.0.0.1:2597"}
+[WebServer] {"level":30,"time":1794279077323,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","msg":"Ghostel server listening on http://127.0.0.1:2597"}
+[WebServer] {"level":30,"time":1794279077812,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-1","req":{"method":"GET","url":"/api/health","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":56117},"msg":"incoming request"}
+[WebServer] {"level":30,"time":1794279077820,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-1","res":{"statusCode":200},"responseTime":7.446000000000026,"msg":"request completed"}
 
 Running 1 test using 1 worker
 
-[WebServer] {"level":30,"time":1794187074401,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-2","req":{"method":"GET","url":"/","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":62799},"msg":"incoming request"}
-[WebServer] {"level":30,"time":1794187074404,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-2","res":{"statusCode":200},"responseTime":3.3804999999999836,"msg":"request completed"}
-[WebServer] {"level":30,"time":1794187074415,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-3","req":{"method":"GET","url":"/assets/index-B65OJnjb.js","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":62799},"msg":"incoming request"}
-[WebServer] {"level":30,"time":1794187074416,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-4","req":{"method":"GET","url":"/assets/index-DtckA3_s.css","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":62801},"msg":"incoming request"}
-[WebServer] {"level":30,"time":1794187074419,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-4","res":{"statusCode":200},"responseTime":2.8003329999999096,"msg":"request completed"}
-[WebServer] {"level":30,"time":1794187074423,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-3","res":{"statusCode":200},"responseTime":8.039166000000023,"msg":"request completed"}
-[WebServer] {"level":30,"time":1794187074510,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-5","req":{"method":"GET","url":"/api/me","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":62799},"msg":"incoming request"}
-[WebServer] {"level":30,"time":1794187074511,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-5","res":{"statusCode":200},"responseTime":0.5071250000000873,"msg":"request completed"}
-[WebServer] {"level":30,"time":1794187074527,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-6","req":{"method":"GET","url":"/assets/nunito-latin-400-normal-r8SDr6Up.woff2","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":62799},"msg":"incoming request"}
-[WebServer] {"level":30,"time":1794187074527,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-7","req":{"method":"GET","url":"/assets/creepster-latin-400-normal-DnKpM-ys.woff2","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":62801},"msg":"incoming request"}
-[WebServer] {"level":30,"time":1794187074528,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-8","req":{"method":"GET","url":"/assets/nunito-latin-700-normal-Dort48En.woff2","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":62804},"msg":"incoming request"}
-[WebServer] {"level":30,"time":1794187074529,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-6","res":{"statusCode":200},"responseTime":2.064416999999821,"msg":"request completed"}
-[WebServer] {"level":30,"time":1794187074529,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-9","req":{"method":"GET","url":"/assets/nunito-latin-800-normal-Dz8SOQK_.woff2","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":62805},"msg":"incoming request"}
-[WebServer] {"level":30,"time":1794187074530,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-7","res":{"statusCode":200},"responseTime":2.602292000000034,"msg":"request completed"}
-[WebServer] {"level":30,"time":1794187074531,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-8","res":{"statusCode":200},"responseTime":2.7132500000000164,"msg":"request completed"}
-[WebServer] {"level":30,"time":1794187074532,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-9","res":{"statusCode":200},"responseTime":2.432749999999942,"msg":"request completed"}
-[WebServer] {"level":30,"time":1794187074796,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-a","req":{"method":"PUT","url":"/api/me","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":62805},"msg":"incoming request"}
-[WebServer] {"level":30,"time":1794187074803,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-a","res":{"statusCode":200},"responseTime":7.7135410000000775,"msg":"request completed"}
-[WebServer] {"level":30,"time":1794187075332,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-b","req":{"method":"GET","url":"/","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":62805},"msg":"incoming request"}
-[WebServer] {"level":30,"time":1794187075333,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-b","res":{"statusCode":304},"responseTime":0.9856669999999212,"msg":"request completed"}
-[WebServer] {"level":30,"time":1794187075381,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-c","req":{"method":"GET","url":"/api/me","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":62805},"msg":"incoming request"}
-[WebServer] {"level":30,"time":1794187075384,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-c","res":{"statusCode":200},"responseTime":2.6795420000003105,"msg":"request completed"}
-[WebServer] {"level":30,"time":1794187075429,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-d","req":{"method":"GET","url":"/","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":62811},"msg":"incoming request"}
-[WebServer] {"level":30,"time":1794187075430,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-d","res":{"statusCode":200},"responseTime":0.6988750000000437,"msg":"request completed"}
-[WebServer] {"level":30,"time":1794187075437,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-e","req":{"method":"GET","url":"/assets/index-B65OJnjb.js","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":62811},"msg":"incoming request"}
-[WebServer] {"level":30,"time":1794187075439,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-e","res":{"statusCode":200},"responseTime":2.556916999999885,"msg":"request completed"}
-[WebServer] {"level":30,"time":1794187075442,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-f","req":{"method":"GET","url":"/some/deep/link","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":62811},"msg":"incoming request"}
-[WebServer] {"level":30,"time":1794187075442,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-f","res":{"statusCode":200},"responseTime":0.6719169999996666,"msg":"request completed"}
-[WebServer] {"level":30,"time":1794187075444,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-g","req":{"method":"GET","url":"/api/nope","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":62811},"msg":"incoming request"}
-[WebServer] {"level":30,"time":1794187075444,"pid":34675,"hostname":"customer-leon-0-78.megared.net.mx","reqId":"req-g","res":{"statusCode":404},"responseTime":0.18891600000006292,"msg":"request completed"}
-  ✓  1 [chromium] › e2e-prod/production.spec.ts:3:1 › production build: secure cookie, security headers, CSP-clean load, realtime (2.6s)
+[WebServer] {"level":30,"time":1794279078707,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-2","req":{"method":"GET","url":"/","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":56119},"msg":"incoming request"}
+[WebServer] {"level":30,"time":1794279078710,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-2","res":{"statusCode":200},"responseTime":2.48370900000009,"msg":"request completed"}
+[WebServer] {"level":30,"time":1794279078725,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-3","req":{"method":"GET","url":"/assets/index-C93GOnJd.js","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":56119},"msg":"incoming request"}
+[WebServer] {"level":30,"time":1794279078726,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-4","req":{"method":"GET","url":"/assets/index-RaNDn1lE.css","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":56121},"msg":"incoming request"}
+[WebServer] {"level":30,"time":1794279078728,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-4","res":{"statusCode":200},"responseTime":1.3309590000001208,"msg":"request completed"}
+[WebServer] {"level":30,"time":1794279078730,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-3","res":{"statusCode":200},"responseTime":4.703999999999951,"msg":"request completed"}
+[WebServer] {"level":30,"time":1794279078817,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-5","req":{"method":"GET","url":"/api/me","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":56119},"msg":"incoming request"}
+[WebServer] {"level":30,"time":1794279078818,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-5","res":{"statusCode":200},"responseTime":0.2807080000000042,"msg":"request completed"}
+[WebServer] {"level":30,"time":1794279078839,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-6","req":{"method":"GET","url":"/assets/nunito-latin-400-normal-r8SDr6Up.woff2","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":56119},"msg":"incoming request"}
+[WebServer] {"level":30,"time":1794279078839,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-7","req":{"method":"GET","url":"/assets/creepster-latin-400-normal-DnKpM-ys.woff2","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":56121},"msg":"incoming request"}
+[WebServer] {"level":30,"time":1794279078840,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-8","req":{"method":"GET","url":"/assets/nunito-latin-700-normal-Dort48En.woff2","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":56124},"msg":"incoming request"}
+[WebServer] {"level":30,"time":1794279078840,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-6","res":{"statusCode":200},"responseTime":1.069541000000072,"msg":"request completed"}
+[WebServer] {"level":30,"time":1794279078840,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-7","res":{"statusCode":200},"responseTime":1.1466669999999795,"msg":"request completed"}
+[WebServer] {"level":30,"time":1794279078841,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-9","req":{"method":"GET","url":"/assets/nunito-latin-800-normal-Dz8SOQK_.woff2","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":56125},"msg":"incoming request"}
+[WebServer] {"level":30,"time":1794279078841,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-9","res":{"statusCode":200},"responseTime":0.5409589999999298,"msg":"request completed"}
+[WebServer] {"level":30,"time":1794279078842,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-8","res":{"statusCode":200},"responseTime":1.861417000000074,"msg":"request completed"}
+[WebServer] {"level":30,"time":1794279079165,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-a","req":{"method":"PUT","url":"/api/me","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":56124},"msg":"incoming request"}
+[WebServer] {"level":30,"time":1794279079176,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-a","res":{"statusCode":200},"responseTime":10.010749999999916,"msg":"request completed"}
+[WebServer] {"level":30,"time":1794279079491,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-b","req":{"method":"GET","url":"/assets/vt323-latin-400-normal-wDgJuOC9.woff2","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":56124},"msg":"incoming request"}
+[WebServer] {"level":30,"time":1794279079495,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-b","res":{"statusCode":200},"responseTime":4.295916999999918,"msg":"request completed"}
+[WebServer] {"level":30,"time":1794279079646,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-c","req":{"method":"GET","url":"/","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":56124},"msg":"incoming request"}
+[WebServer] {"level":30,"time":1794279079648,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-c","res":{"statusCode":304},"responseTime":2.055457999999817,"msg":"request completed"}
+[WebServer] {"level":30,"time":1794279079688,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-d","req":{"method":"GET","url":"/api/me","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":56124},"msg":"incoming request"}
+[WebServer] {"level":30,"time":1794279079693,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-d","res":{"statusCode":200},"responseTime":4.442500000000109,"msg":"request completed"}
+[WebServer] {"level":30,"time":1794279079710,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-e","req":{"method":"GET","url":"/","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":56131},"msg":"incoming request"}
+[WebServer] {"level":30,"time":1794279079711,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-e","res":{"statusCode":200},"responseTime":0.5709590000001299,"msg":"request completed"}
+[WebServer] {"level":30,"time":1794279079718,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-f","req":{"method":"GET","url":"/assets/index-C93GOnJd.js","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":56131},"msg":"incoming request"}
+[WebServer] {"level":30,"time":1794279079720,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-f","res":{"statusCode":200},"responseTime":2.1839999999997417,"msg":"request completed"}
+[WebServer] {"level":30,"time":1794279079721,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-g","req":{"method":"GET","url":"/some/deep/link","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":56131},"msg":"incoming request"}
+[WebServer] {"level":30,"time":1794279079722,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-g","res":{"statusCode":200},"responseTime":0.4705410000001393,"msg":"request completed"}
+[WebServer] {"level":30,"time":1794279079723,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-h","req":{"method":"GET","url":"/api/nope","host":"localhost:2597","remoteAddress":"127.0.0.1","remotePort":56131},"msg":"incoming request"}
+[WebServer] {"level":30,"time":1794279079723,"pid":1643,"hostname":"customer-leon-0-41.megared.net.mx","reqId":"req-h","res":{"statusCode":404},"responseTime":0.11000000000012733,"msg":"request completed"}
+  ✓  1 [chromium] › e2e-prod/production.spec.ts:3:1 › production build: secure cookie, security headers, CSP-clean load, realtime (2.8s)
 
-  1 passed (4.2s)
+  1 passed (4.3s)
 
 # exit code: 0

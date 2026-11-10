@@ -6,6 +6,8 @@ Ghostel is a virtual, low-poly 3D haunted hotel. Tagline (working): "Check in. H
 - Kiroween 2026 on Devpost. Target category: Costume Contest (striking, memorable UI). Fallback: Frankenstein.
 - Official deadline recorded on 2026-11-05: 2026-12-04 14:00 PT (2026-12-05 05:00 WIB). Personal target: 2026-12-03 21:00 WIB.
 - Submission requirements recorded on 2026-11-05 (re-check the official rules before submitting): meaningful Kiro usage, `.kiro` folder at repo root, working app URL, public GitHub repo with an open source license, YouTube demo video under 3 minutes.
+- Seen on 2026-11-10 in search snippets of the official Devpost page (the page itself returns 403 to Kiro): entrants "pick a category" (one per entry), and only new projects built during the submission period (2026-10-30 to 2026-12-04) are eligible. Ghostel started 2026-11-07. Public repo: https://github.com/fadillaoegi/ghostel (MIT, pushed by the owner on 2026-11-09).
+- Category plan (owner, 2026-11-10): submit to Costume Contest only. Ghostel also contains features that echo other categories (M16: Frankenstein and Resurrection; Skeleton Crew to be decided later). The write-up mentions them under "Also inside the hotel" and never claims to be entered in those categories.
 
 ## Product decisions (confirmed)
 - No login. Users are guests identified by an HttpOnly cookie. Identity is the guest ID, never the display name. Names can change at any time.
@@ -15,6 +17,7 @@ Ghostel is a virtual, low-poly 3D haunted hotel. Tagline (working): "Check in. H
 - Presentations (2026-11-08): anyone in a room can ask to present; the room owner approves or refuses and can stop a presentation at any time. One presenter at a time, by screen share (desktop browsers only) or by PDF slides.
 - Floors (2026-11-08): 1 Grand Lobby, 2 Hall of Portraits, 3 Moonlit Greenhouse, 4 Ghoul's Diner (canteen, order a snack at the counter), 5 Rooftop Graveyard with the night city below. Room doors stay on floors 1–3.
 - Phones (2026-11-08): touch screens get an on-screen gamepad (analog stick on the left, context action buttons on the right) in portrait and landscape. Physical gamepads are supported through the Gamepad API.
+- Haunted Mirror and Night Desk (2026-11-10): the Mirror of Costumes on floor 2 can show the guest's own camera as a ghostly reflection (local only, started by a click), and the lobby has a 1987 green-screen terminal with an original text adventure. Both run in the browser only.
 - Visual style: low-poly 3D.
 - Built fresh with Kiro. Do not copy code from the old Ghost Turtle Kit project.
 - Stack: option A, full TypeScript pnpm monorepo (confirmed 2026-11-07, see `architecture.md`).
@@ -32,4 +35,4 @@ Ghostel is a virtual, low-poly 3D haunted hotel. Tagline (working): "Check in. H
 7. Decorations, atmosphere, effects and NPC ghosts so the building never feels empty for a solo judge.
 8. If time allows: a second game or proximity voice.
 
-Owner-requested milestones added later (specs in `.kiro/specs/`): M8 floors and music, M9 room doors, night city and monster variety, M10 Ghoul's Diner and the rooftop on floor 5, M11 phone gamepad and landscape, M12 seats, table calls and the meeting view, M13 camera, M14 presentations (screen share and PDF slides).
+Owner-requested milestones added later (specs in `.kiro/specs/`): M8 floors and music, M9 room doors, night city and monster variety, M10 Ghoul's Diner and the rooftop on floor 5, M11 phone gamepad and landscape, M12 seats, table calls and the meeting view, M13 camera, M14 presentations (screen share and PDF slides), M15 provable Kiro workflow, M16 Haunted Mirror (Frankenstein echo) and Night Desk terminal (Resurrection echo).

@@ -15,7 +15,15 @@ Written 2026-11-08.
 ## Recommendation
 **Enter Costume Contest.** Ghostel's main strength is the experience: a 3D haunted hotel with its own visual identity, music and characters.
 
-Frankenstein is a reasonable fallback, but its pitch would be weaker (see below). Resurrection and Skeleton Crew do not fit.
+Update 2026-11-10: the official page says entrants "pick a category" (search snippet; the page itself returns 403 to Kiro). The owner chose Costume Contest and asked for parts that echo the other categories inside Ghostel. M16 added two of them. The write-up should present them as "Also inside the hotel", without claiming those categories.
+
+| Echo of | Feature (M16) | Why it fits |
+| --- | --- | --- |
+| Frankenstein | The Haunted Mirror: the guest's own webcam stitched into the 3D scene through a custom shader (ghost tint, ripple, a second figure behind you) | Browser camera, WebGL shader and a 3D game world sewn together; stays on the device |
+| Resurrection | The Night Desk: a 1987 green-screen terminal in the lobby with an original text adventure, VT323 phosphor font and scanlines | Brings back the CRT terminal and interactive fiction, a 1970s–80s genre |
+| Skeleton Crew | Not done. Owner decides later (idea: a second game on the existing `GameEngine` interface) | — |
+
+Frankenstein is a reasonable fallback, but its pitch would be weaker (see below). Resurrection and Skeleton Crew do not fit as the main category.
 
 ## Costume Contest: which parts carry it
 

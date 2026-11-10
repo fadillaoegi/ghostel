@@ -2,6 +2,7 @@ import "@fontsource/creepster/400.css";
 import "@fontsource/nunito/400.css";
 import "@fontsource/nunito/700.css";
 import "@fontsource/nunito/800.css";
+import "@fontsource/vt323/400.css";
 import "./styles.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";

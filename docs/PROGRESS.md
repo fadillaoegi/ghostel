@@ -10,6 +10,7 @@
 | 6 | One polished shared game (Pumpkin Trivia, confirmed) + game system | Done 2026-11-07 |
 | 7 | Decoration, atmosphere, NPC ghosts | Done 2026-11-07 |
 | 8 | Second game or proximity voice | Not started (replaced for now by the owner's requests: floors and music in M8, doors, city and monsters in M9) |
+| M16 | Haunted Mirror and Night Desk terminal | Done 2026-11-10 |
 
 ## 2026-11-07 — Milestone 1 (spec `m1-check-in-and-lobby`)
 Owner-defined acceptance criteria and their evidence:
@@ -148,3 +149,27 @@ Check results, run in order on 2026-11-09 (all exit code 0):
 - production smoke test
 
 Not verified: calls, camera and screen sharing between two real devices on different networks (needs HTTPS hosting, maybe TURN); the physical gamepad on real hardware (tested with a fake `navigator.getGamepads`); the layout on a real phone.
+
+## 2026-11-10 — Milestone 16: the Haunted Mirror and the Night Desk (spec `m16-mirror-and-night-desk`, owner request)
+
+Owner request: stay in Costume Contest, but add parts that echo the other categories. Start with Frankenstein and Resurrection; decide on Skeleton Crew later.
+
+| Criterion | Evidence |
+| --- | --- |
+| The mirror asks for the camera only after a click, video only | `e2e/oddities.spec.ts` (a `getUserMedia` spy records no stream before the click, then exactly one stream with 1 video and 0 audio tracks) |
+| The mirror's camera stops when the guest walks away or clicks again | Same test: every recorded track is `ended` after walking away, and again after an on/off click |
+| The mirror stream never reaches a call or the server | By design: `apps/web/src/ui/mirrorCam.ts` does not import `CallClient`, and the guest is not in a call. No automated network check. |
+| The terminal is an obstacle with a walkable prompt; NPCs, candies and other prompts unaffected | `packages/shared/test/nightdesk.test.ts`; existing `tables.test.ts`, `npcs.test.ts` and the `movement.test.ts` grid sweep (which caught a wall-side push-out problem; fixed by extending the desk box into the wall) |
+| The story can be finished; locked door, ledger and input limits work | `nightdesk.test.ts` (12 tests); E2E plays it to "CHECKOUT COMPLETE … 11 MOVES" |
+| Typing in the terminal does not move the avatar | E2E: after N/S/E/W commands and Escape the terminal prompt is still shown |
+| Looks right | Screenshots `desktop-night-desk-lobby.png`, `desktop-night-desk.png`, `desktop-mirror-camera.png` (reviewed; the desk and screen were enlarged after the first review) |
+
+Check results, run in order on 2026-11-10 (all exit code 0):
+- typecheck
+- 128 shared + 8 web unit tests
+- 87 server integration tests
+- build (web JS 1,473 kB, 405 kB gzip)
+- 27 Playwright tests (2.7 min)
+- production smoke test
+
+Not verified: the mirror with a real camera (only Chromium's fake camera); the terminal on a real phone keyboard.

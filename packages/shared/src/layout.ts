@@ -21,6 +21,12 @@ export const PLAYER_RADIUS = 0.4;
 /** Walkable floor of the grand lobby (world units ≈ metres). North is −z. */
 export const LOBBY_BOUNDS: Bounds = { minX: -14, maxX: 14, minZ: -10, maxZ: 10 };
 
+/**
+ * The Night Desk: the hotel's 1987 terminal, under the north window east of the reception (M16).
+ * The box reaches into the wall (minZ < bounds.minZ) so a point pushed out of it always leaves south.
+ */
+export const NIGHT_DESK = { minX: 4.5, maxX: 5.9, minZ: -10.8, maxZ: -9.2 } as const;
+
 export const LOBBY_OBSTACLES: readonly Obstacle[] = [
   { kind: "circle", label: "fountain", x: 0, z: 0, r: 1.9 },
   { kind: "box", label: "reception", minX: -3.2, maxX: 3.2, minZ: -9.2, maxZ: -7.8 },
@@ -30,6 +36,7 @@ export const LOBBY_OBSTACLES: readonly Obstacle[] = [
   { kind: "circle", label: "pillar", x: 10, z: -6, r: 0.6 },
   { kind: "circle", label: "pillar", x: 10, z: 0, r: 0.6 },
   { kind: "circle", label: "pillar", x: 10, z: 6, r: 0.6 },
+  { kind: "box", label: "night-desk", ...NIGHT_DESK },
 ];
 
 /** Guests appear near the front doors (south side). */

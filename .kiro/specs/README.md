@@ -17,6 +17,7 @@ One folder per milestone, each with `requirements.md`, `design.md` and `tasks.md
 | 12 Seats, table calls, meeting view, room capacity | `m12-seats-and-meetings` | done | after code |
 | 13 Camera | `m13-camera` | done | after code |
 | 14 Presentations (screen share, PDF slides) | `m14-presentation` | done | after code |
-| 15 Provable Kiro workflow (hooks, steering, specs, log) | `m15-kiro-workflow` | in progress (hook verification, Devpost rules) | before code |
+| 15 Provable Kiro workflow (hooks, steering, specs, log) | `m15-kiro-workflow` | in progress (PostFileSave hook seen only indirectly, Devpost rules) | before code |
+| 16 Haunted Mirror (camera, Frankenstein echo) and Night Desk terminal (Resurrection echo) | `m16-mirror-and-night-desk` | done | before code |
 
 Milestone 8 of the original brief ("a second game or proximity voice") has not been started.

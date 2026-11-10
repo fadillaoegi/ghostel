@@ -815,6 +815,33 @@ kbd {
     box-shadow: 0 0 36px rgba(255, 122, 26, 0.6);
   }
 }
+/* The Haunted Mirror's camera button sits above the mirror prompt. */
+.mirror-cam {
+  position: absolute;
+  left: 50%;
+  bottom: 10.4rem;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.6rem 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
+  z-index: 12;
+  border-color: var(--violet);
+  box-shadow: 0 0 24px rgba(139, 92, 246, 0.4);
+  max-width: calc(100vw - 2rem);
+}
+.mirror-cam small {
+  font-weight: 600;
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+.mirror-cam[data-cam="on"] {
+  border-color: var(--ecto);
+  box-shadow: 0 0 28px rgba(67, 255, 176, 0.45);
+}
 .hud-icon {
   position: relative;
 }
@@ -962,6 +989,9 @@ kbd {
   }
   .door-prompt {
     bottom: 9.5rem;
+  }
+  .mirror-cam {
+    bottom: 13.2rem;
   }
 }
 
@@ -1574,6 +1604,11 @@ kbd {
     max-width: 40vw;
     font-size: 0.85rem;
   }
+  .mirror-cam {
+    bottom: 4.6rem;
+    max-width: 40vw;
+    font-size: 0.85rem;
+  }
   .pad-zone {
     width: 40vw;
     height: 75vh;
@@ -1600,6 +1635,10 @@ kbd {
   }
   .door-prompt {
     bottom: calc(10.2rem + env(safe-area-inset-bottom));
+    max-width: 88vw;
+  }
+  .mirror-cam {
+    bottom: calc(13.9rem + env(safe-area-inset-bottom));
     max-width: 88vw;
   }
   .hud-title {
@@ -1982,5 +2021,156 @@ kbd {
   .stage-float.stage-float--min {
     width: 150px;
     bottom: calc(max(0.9rem, env(safe-area-inset-bottom)) + 7.5rem);
+  }
+}
+
+/* ---------- Night Desk terminal (M16): a 1987 green-screen CRT ---------- */
+.crt {
+  --phosphor: #7dff9a;
+  position: relative;
+  width: min(680px, 100%);
+  padding: 0.8rem 1rem 1rem;
+  border-radius: 26px;
+  background: linear-gradient(160deg, #3a3344, #1d1924 70%);
+  box-shadow:
+    0 0 0 2px #4b3f5c,
+    0 18px 60px rgba(0, 0, 0, 0.7),
+    0 0 60px rgba(67, 255, 110, 0.18);
+  font-family: "VT323", ui-monospace, Menlo, Consolas, monospace;
+  color: var(--phosphor);
+}
+.crt-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.3rem 0.5rem;
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+  color: #c9bfa6;
+}
+.crt-close {
+  background: none;
+  border: 1px solid #6b5f7d;
+  border-radius: 8px;
+  color: #c9bfa6;
+  font: inherit;
+  padding: 0.05rem 0.5rem;
+  cursor: pointer;
+}
+.crt-screen {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px / 22px;
+  background: radial-gradient(ellipse at center, #062b13 0%, #021407 75%, #010a04 100%);
+  box-shadow:
+    inset 0 0 50px rgba(0, 0, 0, 0.85),
+    inset 0 0 12px rgba(67, 255, 110, 0.25);
+  padding: 0.9rem 1rem 0.7rem;
+  text-shadow:
+    0 0 4px rgba(125, 255, 154, 0.9),
+    0 0 12px rgba(67, 255, 110, 0.45);
+  animation: crt-flicker 5s ease-in-out infinite;
+}
+/* Scanlines and a curved-glass vignette over the text. */
+.crt-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0) 0 2px, rgba(0, 0, 0, 0.3) 2px 3px),
+    radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.55) 100%);
+}
+@keyframes crt-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.96;
+  }
+}
+.crt-log {
+  height: min(50vh, 400px);
+  overflow-y: auto;
+  font-size: 1.4rem;
+  line-height: 1.12;
+  scrollbar-width: thin;
+  scrollbar-color: #2f7a45 transparent;
+}
+.crt-line {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.crt-line--echo {
+  color: #d6ffe0;
+}
+.crt-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+  font-size: 1.4rem;
+}
+.crt-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--phosphor);
+  font: inherit;
+  text-transform: uppercase;
+  caret-color: var(--phosphor);
+  text-shadow: inherit;
+}
+.crt-keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.7rem;
+  justify-content: center;
+}
+.crt-key {
+  min-width: 3rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 6px;
+  border: 1px solid #8a7f68;
+  border-bottom-width: 3px;
+  background: #b9ae94;
+  color: #2b2633;
+  font: inherit;
+  font-size: 1.15rem;
+  cursor: pointer;
+}
+.crt-key:active {
+  transform: translateY(1px);
+  border-bottom-width: 2px;
+}
+@media (max-width: 820px), (max-height: 520px) and (pointer: coarse) {
+  .crt {
+    padding: 0.6rem 0.6rem 0.7rem;
+    border-radius: 18px;
+  }
+  .crt-log {
+    height: 42dvh;
+    font-size: 1.15rem;
+  }
+  .crt-input-row {
+    font-size: 1.15rem;
+  }
+}
+@media (orientation: landscape) and (max-height: 520px) and (pointer: coarse) {
+  .crt-log {
+    height: 46dvh;
+  }
+  .crt-keys {
+    margin-top: 0.4rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .crt-screen {
+    animation: none;
   }
 }

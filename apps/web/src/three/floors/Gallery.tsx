@@ -1,10 +1,11 @@
 import { GALLERY_BOUNDS, GALLERY_MIRROR, GALLERY_OBSTACLES, GALLERY_PORTRAITS } from "@ghostel/shared";
 import { Sparkles } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useMemo, useRef, type RefObject } from "react";
+import { useEffect, useMemo, useRef, useSyncExternalStore, type RefObject } from "react";
 import * as THREE from "three";
 import { Candle } from "../Decor";
 import { makeCheckerTexture, useLabelTexture } from "../textures";
+import { mirrorCam } from "../../ui/mirrorCam";
 
 const b = GALLERY_BOUNDS;
 const W = b.maxX - b.minX;
@@ -122,9 +123,73 @@ function Armour({ x, z }: { x: number; z: number }) {
   );
 }
 
-/** The Mirror of Costumes: a shimmering oval on the east wall. */
+const VERTEX = /* glsl */ `
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}`;
+
+// The guest's camera as a ghost: mirrored, cropped to the oval, rippling, violet-tinted, with scanlines.
+const FRAGMENT = /* glsl */ `
+uniform sampler2D uMap;
+uniform float uTime;
+uniform vec2 uScale;
+varying vec2 vUv;
+
+vec3 sampleCam(vec2 uv) {
+  // Mirror horizontally and crop the centre of the video to the oval's shape.
+  vec2 c = vec2(0.5 - (uv.x - 0.5) * uScale.x, 0.5 + (uv.y - 0.5) * uScale.y);
+  return texture2D(uMap, clamp(c, 0.0, 1.0)).rgb;
+}
+
+void main() {
+  vec2 uv = vUv;
+  uv.x += sin(uv.y * 16.0 + uTime * 1.4) * 0.005;
+  uv.y += sin(uv.x * 12.0 + uTime * 0.9) * 0.004;
+  vec3 cam = sampleCam(uv);
+  // A faint second image drifting beside the first: something stands behind you.
+  vec3 echo = sampleCam(uv + vec2(0.035 * sin(uTime * 0.35), 0.01));
+  float lum = dot(cam, vec3(0.299, 0.587, 0.114));
+  float echoLum = dot(echo, vec3(0.299, 0.587, 0.114));
+  vec3 ghost = mix(vec3(0.05, 0.02, 0.14), vec3(0.78, 0.82, 1.0), pow(clamp(lum, 0.0, 1.0), 1.25));
+  ghost = mix(ghost, cam, 0.32);
+  ghost += vec3(0.45, 0.3, 0.9) * echoLum * 0.22;
+  // Mist rolling across the glass.
+  float mist = 0.5 + 0.5 * sin(uv.x * 5.0 + uTime * 0.25) * sin(uv.y * 3.0 - uTime * 0.18);
+  ghost = mix(ghost, vec3(0.62, 0.55, 0.85), mist * 0.12);
+  ghost *= 0.9 + 0.1 * sin(vUv.y * 420.0);
+  float edge = smoothstep(0.62, 1.0, length(vUv - 0.5) * 2.0);
+  ghost = mix(ghost, vec3(0.36, 0.22, 0.68), edge * 0.85);
+  gl_FragColor = vec4(ghost, 1.0);
+  #include <colorspace_fragment>
+}`;
+
+/** Width / height of the oval glass (circle radius 1.02, scaled 1 × 1.45). */
+const MIRROR_ASPECT = 1 / 1.45;
+
+function CameraReflection({ video }: { video: HTMLVideoElement }) {
+  const texture = useMemo(() => {
+    const t = new THREE.VideoTexture(video);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  }, [video]);
+  useEffect(() => () => texture.dispose(), [texture]);
+  const uniforms = useMemo(() => ({ uMap: { value: texture }, uTime: { value: 0 }, uScale: { value: new THREE.Vector2(1, 1) } }), [texture]);
+  useFrame(({ clock }) => {
+    uniforms.uTime.value = clock.elapsedTime;
+    const va = video.videoWidth > 0 && video.videoHeight > 0 ? video.videoWidth / video.videoHeight : 4 / 3;
+    // Cover, not stretch: a wide camera shows its middle part.
+    if (va > MIRROR_ASPECT) uniforms.uScale.value.set(MIRROR_ASPECT / va, 1);
+    else uniforms.uScale.value.set(1, va / MIRROR_ASPECT);
+  });
+  return <shaderMaterial uniforms={uniforms} vertexShader={VERTEX} fragmentShader={FRAGMENT} toneMapped={false} fog={false} />;
+}
+
+/** The Mirror of Costumes: a shimmering oval on the east wall. With the camera on, it shows the guest as a ghost. */
 function Mirror() {
   const surface = useRef<THREE.MeshStandardMaterial>(null);
+  const cam = useSyncExternalStore(mirrorCam.subscribe, mirrorCam.getSnapshot);
   const title = useLabelTexture("Mirror of Costumes", { font: "Creepster", size: 64, color: "#ffe2b0", glow: "#8b5cf6", width: 768, height: 110 });
   useFrame(({ clock }) => {
     if (!surface.current) return;
@@ -137,9 +202,13 @@ function Mirror() {
         <torusGeometry args={[1.05, 0.12, 6, 24]} />
         <meshStandardMaterial color={GOLD} metalness={0.9} roughness={0.25} />
       </mesh>
-      <mesh scale={[1, 1.45, 1]} position={[0, 0, -0.02]}>
+      <mesh scale={[1, 1.45, 1]} position={[0, 0, -0.02]} userData={{ mirror: cam.video ? "camera" : "glass" }}>
         <circleGeometry args={[1.02, 24]} />
-        <meshStandardMaterial ref={surface} color="#9fb7ff" metalness={1} roughness={0.08} emissive="#5b3fa8" emissiveIntensity={0.9} />
+        {cam.video ? (
+          <CameraReflection key="camera" video={cam.video} />
+        ) : (
+          <meshStandardMaterial key="glass" ref={surface} color="#9fb7ff" metalness={1} roughness={0.08} emissive="#5b3fa8" emissiveIntensity={0.9} />
+        )}
       </mesh>
       <mesh position={[0, 1.95, 0.05]}>
         <planeGeometry args={[3.2, 0.46]} />

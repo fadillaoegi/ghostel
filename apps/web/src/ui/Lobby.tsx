@@ -12,6 +12,8 @@ import { RoomSettings } from "./RoomSettings";
 import { TriviaPanel } from "./TriviaPanel";
 import { ElevatorPanel } from "./ElevatorPanel";
 import { SnackMenu } from "./SnackMenu";
+import { NightDesk } from "./NightDesk";
+import { mirrorCam } from "./mirrorCam";
 import { HotelMusic, musicEnabled, setMusicEnabled, themeFor } from "./music";
 import { CallBar, MeetingView, useCall, voiceMarkOf, type VoiceMark } from "./MeetingView";
 import { PresentControls, PresentRequests, Stage } from "./Presentation";
@@ -42,13 +44,14 @@ export function Lobby({ profile, onProfile }: { profile: Profile; onProfile: (p:
   return <LobbyView client={client} profile={profile} onProfile={onProfile} />;
 }
 
-type Modal = null | "costume" | "rooms" | "settings" | "elevator" | "snack";
+type Modal = null | "costume" | "rooms" | "settings" | "elevator" | "snack" | "terminal";
 
 const PROMPT_TEXT: Record<Exclude<PromptKind, "door">, { icon: string; desktop: string; touch: string }> = {
   elevator: { icon: "🛗", desktop: "to call the elevator", touch: "Tap to call the elevator" },
   mirror: { icon: "🪞", desktop: "to try on costumes", touch: "Tap to try on costumes" },
   counter: { icon: "🍽️", desktop: "to order a snack", touch: "Tap to order a snack" },
   seat: { icon: "🪑", desktop: "to sit down", touch: "Tap to sit down" },
+  terminal: { icon: "🖥️", desktop: "to log in to the Night Desk", touch: "Tap to log in to the Night Desk" },
 };
 
 /** A chair someone already sits on shows no prompt. */
@@ -83,6 +86,8 @@ function actionLabel(p: ScenePrompt, doors: readonly DoorInfo[]): string {
       return "Order";
     case "seat":
       return "Sit";
+    case "terminal":
+      return "Terminal";
   }
 }
 
@@ -167,6 +172,19 @@ function LobbyView({ client, profile, onProfile }: { client: PresenceClient; pro
   };
   const stand = () => client.sendStand();
 
+  // The Haunted Mirror (floor 2): a local camera of its own, only while standing at the mirror.
+  const mirror = useSyncExternalStore(mirrorCam.subscribe, mirrorCam.getSnapshot);
+  const atMirror = prompt?.kind === "mirror" && !seated;
+  useEffect(() => {
+    if (!atMirror) mirrorCam.stop();
+  }, [atMirror]);
+  useEffect(() => () => mirrorCam.stop(), []);
+  useEffect(() => {
+    if (mirror.status !== "error") return;
+    const timer = window.setTimeout(() => mirrorCam.stop(), 5000);
+    return () => window.clearTimeout(timer);
+  }, [mirror.status]);
+
   // Presentation: one stage element, shown in the meeting view (seated) or a floating panel; the 3D
   // room screen copies whatever it shows.
   const presentation = inRoom ? presence.presentation : null;
@@ -239,6 +257,7 @@ function LobbyView({ client, profile, onProfile }: { client: PresenceClient; pro
     if (p.kind === "elevator") return setModal("elevator");
     if (p.kind === "mirror") return setModal("costume");
     if (p.kind === "counter") return setModal("snack");
+    if (p.kind === "terminal") return setModal("terminal");
     if (p.kind === "seat") return sitOrStand(p.code);
     const door = presence.doors.find((d) => d.code === p.code);
     if (!door) return;
@@ -499,6 +518,25 @@ function LobbyView({ client, profile, onProfile }: { client: PresenceClient; pro
         </button>
       )}
 
+      {atMirror && modal === null && mirrorCam.available() && (
+        <button
+          type="button"
+          className="panel mirror-cam"
+          data-testid="mirror-cam"
+          data-cam={mirror.status}
+          aria-pressed={mirror.status === "on"}
+          onClick={() => (mirror.status === "on" || mirror.status === "starting" ? mirrorCam.stop() : void mirrorCam.start())}
+        >
+          <span>{mirror.status === "on" ? "🙈 Stop the mirror" : mirror.status === "starting" ? "👁️ Waking the mirror…" : "👁️ Look into the mirror"}</span>
+          <small>Uses your camera. Only you see it; nothing is sent.</small>
+        </button>
+      )}
+      {mirror.error && (
+        <p className="panel toast" role="alert" data-testid="mirror-error">
+          {mirror.error}
+        </p>
+      )}
+
       {!touch && <div className="hud-chat">{chat("docked")}</div>}
 
       <footer className="hud hud-bottom">
@@ -599,6 +637,16 @@ function LobbyView({ client, profile, onProfile }: { client: PresenceClient; pro
             client.sendOrder(snack);
             setModal(null);
           }}
+        />
+      )}
+      {modal === "terminal" && (
+        <NightDesk
+          touch={touch}
+          context={{
+            guests: presence.players.map((p) => p.name),
+            doors: presence.doors.filter((d) => d.floor === (floor ?? 0)).map((d) => ({ code: d.code, name: d.room?.name ?? null })),
+          }}
+          onClose={() => setModal(null)}
         />
       )}
       {modal === "costume" && (

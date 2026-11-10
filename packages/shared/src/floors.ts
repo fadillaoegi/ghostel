@@ -1,4 +1,4 @@
-import { LOBBY_LAYOUT, ROOM_BOUNDS, ROOM_OBSTACLES, roomSpawnPoint, type Bounds, type Layout, type Obstacle, type Vec2 } from "./layout";
+import { LOBBY_LAYOUT, NIGHT_DESK, ROOM_BOUNDS, ROOM_OBSTACLES, roomSpawnPoint, type Bounds, type Layout, type Obstacle, type Vec2 } from "./layout";
 import { DOOR_ZONE_RADIUS, doorsOnFloor, inFrontOf } from "./doors";
 import { COUNTER_REACH, COUNTER_SPOT } from "./canteen";
 import { FLOOR_TABLES, roomTable, seatZones, tableObstacles, tablesFor } from "./tables";
@@ -94,7 +94,7 @@ export const FLOOR_LAYOUTS: Record<UpperFloor, Layout> = {
   5: { bounds: ROOFTOP_BOUNDS, obstacles: withTables(5, ROOFTOP_OBSTACLES), spawn: ELEVATORS[5].arrive },
 };
 
-export type PromptKind = "door" | "elevator" | "mirror" | "counter" | "seat";
+export type PromptKind = "door" | "elevator" | "mirror" | "counter" | "seat" | "terminal";
 export interface PromptZone {
   kind: PromptKind;
   x: number;
@@ -111,6 +111,11 @@ function doorZones(floor: number): PromptZone[] {
 function elevatorZone(floor: FloorNumber): PromptZone {
   const { door, facing } = ELEVATORS[floor];
   return facing === "north" ? { kind: "elevator", x: door.x, z: door.z + 0.9, r: 1.9 } : { kind: "elevator", x: door.x + 0.9, z: door.z, r: 1.9 };
+}
+
+/** In front of the Night Desk terminal (lobby). Overlaps the elevator zone a little; the nearer zone wins. */
+export function nightDeskZone(): PromptZone {
+  return { kind: "terminal", x: (NIGHT_DESK.minX + NIGHT_DESK.maxX) / 2, z: NIGHT_DESK.maxZ + 0.9, r: 1.2 };
 }
 
 /** Stable key for a place: "lobby", "floor:2", "room:<id>". */
@@ -147,7 +152,7 @@ export function layoutForPlace(place: Place): Layout {
 /** Spots where walking up shows a prompt (E / tap). */
 export function promptZones(place: Place): readonly PromptZone[] {
   if (place.kind === "lobby") {
-    return [...doorZones(1), elevatorZone(1), ...seatZones(tablesFor(place))];
+    return [...doorZones(1), elevatorZone(1), ...seatZones(tablesFor(place)), nightDeskZone()];
   }
   if (place.kind === "room") return seatZones(tablesFor(place));
   if (place.kind === "floor") {

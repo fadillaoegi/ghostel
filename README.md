@@ -6,7 +6,7 @@ Ghostel is a low-poly 3D haunted hotel in the browser. Guests build a costumed c
 
 ![Two guests in the Grand Lobby](docs/evidence/screenshots/desktop-lobby-two-guests.png)
 
-## What works now (milestones 1–14)
+## What works now (milestones 1–14 and 16)
 - Character creator: heads (classic, pumpkin, skull, black cat, vampire, werewolf, Frankenstein, zombie, alien), hats (witch, top hat, horns, pirate, bat ears, and a Golden Crown to unlock), costumes (vampire cape, ghost sheet, mummy wraps, bat wings, skeleton, wizard robe, zombie rags, werewolf fur), body and accent colours, "Surprise me", live 3D preview.
 - Guest sessions without login: HttpOnly cookie, profile saved in PostgreSQL, survives reloads. Change your name or costume any time.
 - Grand Lobby: fountain with a floating ghost, reception desk, pillars with lanterns, jack-o'-lanterns, candles, bats and moonlight.
@@ -25,6 +25,10 @@ Ghostel is a low-poly 3D haunted hotel in the browser. Guests build a costumed c
 - Pumpkin Trivia at the room table: 7 Halloween questions, 15 seconds each, with points for speed, a live scoreboard, a reveal showing who picked what, and a podium. Plays against Jack O'Bot when you are alone. Keys 1–4 on desktop, a 2×2 grid on phones, and small synthesized sound effects. The server owns the questions, timer and scores, and never sends the answer before the reveal.
 - Calls in rooms and at tables: unmute to talk, a live "n in call · n connected" pill, and name tags that glow while someone speaks.
 - Lobby chat with speech bubbles above characters, recent history for late arrivals, and a phone chat sheet with an unread badge. The server normalises text, strips control and bidi-override characters and rate-limits each guest across all their tabs.
+- The Haunted Mirror (floor 2): at the Mirror of Costumes, click "Look into the mirror" and your own camera appears in the glass as a ghost: mirrored, violet-tinted, rippling, with a faint second figure behind you. The camera stays on your device and turns off when you click again or walk away.
+- The Night Desk (lobby): a 1987 green-screen terminal on a desk next to the reception. Press E to log in and play a short original text adventure ("one guest never checked out of room 13"). `WHO` and `ROOMS` list the guests and doors in the lobby. Quick buttons make it playable on phones.
+
+![The Night Desk terminal](docs/evidence/screenshots/desktop-night-desk.png)
 
 Coming next: the public HTTPS deployment (see [docs/DEPLOY.md](docs/DEPLOY.md)), then submission material. See [docs/PROGRESS.md](docs/PROGRESS.md).
 
@@ -51,8 +55,8 @@ Open http://localhost:5290. Open a second browser profile or a private window to
 ## Checks
 ```sh
 pnpm typecheck
-pnpm test         # 116 shared + 8 web unit + 87 server integration tests (needs pnpm db:up)
-pnpm test:e2e     # builds, resets ghostel_test, then 25 Playwright tests (fake microphone, camera and screen; short trivia rounds)
+pnpm test         # 128 shared + 8 web unit + 87 server integration tests (needs pnpm db:up)
+pnpm test:e2e     # builds, resets ghostel_test, then 27 Playwright tests (fake microphone, camera and screen; short trivia rounds)
 pnpm test:prod    # production build with NODE_ENV=production: secure cookie, headers, CSP
 pnpm build
 ```
@@ -70,6 +74,7 @@ Latest real output is in [docs/evidence/](docs/evidence/).
 ## Calls, camera and privacy
 - Calls are peer-to-peer WebRTC. Like every P2P call, they show your IP address to the other people in the call. Ghostel only signals between members of the same call: the guests inside one room, or the guests seated at one table.
 - Microphone, camera and screen share start only after you click them, and stop when you leave the call (stand up, leave the room, change floor or close the tab).
+- The Haunted Mirror uses a separate camera stream that is never sent anywhere: no call, no server. It stops when you click again, walk away, sit down or change floor.
 - Every person sends their media to every other person in the call (a mesh), so calls stay small: tables seat 2 or 4, rooms hold up to 8 guests, and camera tiles are about 320×240. Bigger video calls would need an SFU such as LiveKit Cloud.
 - PDF slides are kept in the server's memory only, only guests inside that room can download them, and they are deleted when the presentation ends.
 - Some networks block direct connections. Set `VOICE_ICE_SERVERS` to add a TURN server. LiveKit Cloud is the planned fallback for larger calls.

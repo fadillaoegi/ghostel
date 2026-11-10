@@ -12,6 +12,8 @@ All 3D content is built in this repo from three.js primitives (boxes, cones, cyl
 - `apps/web/src/three/floors/Canteen.tsx` — Ghoul's Diner: counter, soup pot, jukebox, lamps, windows, menu board (canvas text)
 - `apps/web/src/three/Tables.tsx`, `Snack.tsx` — tables and chairs on every floor and the rooms' long tables; the six Diner snacks
 - `apps/web/src/three/floors/City.tsx` — the night city below the rooftop: seeded instanced buildings with canvas window textures, traffic, street lights, river and bridge, clock tower, church, radio mast
+- `apps/web/src/three/NightDesk.tsx` — the Night Desk: desk, CRT monitor, keyboard (M16)
+- The Haunted Mirror's camera shader (`apps/web/src/three/floors/Gallery.tsx`, M16) was written for this project. It only processes the guest's own camera image, on the guest's device.
 
 No external model files are used yet. License: MIT, same as the project.
 
@@ -25,13 +27,14 @@ All sounds are synthesized at runtime with the Web Audio API: `apps/web/src/ui/s
 The five themes in `apps/web/src/ui/scores.ts` were composed for Ghostel in this project: "Waltz of the Lost Keys", "Minuet for Watching Eyes", "Lullaby for Sleeping Pumpkins", "Swing for Hungry Ghouls" (Ghoul's Diner) and "Nocturne for a Full Moon" (MIT).
 
 ## Text content
-The 36 Pumpkin Trivia questions (`packages/shared/src/games/trivia-questions.ts`) and all NPC lines (`packages/shared/src/npcs.ts`) were written for this project (MIT).
+The 36 Pumpkin Trivia questions (`packages/shared/src/games/trivia-questions.ts`), all NPC lines (`packages/shared/src/npcs.ts`) and the Night Desk text adventure (`packages/shared/src/nightdesk.ts`, M16) were written for this project (MIT). The Night Desk's `XYZZY` reply is a one-word nod to the 1970s game Colossal Cave Adventure; no text from it is used.
 
 ## Fonts
 | Font | Package | License |
 | --- | --- | --- |
 | Creepster | `@fontsource/creepster` 5.3.0 | SIL Open Font License 1.1 |
 | Nunito | `@fontsource/nunito` 5.3.0 | SIL Open Font License 1.1 |
+| VT323 (Night Desk terminal, M16) | `@fontsource/vt323` 5.3.0 | SIL Open Font License 1.1 (checked in the package's `LICENSE`, 2026-11-10) |
 | pdf.js standard fonts (Foxit Serif/Sans/Fixed/Symbol/Dingbats) | copied from `pdfjs-dist` 6.5.438 `standard_fonts/` to `/pdfjs/standard_fonts/` at build | BSD-3-Clause (PDFium authors), file `LICENSE_FOXIT` |
 | Liberation Sans (pdf.js standard fonts) | same | SIL Open Font License 1.1, file `LICENSE_LIBERATION` |
 

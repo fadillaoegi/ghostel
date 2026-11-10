@@ -48,6 +48,8 @@ function tone(freq: number, start: number, length: number, type: OscillatorType 
 
 export const sfx = {
   tick: () => tone(880, 0, 0.08, "square", 0.03),
+  /** A soft key click for the Night Desk terminal. */
+  key: () => tone(1700 + Math.random() * 300, 0, 0.03, "square", 0.012),
   pick: () => tone(520, 0, 0.12, "triangle", 0.06),
   correct: () => {
     tone(660, 0, 0.15, "triangle");

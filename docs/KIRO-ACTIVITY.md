@@ -10,11 +10,11 @@ Ghostel was built from an empty folder with **Kiro CLI 3.1.0** over three sessio
 | Kiro feature | What exists in this repo | Evidence |
 | --- | --- | --- |
 | **Steering** | 7 files in `.kiro/steering/`. Five are always included (product, architecture, security, language and workflow, attribution). `visual-style.md` loads only for files in `apps/web/src/three/` (`fileMatch`). `submission.md` loads only when included by hand (`manual`). | Kiro gave the steering files to the agent as workspace rules during the sessions. They hold decisions (stack, security rules, language, no git) that were never repeated in prompts. |
-| **Specs** | 15 milestone folders in `.kiro/specs/` (index: `.kiro/specs/README.md`), each with requirements, design and tasks. M1–M10 and M15 were written before the code. M11–M14 were written after it; their specs say so at the top. | The task lists are ticked in order. Design changes found while coding are written back into the design files. |
+| **Specs** | 16 milestone folders in `.kiro/specs/` (index: `.kiro/specs/README.md`), each with requirements, design and tasks. M1–M10, M15 and M16 were written before the code. M11–M14 were written after it; their specs say so at the top. | The task lists are ticked in order. Design changes found while coding are written back into the design files. |
 | **Hooks** | `.kiro/hooks/`: a PreToolUse guard that blocks git commands and writes to the old project, a SessionStart status hook, and a PostFileSave hook that runs the shared tests. Scripts are in `scripts/kiro-hooks/`, with tests (`pnpm test:hooks`). | `docs/evidence/kiro-hooks.log`, one line per guard or status run. **Proven:** the guard blocked a real Kiro tool call on 2026-11-09 (it was a false positive, which was fixed and covered by a test). The SessionStart hook ran at the start of session 4 (2026-11-09): it wrote a log line and its status text reached the agent's context. **Indirect only:** the PostFileSave hook (the Vitest cache was rewritten one second after an agent save; the hook does not log). |
 | **Subagent** | Kiro's `introspect` agent read the official Kiro docs and explained why the first hook never showed output (silent on success; file triggers are V3-only and fire only for agent edits; loaded at session start). | Session 3 log below. |
 | **Web research** | Render Free limits, Neon Free limits, Kiroween categories (the Devpost page returns 403, so a secondary source), browser support for screen capture, the PostgreSQL 18 Docker data-path change. | Sources cited in `docs/DEPLOY.md`, `docs/CATEGORY-REPORT.md` and the session logs. |
-| **Real checks** | Typecheck, 116 + 8 unit tests, 87 integration tests on PostgreSQL 18, 25 Playwright browser tests (two browsers, fake microphone, camera and screen), production smoke test. | `docs/evidence/*.txt` (real output, exit codes), 52 screenshots in `docs/evidence/screenshots/`. |
+| **Real checks** | Typecheck, 128 + 8 unit tests, 87 integration tests on PostgreSQL 18, 27 Playwright browser tests (two browsers, fake microphone, camera and screen), production smoke test (latest run 2026-11-10). | `docs/evidence/*.txt` (real output, exit codes), 55 screenshots in `docs/evidence/screenshots/`. |
 
 ### Decisions the owner made through Kiro (examples)
 - Stack, Pumpkin Trivia as the first game, rooms as separate scenes ("sesuai kamu rekomendasikan").
@@ -425,3 +425,43 @@ New screenshots: `desktop-door-prompt.png` (floor 2 doors, 2B ajar), `desktop-fl
 - **Research:** `https://kiroween.devpost.com/rules` and `https://kiroween.devpost.com/` both returned HTTP 403 to Kiro's fetch tool again. A web search returned a snippet from `kiroween.devpost.com` (search snippet only, not the full page) saying only new projects are eligible: they must be built during the submission period, October 30 to December 4, 2026. Ghostel's first session was on 2026-11-07. Other results were Kiroween 2025 pages and other hackathons, so they were not used as 2026 rules.
 - **Finding in the repo:** `.gitignore` contains `*.log`, which also ignores `docs/evidence/kiro-hooks.log`, the only log of the hook runs. Not changed yet; waiting for the owner.
 - **Fix (owner: "gitignore dulu"):** added `!docs/evidence/kiro-hooks.log` right after `*.log` in `.gitignore`. Kiro also listed generated and secret files in the working tree (`find`, without git). Each one is already covered by an existing rule: `.env`, `backups/` (the PostgreSQL 17 dump), `apps/*/dist`, `playwright-report/`, `test-results/`, `node_modules/`. `.env.example` holds only the documented local-only credentials. Not checked with `git check-ignore`, because git is the owner's job.
+
+### Session 4, continued: public repository
+
+- **Owner, in their own terminal (pasted to Kiro):** `git init`, `git add .`, `git commit -m "first init"` (root commit `2a41260`, 264 files), then pushed to `https://github.com/fadillaoegi/ghostel` (branch `main`). Kiro ran no git command. The guard hook did not fire, because these commands did not go through Kiro.
+- **Kiro checked, without git:**
+  - The pasted file list includes `.kiro/` (hooks, specs, steering), `LICENSE`, `docs/evidence/kiro-hooks.log` and all 52 screenshots. It contains no `.env`, `backups/`, `dist/`, `node_modules/`, `playwright-report/` or `test-results/`.
+  - A `find` of the working tree, minus the ignored paths, also counts 264 files, the same number as the commit.
+  - `https://api.github.com/repos/fadillaoegi/ghostel` (fetched 2026-11-09): `"visibility":"public"`, `"license":{"spdx_id":"MIT"}`, default branch `main`, pushed at 2026-11-09T15:11:19Z.
+
+## Session 4, continued — 2026-11-10: Milestone 16 (Haunted Mirror, Night Desk)
+
+- **Prompts (owner, Indonesian, summarised):**
+  - "Make Ghostel fit every category." Kiro answered that the official page says to pick one category. The owner replied that he will submit to Costume Contest but wants parts of the other categories inside Ghostel.
+  - Kiro proposed one feature per category. The owner chose "Frankenstein and Resurrection first; Skeleton Crew later".
+  - During the work: "always keep the rules and the competition requirements up to date".
+- **Assumption stated by Kiro:** the owner did not pick between the two Resurrection ideas, so Kiro took its own recommendation (the CRT terminal, not the Morse telegraph).
+- **Spec first:** `.kiro/specs/m16-mirror-and-night-desk/{requirements,design,tasks}.md`, written before any code. All 7 tasks are ticked, and the changes found while building are listed in `tasks.md`.
+- **Steering updated:**
+  - `product.md`: the category plan, the "pick a category" and new-project notes, the decision and the milestone.
+  - `security.md`: the mirror camera rule, and "client-only features add no server input".
+  - `submission.md`: rewritten with the eligibility notes and the "Also inside the hotel" item.
+- **Subagent:** a `context-gatherer` run mapped the mirror, prompt zones, lobby layout, video textures, candies, overlays, headers and E2E helpers before the spec was written.
+- **Package added:** `@fontsource/vt323` 5.3.0. Its OFL 1.1 license was read in the package's `LICENSE` file.
+- **Problems found and fixed:**
+  1. The movement grid sweep (`movement.test.ts`) failed with the first desk box, which was flush with the wall: push-out could send a point north into the wall and back inside. The box now reaches into the wall.
+  2. The first screenshots showed the desk too small and hidden by the avatar, and the fake camera almost white in the mirror. Kiro enlarged the monitor, added a glowing plaque and softened the shader's brightness curve, then looked at new screenshots.
+  3. An unused helper (`trackState`) was removed before the tests were written. The E2E test checks the camera with a `getUserMedia` spy in an init script instead.
+- **PostFileSave hook:** shared files were saved many times in this milestone. No hook output appeared in the tool results; the hook is silent by design (see the earlier entry).
+
+### Results (see `docs/evidence/`, run in order on 2026-11-10)
+| Command | Result |
+| --- | --- |
+| `pnpm typecheck` | exit 0 |
+| `pnpm test:unit` | shared 12 files / 128 tests, web 1 file / 8 tests |
+| `pnpm test:server` | 11 files, 87 tests |
+| `pnpm build` | exit 0; web JS 1,473 kB (405 kB gzip) |
+| `pnpm exec playwright test` | 27 passed (2.7 min) |
+| `pnpm test:prod` | 1 passed |
+
+New screenshots: `desktop-night-desk-lobby.png`, `desktop-night-desk.png`, `desktop-mirror-camera.png`.

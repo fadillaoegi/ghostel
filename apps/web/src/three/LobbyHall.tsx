@@ -3,6 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import { makeCheckerTexture, useLabelTexture } from "./textures";
+import { NightDeskModel } from "./NightDesk";
 
 const WALL = "#2a1b3d";
 const WAINSCOT = "#1a1026";
@@ -348,6 +349,7 @@ export function LobbyHall() {
         if (o.kind === "circle" && o.label === "pillar") return <Pillar key={i} x={o.x} z={o.z} r={o.r} />;
         if (o.kind === "circle" && o.label === "fountain") return <Fountain key={i} r={o.r} />;
         if (o.kind === "box" && o.label === "reception") return <Reception key={i} {...o} />;
+        if (o.kind === "box" && o.label === "night-desk") return <NightDeskModel key={i} minX={o.minX} maxX={o.maxX} maxZ={o.maxZ} />;
         return null;
       })}
     </group>
