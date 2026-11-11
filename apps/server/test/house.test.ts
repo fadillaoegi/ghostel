@@ -39,4 +39,13 @@ describe("house rooms", () => {
     const { rows } = await server.pool.query("SELECT count(*)::int AS n FROM rooms WHERE owner_id = '00000000-0000-4000-8000-00000000c0de'");
     expect(rows[0].n).toBe(HOUSE_ROOMS.length);
   });
+
+  it("seeding gives every house room its game (1B moved from Trivia to Monster Pairs in M17)", async () => {
+    const library = HOUSE_ROOMS.find((r) => r.slot === "B");
+    expect(library?.game).toBe("monster_pairs");
+    await server.pool.query("UPDATE rooms SET game = 'pumpkin_trivia' WHERE id = $1", [library?.id]);
+    await ensureHouseRooms(server.pool);
+    const { rows } = await server.pool.query("SELECT id, game FROM rooms WHERE owner_id = $1 ORDER BY slot", [CONCIERGE_ID]);
+    expect(rows).toEqual(HOUSE_ROOMS.map((r) => ({ id: r.id, game: r.game })));
+  });
 });

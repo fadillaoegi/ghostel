@@ -19,5 +19,7 @@ One folder per milestone, each with `requirements.md`, `design.md` and `tasks.md
 | 14 Presentations (screen share, PDF slides) | `m14-presentation` | done | after code |
 | 15 Provable Kiro workflow (hooks, steering, specs, log) | `m15-kiro-workflow` | in progress (PostFileSave hook seen only indirectly, Devpost rules) | before code |
 | 16 Haunted Mirror (camera, Frankenstein echo) and Night Desk terminal (Resurrection echo) | `m16-mirror-and-night-desk` | done | before code |
+| 17 Ghostel Game Kit and Monster Pairs (Skeleton Crew echo; second game) | `m17-game-kit-monster-pairs` | done | before code |
+| 18 Brighter lighting | `m18-brighter-lighting` | done | before code |
 
-Milestone 8 of the original brief ("a second game or proximity voice") has not been started.
+Milestone 8 of the original brief ("a second game or proximity voice") is covered by M17's second game.

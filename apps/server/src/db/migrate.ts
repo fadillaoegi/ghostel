@@ -74,6 +74,14 @@ export const MIGRATIONS: readonly { id: string; sql: string }[] = [
     id: "005_room_capacity",
     sql: `ALTER TABLE rooms ADD COLUMN capacity smallint NOT NULL DEFAULT 8 CONSTRAINT rooms_capacity_check CHECK (capacity BETWEEN 2 AND 8);`,
   },
+  {
+    // M17: Monster Pairs is a room game. Existing rooms keep their game.
+    id: "006_monster_pairs",
+    sql: `
+      ALTER TABLE rooms DROP CONSTRAINT rooms_game_check;
+      ALTER TABLE rooms ADD CONSTRAINT rooms_game_check CHECK (game IN ('none', 'pumpkin_trivia', 'monster_pairs'));
+    `,
+  },
 ];
 
 const LOCK_KEY = 47_011_001; // arbitrary constant for pg_advisory_lock

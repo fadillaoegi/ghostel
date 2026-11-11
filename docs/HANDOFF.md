@@ -1,6 +1,6 @@
 # Handoff
 
-Last session: 2026-11-10. Milestones 1–7, the owner's milestones M8–M14 and M16 are implemented and tested. M8 is floors and music, M9 room doors, night city and monsters, M10 Ghoul's Diner and the rooftop on floor 5, M11 phone gamepad and landscape, M12 seats, table calls and the meeting view, M13 camera, M14 presentations. Specs are in `.kiro/specs/` (`m1-check-in-and-lobby` covers milestones 1 and 2). The category report is in `docs/CATEGORY-REPORT.md`.
+Last session: 2026-11-10. Milestones 1–7, the owner's milestones M8–M14, M16 and M17 are implemented and tested. M8 is floors and music, M9 room doors, night city and monsters, M10 Ghoul's Diner and the rooftop on floor 5, M11 phone gamepad and landscape, M12 seats, table calls and the meeting view, M13 camera, M14 presentations. Specs are in `.kiro/specs/` (`m1-check-in-and-lobby` covers milestones 1 and 2). The category report is in `docs/CATEGORY-REPORT.md`.
 
 ## Start the next session
 ```sh
@@ -10,7 +10,7 @@ kiro-cli
 Start Kiro from this folder so `.kiro/steering`, `AGENTS.md` and `.kiro/hooks` load.
 
 ## Open items
-0. **`pnpm dev` not smoke-tested.** The agent shell blocked long-running dev commands, so the Vite proxy (`/api`, `/ws` → :2590) has not been run here. All tests used the production build, which serves web, API and WebSocket from one origin. Run `pnpm dev` once, open http://localhost:5290 and check that the lobby reaches "Live".
+0. **`pnpm dev` smoke-tested on 2026-11-10.** It was started detached with `nohup` (the agent shell refuses `pnpm dev` directly). `/api/health` through the Vite proxy on :5290 returned `{"ok":true}`. A headless Chromium checked in at http://localhost:5290 and reached "Live" in the Grand Lobby with 0 page errors. The dev database applied migration `006_monster_pairs`, and house room 1B now runs Monster Pairs.
 1. **Verify the remaining Kiro hooks (M15 task 3).**
    - The guard hook is **proven**: on 2026-11-09 it blocked a real tool call in Kiro (log line in `docs/evidence/kiro-hooks.log`).
    - Still to see: the `session-status` hook. Start a fresh Kiro session in this folder and check that the log gets a `session-status … SessionStart` line and that the agent mentions the status.
@@ -23,7 +23,8 @@ Start Kiro from this folder so `.kiro/steering`, `AGENTS.md` and `.kiro/hooks` l
 4. **Deployment is prepared; it needs the owner's accounts.** Follow `docs/DEPLOY.md`: a Neon project, then a Render Blueprint from `render.yaml`, with `DATABASE_URL` and `ALLOWED_ORIGINS` set in the dashboard. Then set the GitHub variable `GHOSTEL_URL` to enable the keep-alive workflow. After the deploy, test voice on two real devices on different networks. Not yet verified on Render itself: `corepack enable` in the build (fallback in DEPLOY.md) and the real `X-Forwarded-For` layout (`TRUST_PROXY=1`).
    - Then: re-check the official Kiroween rules, record the demo video (under 3 minutes), and write the Devpost text.
    - Voice was tested only on localhost with Chromium's fake microphone. Test once with two real devices on different networks (needs HTTPS hosting). Without TURN, some networks will fail to connect.
-5. **Polish:** on phones the HUD hides the place name (the room name is on the 3D wall sign, but the HUD could show it too); rooms are still fairly dark. Name-tag overlap was fixed in M5 by nudging tags apart.
+5. **Polish:** on phones the HUD hides the place name (the room name is on the 3D wall sign, but the HUD could show it too). Lighting was brightened in M18 (rooms from mean luma ≈ 10 to ≈ 16). Name-tag overlap was fixed in M5 by nudging tags apart.
+   - **E2E and machine load:** the door 2B walk in `rooms.spec.ts` fails when the load average is far above 10. On 2026-11-11, macOS storage scanning kept it at 19–97. Start E2E runs when `uptime` shows a low load. The stored run (load 2.9 at the start) passed 29 of 29.
 6. **Bundle size:** web JS is 1,411 kB (386 kB gzip, `docs/evidence/build.txt`). Lazy-load the 3D scene behind the creator, and the city behind floor 4, if the first load feels slow on phones.
 7. **E2E speed:** the suite took 3.3–6 minutes in this session (M8: 1.7 minutes). Each open lobby page renders continuously, so with 3–4 browser contexts a new page needs 4–8 s to reach the lobby (measured with a throwaway probe). Hiding the new doors and NPC avatars did not change that. Main-thread time was about 150 ms/s per lobby page either way. Machine load (Docker VM) varied a lot. If it matters, try `frameloop="demand"` for hidden tabs or pause rendering on `visibilitychange`.
 9. **Real-device checks for M10–M14:**
@@ -42,6 +43,14 @@ Start Kiro from this folder so `.kiro/steering`, `AGENTS.md` and `.kiro/hooks` l
   - The Haunted Mirror camera is `apps/web/src/ui/mirrorCam.ts`, separate from `CallClient`. The shader is in `three/floors/Gallery.tsx`.
   - E2E is in `e2e/oddities.spec.ts`. It spies on `getUserMedia` with an init script.
   - Skeleton Crew is still undecided (owner).
+- M17 (2026-11-10):
+  - Monster Pairs rules are in `packages/shared/src/games/pairs.ts`, and the panel in `apps/web/src/ui/PairsPanel.tsx`. The shared podium and timer are in `GameParts.tsx`.
+  - Migration `006_monster_pairs` widens `rooms_game_check`.
+  - House room 1B now runs Monster Pairs. `ensureHouseRooms` updates house room games on every start.
+  - `TRIVIA_FAST=1` also selects a 4-pair game.
+  - `hub.ts` was not changed. How to add a game: `docs/GAME-KIT.md`.
+  - Before the migration, the dev database was backed up to `backups/ghostel-pg18-before-006-20261110-142214.dump` (gitignored).
+  - A dev server (PID 27722, started 2026-11-09 20:25, not by Kiro in this session) still runs the old build against the dev database. After a restart it applies migration 006 and switches house room 1B to Monster Pairs.
 - Ports: web 5290, server 2590, PostgreSQL 5490, E2E server 2595.
 - The server registers static files at startup: after `pnpm build`, restart it, or new asset names fall through to `index.html`. Old project ports 5178, 5179, 8098, 5478 are avoided.
 - Databases: `ghostel` (dev) and `ghostel_test` (integration + E2E), both in the `ghostel-postgres-1` container (PostgreSQL 18, `postgres:18-alpine`), volume `ghostel_ghostel_pg18` mounted at `/var/lib/postgresql` (18+ keeps data in `/var/lib/postgresql/18/docker`). The old PostgreSQL 17 volume `ghostel_ghostel_pg` was removed on 2026-11-09 at the owner's request, after a `pg_dump` to `backups/` (gitignored) that was restored into 18.

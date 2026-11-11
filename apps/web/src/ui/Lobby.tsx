@@ -1,4 +1,4 @@
-import { CROWN_CANDIES, floorName, floorOfPlace, parseSeatCode, sceneKeyFor, type DoorInfo, type FloorNumber, type GameView, type PromptKind, type Profile } from "@ghostel/shared";
+import { CROWN_CANDIES, floorName, floorOfPlace, parseSeatCode, sceneKeyFor, type DoorInfo, type FloorNumber, type GameView, type PromptKind, type Profile, type RoomGame } from "@ghostel/shared";
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { useGamepad, useKeyboardControls } from "../input/controls";
 import { PresenceClient, type PlayerView } from "../net/presence";
@@ -10,6 +10,7 @@ import { ActionButton, Joystick } from "./Joystick";
 import { RoomDirectory, type DirectoryIntent } from "./RoomDirectory";
 import { RoomSettings } from "./RoomSettings";
 import { TriviaPanel } from "./TriviaPanel";
+import { PairsPanel } from "./PairsPanel";
 import { ElevatorPanel } from "./ElevatorPanel";
 import { SnackMenu } from "./SnackMenu";
 import { NightDesk } from "./NightDesk";
@@ -31,6 +32,50 @@ function useCoarsePointer(): boolean {
 }
 
 const STATUS_TEXT = { connecting: "Connecting…", online: "Live", reconnecting: "Reconnecting…" } as const;
+
+/** Start button per room game (the Game Kit: one panel per engine, picked by `view.game`). */
+const GAME_START: Record<RoomGame, string> = { none: "", pumpkin_trivia: "🎃 Play Pumpkin Trivia", monster_pairs: "🃏 Play Monster Pairs" };
+
+function GamePanel({
+  view,
+  receivedAt,
+  selfId,
+  onAction,
+  onPlayAgain,
+  onClose,
+}: {
+  view: GameView;
+  receivedAt: number;
+  selfId: string | null;
+  onAction?: (action: unknown) => void;
+  onPlayAgain?: () => void;
+  onClose?: () => void;
+}) {
+  switch (view.game) {
+    case "pumpkin_trivia":
+      return (
+        <TriviaPanel
+          view={view}
+          receivedAt={receivedAt}
+          selfId={selfId}
+          onAnswer={onAction ? (round, choice) => onAction({ round, choice }) : undefined}
+          onPlayAgain={onPlayAgain}
+          onClose={onClose}
+        />
+      );
+    case "monster_pairs":
+      return (
+        <PairsPanel
+          view={view}
+          receivedAt={receivedAt}
+          selfId={selfId}
+          onFlip={onAction ? (turn, card) => onAction({ turn, card }) : undefined}
+          onPlayAgain={onPlayAgain}
+          onClose={onClose}
+        />
+      );
+  }
+}
 
 export function Lobby({ profile, onProfile }: { profile: Profile; onProfile: (p: Profile) => void }) {
   // Created in an effect (not during render) so StrictMode's double mount cannot leak or close a live socket.
@@ -218,7 +263,7 @@ function LobbyView({ client, profile, onProfile }: { client: PresenceClient; pro
     else if (game) setLastResult(null);
   }, [game]);
   useEffect(() => setLastResult(null), [sceneKey]);
-  const canStartGame = place.kind === "room" && place.room.game === "pumpkin_trivia" && !game;
+  const canStartGame = place.kind === "room" && place.room.game !== "none" && !game;
   const startGame = () => {
     setLastResult(null);
     client.sendGame({ t: "game_start" });
@@ -446,30 +491,19 @@ function LobbyView({ client, profile, onProfile }: { client: PresenceClient; pro
         />
       )}
 
-      {canStartGame && !lastResult && (
+      {canStartGame && !lastResult && place.kind === "room" && (
         <button type="button" className="btn btn--primary hud-game" onClick={startGame}>
-          🎃 Play Pumpkin Trivia
+          {GAME_START[place.room.game]}
         </button>
       )}
       {game ? (
         <div className="hud-trivia">
-          <TriviaPanel
-            view={game.view}
-            receivedAt={game.receivedAt}
-            selfId={presence.selfId}
-            onAnswer={(round, choice) => client.sendGame({ t: "game_action", action: { round, choice } })}
-          />
+          <GamePanel view={game.view} receivedAt={game.receivedAt} selfId={presence.selfId} onAction={(action) => client.sendGame({ t: "game_action", action })} />
         </div>
       ) : (
         lastResult && (
           <div className="hud-trivia">
-            <TriviaPanel
-              view={lastResult}
-              receivedAt={0}
-              selfId={presence.selfId}
-              onPlayAgain={canStartGame ? startGame : undefined}
-              onClose={() => setLastResult(null)}
-            />
+            <GamePanel view={lastResult} receivedAt={0} selfId={presence.selfId} onPlayAgain={canStartGame ? startGame : undefined} onClose={() => setLastResult(null)} />
           </div>
         )
       )}

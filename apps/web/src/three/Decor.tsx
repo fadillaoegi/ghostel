@@ -173,9 +173,9 @@ export function Decor() {
 export function Lights() {
   return (
     <>
-      <ambientLight intensity={0.6} color="#7a68a8" />
-      <hemisphereLight args={["#6b5ba0", "#1a0f24", 0.8]} />
-      <directionalLight position={[8, 14, -6]} intensity={0.9} color="#a9bcff" />
+      <ambientLight intensity={1.15} color="#7a68a8" />
+      <hemisphereLight args={["#6b5ba0", "#1a0f24", 1.3]} />
+      <directionalLight position={[8, 14, -6]} intensity={1.05} color="#a9bcff" />
       <pointLight position={[0, 3, -7]} color="#ffb347" intensity={6} distance={10} decay={1.6} />
     </>
   );

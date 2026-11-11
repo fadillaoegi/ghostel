@@ -1,0 +1,16 @@
+# 2026-11-11 08:43:22 WIB — $ node scripts/measure-brightness.mjs … (screenshots re-taken by E2E after the final M18 values)
+
+file	whole	middle
+desktop-lobby-ghosts.png	22.7	20.4
+desktop-lobby-two-guests.png	20.4	23.9
+desktop-floor2-gallery.png	23.0	25.7
+desktop-floor3-greenhouse.png	25.3	26.1
+desktop-floor4-diner.png	33.5	33.0
+desktop-floor5-rooftop.png	24.1	28.4
+desktop-house-room.png	14.7	15.1
+desktop-room-library.png	15.4	17.7
+desktop-room-ballroom.png	14.9	16.4
+phone-lobby.png	32.9	27.0
+phone-room-ballroom.png	23.5	22.4
+
+# exit code: 0

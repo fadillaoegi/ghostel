@@ -21,7 +21,7 @@ import { roomsApi, type RoomForm } from "../api";
 
 export const ACCESS_LABELS: Record<RoomAccess, string> = { open: "🔓 Open", locked: "🔒 Locked", password: "🔑 Password" };
 export const DECOR_LABELS: Record<RoomDecor, string> = { crypt: "⚰️ Crypt", library: "📚 Haunted library", ballroom: "🕯️ Ballroom" };
-export const GAME_LABELS: Record<RoomGame, string> = { none: "💬 Just hang out", pumpkin_trivia: "🎃 Pumpkin Trivia" };
+export const GAME_LABELS: Record<RoomGame, string> = { none: "💬 Just hang out", pumpkin_trivia: "🎃 Pumpkin Trivia", monster_pairs: "🃏 Monster Pairs" };
 
 function Choice<T extends string>({
   label,

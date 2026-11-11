@@ -18,7 +18,7 @@ All 3D content is built in this repo from three.js primitives (boxes, cones, cyl
 No external model files are used yet. License: MIT, same as the project.
 
 ## Textures
-Generated at runtime on `<canvas>` (`apps/web/src/three/textures.ts`, `RoomDoors.tsx`, `floors/City.tsx`): floor checker, moon halo, sign text, door plaques, city windows. No image files.
+Generated at runtime on `<canvas>` (`apps/web/src/three/textures.ts`, `RoomDoors.tsx`, `floors/City.tsx`): floor checker, moon halo, sign text, door plaques, city windows. No image files. `scripts/measure-brightness.mjs` (M18) only measures screenshots and is not part of the app.
 
 ## Sound
 All sounds are synthesized at runtime with the Web Audio API: `apps/web/src/ui/sfx.ts` (trivia effects) and `apps/web/src/ui/music.ts` (instruments and reverb). No audio files.
@@ -27,7 +27,7 @@ All sounds are synthesized at runtime with the Web Audio API: `apps/web/src/ui/s
 The five themes in `apps/web/src/ui/scores.ts` were composed for Ghostel in this project: "Waltz of the Lost Keys", "Minuet for Watching Eyes", "Lullaby for Sleeping Pumpkins", "Swing for Hungry Ghouls" (Ghoul's Diner) and "Nocturne for a Full Moon" (MIT).
 
 ## Text content
-The 36 Pumpkin Trivia questions (`packages/shared/src/games/trivia-questions.ts`), all NPC lines (`packages/shared/src/npcs.ts`) and the Night Desk text adventure (`packages/shared/src/nightdesk.ts`, M16) were written for this project (MIT). The Night Desk's `XYZZY` reply is a one-word nod to the 1970s game Colossal Cave Adventure; no text from it is used.
+The 36 Pumpkin Trivia questions (`packages/shared/src/games/trivia-questions.ts`), all NPC lines (`packages/shared/src/npcs.ts`), the Night Desk text adventure (`packages/shared/src/nightdesk.ts`, M16) and the Monster Pairs rules and card names (`packages/shared/src/games/pairs.ts`, M17; the card faces are standard Unicode emoji drawn by the guest's system font) were written for this project (MIT). The Night Desk's `XYZZY` reply is a one-word nod to the 1970s game Colossal Cave Adventure; no text from it is used.
 
 ## Fonts
 | Font | Package | License |

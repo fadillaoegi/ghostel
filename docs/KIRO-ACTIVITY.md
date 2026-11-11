@@ -10,11 +10,11 @@ Ghostel was built from an empty folder with **Kiro CLI 3.1.0** over three sessio
 | Kiro feature | What exists in this repo | Evidence |
 | --- | --- | --- |
 | **Steering** | 7 files in `.kiro/steering/`. Five are always included (product, architecture, security, language and workflow, attribution). `visual-style.md` loads only for files in `apps/web/src/three/` (`fileMatch`). `submission.md` loads only when included by hand (`manual`). | Kiro gave the steering files to the agent as workspace rules during the sessions. They hold decisions (stack, security rules, language, no git) that were never repeated in prompts. |
-| **Specs** | 16 milestone folders in `.kiro/specs/` (index: `.kiro/specs/README.md`), each with requirements, design and tasks. M1–M10, M15 and M16 were written before the code. M11–M14 were written after it; their specs say so at the top. | The task lists are ticked in order. Design changes found while coding are written back into the design files. |
+| **Specs** | 17 milestone folders in `.kiro/specs/` (index: `.kiro/specs/README.md`), each with requirements, design and tasks. M1–M10 and M15–M17 were written before the code. M11–M14 were written after it; their specs say so at the top. | The task lists are ticked in order. Design changes found while coding are written back into the design files. |
 | **Hooks** | `.kiro/hooks/`: a PreToolUse guard that blocks git commands and writes to the old project, a SessionStart status hook, and a PostFileSave hook that runs the shared tests. Scripts are in `scripts/kiro-hooks/`, with tests (`pnpm test:hooks`). | `docs/evidence/kiro-hooks.log`, one line per guard or status run. **Proven:** the guard blocked a real Kiro tool call on 2026-11-09 (it was a false positive, which was fixed and covered by a test). The SessionStart hook ran at the start of session 4 (2026-11-09): it wrote a log line and its status text reached the agent's context. **Indirect only:** the PostFileSave hook (the Vitest cache was rewritten one second after an agent save; the hook does not log). |
 | **Subagent** | Kiro's `introspect` agent read the official Kiro docs and explained why the first hook never showed output (silent on success; file triggers are V3-only and fire only for agent edits; loaded at session start). | Session 3 log below. |
 | **Web research** | Render Free limits, Neon Free limits, Kiroween categories (the Devpost page returns 403, so a secondary source), browser support for screen capture, the PostgreSQL 18 Docker data-path change. | Sources cited in `docs/DEPLOY.md`, `docs/CATEGORY-REPORT.md` and the session logs. |
-| **Real checks** | Typecheck, 128 + 8 unit tests, 87 integration tests on PostgreSQL 18, 27 Playwright browser tests (two browsers, fake microphone, camera and screen), production smoke test (latest run 2026-11-10). | `docs/evidence/*.txt` (real output, exit codes), 55 screenshots in `docs/evidence/screenshots/`. |
+| **Real checks** | Typecheck, 136 + 8 unit tests, 90 integration tests on PostgreSQL 18, 29 Playwright browser tests (two browsers, fake microphone, camera and screen), production smoke test (latest run 2026-11-10). | `docs/evidence/*.txt` (real output, exit codes, including one failed run kept as-is), 58 screenshots in `docs/evidence/screenshots/`. |
 
 ### Decisions the owner made through Kiro (examples)
 - Stack, Pumpkin Trivia as the first game, rooms as separate scenes ("sesuai kamu rekomendasikan").
@@ -465,3 +465,90 @@ New screenshots: `desktop-door-prompt.png` (floor 2 doors, 2B ajar), `desktop-fl
 | `pnpm test:prod` | 1 passed |
 
 New screenshots: `desktop-night-desk-lobby.png`, `desktop-night-desk.png`, `desktop-mirror-camera.png`.
+
+## Session 4, continued — 2026-11-10: Milestone 17 (Ghostel Game Kit, Monster Pairs)
+
+- **Prompts (owner, Indonesian, summarised):**
+  - "Which ideas do you know for a Skeleton Crew element?" Kiro proposed four:
+    - A: a second game on the existing kit
+    - B: musical chairs
+    - C: the hotel as a template
+    - D: an NPC template
+  - Kiro recommended A, and the owner chose it ("oke lanjut A").
+- **Spec first:** `.kiro/specs/m17-game-kit-monster-pairs/{requirements,design,tasks}.md`. All 8 tasks are ticked, and the changes found while building are listed in `tasks.md`.
+- **Steering updated:**
+  - `product.md`: the second game decision, the milestone 8 note and the category plan.
+  - `submission.md`: the "Also inside the hotel" item.
+- **Database:** before adding migration `006_monster_pairs`, Kiro backed up the dev database with `pg_dump` to `backups/ghostel-pg18-before-006-20261110-142214.dump`.
+  - The dev database is not migrated yet. A dev server started on 2026-11-09 20:25 (PID 27722, not started by Kiro in this session) was still running the old build, and Kiro did not stop it.
+- **New document:** `docs/GAME-KIT.md`. It has the interface, what the hub does with it, the steps M17 actually took, and a skeleton marked as an example that is not in the codebase.
+- **Problems found and fixed:** see `tasks.md`. In short:
+  - The turn hand-over had to move from `removePlayer` to `advance`.
+  - The test players had to remember faces.
+  - The migration test needed the pre-006 game for room 1B.
+  - A phone E2E test took a door that a later spec needed.
+- **Failed run, kept:** one full E2E run failed 2 walking tests in `rooms.spec.ts` while the machine's load average was about 20 (`uptime` showed 20.90 over 15 minutes right after it). The output was saved before re-running. The same specs passed alone, and the next full run passed 29 of 29.
+
+### Results (see `docs/evidence/`, 2026-11-10)
+| Command | Result |
+| --- | --- |
+| `pnpm typecheck` | exit 0 |
+| `pnpm test:unit` | shared 13 files / 136 tests, web 1 file / 8 tests |
+| `pnpm test:server` | 11 files, 90 tests |
+| `pnpm build` | exit 0; web JS 1,479 kB (406 kB gzip) |
+| `pnpm exec playwright test` | first run: 27 passed, 2 failed (kept in `test-e2e-failed-under-load-2026-11-10.txt`); re-run: 29 passed (8.3 min) |
+| `pnpm test:prod` | 1 passed |
+
+New screenshots: `desktop-pairs-board.png`, `desktop-pairs-podium.png`, `phone-pairs-board.png`.
+
+### Session 4, continued: running the app for the owner
+
+- **Prompt (owner):** "run the app first, I want to try it", then "how confident are you that we win?".
+- **Hosting:** the owner said he has his own VPS. Kiro had kept offering Neon and Render as if they were decided. The owner asked why, and Kiro answered that it was its own tentative plan from session 1, never confirmed by the owner. VPS details are pending.
+- **Stale server:** port 2590 was held by a Ghostel server running the pre-M16 build (PID 27722, started 2026-11-09 20:25). Kiro stopped it with `SIGTERM` so the owner would try the current code, and said so.
+- **`pnpm dev`:** the agent shell refused to run it directly ("appears to be a development server command"). Kiro started it detached with `nohup`, with a log in `/tmp/ghostel-dev.log`.
+  - Vite reported "ready" on http://127.0.0.1:5290, and the server reported "ready" on http://127.0.0.1:2590.
+  - `curl http://127.0.0.1:5290/api/health` through the Vite proxy returned `HTTP/1.1 200 OK` and `{"ok":true}`.
+  - The dev database's latest migration is `006_monster_pairs`, and house rooms are 1A `pumpkin_trivia`, 1B `monster_pairs`, 1C `none`.
+  - A throwaway headless Chromium script (not saved in the repo) checked in as "Smoke Tester" at http://localhost:5290. It printed `status: Live`, `place: Grand Lobby`, `page errors: 0`. This closes HANDOFF item 0. The script created one guest, "Smoke Tester", in the dev database.
+
+### Session 4, continued: reading the rules and judging criteria
+
+- **Prompt (owner):** "now try to read the official rules and judging criteria".
+- **Result:**
+  - `https://kiroween.devpost.com/rules` returned HTTP 403 again.
+  - A web search found the AWS Japan blog post about Kiroween 2026 (https://aws.amazon.com/jp/blogs/news/kiroween-2026/). The post says it summarises the official Devpost overview and Official Rules as of 2026-10-31 and that the English pages are authoritative.
+  - Kiro read it in full and recorded an English paraphrase in `.kiro/steering/submission.md`: dates, eligibility, submission items, prizes and the five judging criteria (20% each).
+- **New facts that change plans:**
+  - The judging criteria are Potential Impact, Technological Implementation, Design, Innovation/Idea and Presentation, each 20%.
+  - The Kiro write-up topics include custom agents, MCP, property-based testing and Kiro powers. Ghostel has not used these.
+  - Free Kiro credits must be requested by 2026-12-01 12:00 PT.
+  - A Bonus Blog Prize and a Social Blitz prize exist.
+  - Some countries are excluded. The owner has to check Indonesia in the official text.
+- M15 task 7 stays open: the official English text has still not been read directly.
+
+## Session 4, continued — 2026-11-10/11: Milestone 18 (brighter lighting)
+
+- **Prompt (owner):** "make Ghostel's lighting a little brighter, it is too dark".
+- **Spec first:** `.kiro/specs/m18-brighter-lighting/`. Kiro measured before changing anything: it wrote `scripts/measure-brightness.mjs` (the mean luma of a PNG via Playwright's Chromium, because the machine's Python has no PIL) and stored the baseline.
+- **Agent mistake caught:** the first evidence file recorded `$?` after an `echo`, so its exit code line was meaningless. This is the same error as in session 1. Kiro re-recorded it, capturing the exit code right after the command.
+- **Iterations, all measured or traced:**
+  1. Exposure 1.15, later fog, more ambient and hemisphere light, and warm point lights in the lobby and the rooms. The rooms got brighter, but the 2B room E2E test hit its 90 s timeout. A Playwright trace showed a chat `Fill` taking 9.5 s and a `Press` taking 20 s. Kiro removed the extra point lights.
+  2. The phone lobby screenshot was unchanged (8.0 → 8.2), because the phone camera looks mostly at the nearly black floor. Kiro made the lobby floor checker lighter, and it went to 27.0.
+  3. A screenshot tool returned a cached copy of a re-taken PNG, so Kiro copied the file under a new name to look at it.
+- **Flaky E2E, not fixed:**
+  - The 2B door walk in `rooms.spec.ts` failed in several runs. Load averages were 19 to 97, from macOS storage scanning processes running for 1–2 days.
+  - Kiro tried waiting for the elevator prompt, and later a step-by-step walk helper. Neither helped, and the step helper did worse, so both were reverted. The spec is back to its original code.
+  - The stored full run is 28 passed and 1 failed. A re-run on a quieter machine is needed before calling M18 fully verified.
+- **Re-run:** at 09:30 the load average dropped to 2.6. A full E2E run started at 09:33 (load 2.9) passed 29 of 29 (exit 0) without any test change. The production smoke test passed afterwards. M18 is done.
+
+### Results (see `docs/evidence/`, 2026-11-11)
+| Command | Result |
+| --- | --- |
+| `pnpm typecheck` | exit 0 |
+| `pnpm test:unit` | 136 shared + 8 web |
+| `pnpm test:server` | 90 passed |
+| `pnpm build` | exit 0 |
+| `pnpm exec playwright test` | 29 passed (7.5 min) |
+| `pnpm test:prod` | 1 passed |
+| `scripts/measure-brightness.mjs` | `brightness-before-m18.txt`, `brightness-after-m18.txt` |

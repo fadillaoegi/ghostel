@@ -6,7 +6,7 @@ Ghostel is a low-poly 3D haunted hotel in the browser. Guests build a costumed c
 
 ![Two guests in the Grand Lobby](docs/evidence/screenshots/desktop-lobby-two-guests.png)
 
-## What works now (milestones 1–14 and 16)
+## What works now (milestones 1–14, 16 and 17)
 - Character creator: heads (classic, pumpkin, skull, black cat, vampire, werewolf, Frankenstein, zombie, alien), hats (witch, top hat, horns, pirate, bat ears, and a Golden Crown to unlock), costumes (vampire cape, ghost sheet, mummy wraps, bat wings, skeleton, wizard robe, zombie rags, werewolf fur), body and accent colours, "Surprise me", live 3D preview.
 - Guest sessions without login: HttpOnly cookie, profile saved in PostgreSQL, survives reloads. Change your name or costume any time.
 - Grand Lobby: fountain with a floating ghost, reception desk, pillars with lanterns, jack-o'-lanterns, candles, bats and moonlight.
@@ -21,8 +21,10 @@ Ghostel is a low-poly 3D haunted hotel in the browser. Guests build a costumed c
 - Phones in portrait and landscape: an on-screen gamepad with a floating analog stick on the left and an action button on the right; panels and chat fit short landscape screens; a full-screen button on Android. Physical gamepads work too (left stick or d-pad, A to act, B to go back).
 - Candy hunt: 12 candies hidden across the floors, checked by the server (right floor, close enough) and saved to your profile. Find them all to unlock the Golden Crown.
 - Original music for every floor (a music-box waltz, a harpsichord minuet, a celesta lullaby and a theremin nocturne), performed live in the browser and cross-faded when you change floors.
-- The hotel is never empty: ghosts and monsters drift around every floor and give tips when you walk up to them (Wisp, Boo-ella, Sir Floats-a-Lot and Sergeant Wraps the mummy in the lobby, Mortimer the vampire concierge who greets you by name, the Frankenstein Curator and Lady Whisper upstairs, Gourdon the werewolf gardener and Moldy Mo the zombie in the greenhouse, Stargazer Stella and Zorp the alien tourist on the roof), and every room has a host ghost. Three house rooms (Pumpkin Trivia Hall 1A, Midnight Library 1B, The Quiet Crypt 1C) are always open.
+- The hotel is never empty: ghosts and monsters drift around every floor and give tips when you walk up to them (Wisp, Boo-ella, Sir Floats-a-Lot and Sergeant Wraps the mummy in the lobby, Mortimer the vampire concierge who greets you by name, the Frankenstein Curator and Lady Whisper upstairs, Gourdon the werewolf gardener and Moldy Mo the zombie in the greenhouse, Stargazer Stella and Zorp the alien tourist on the roof), and every room has a host ghost. Three house rooms (Pumpkin Trivia Hall 1A, Midnight Library 1B with Monster Pairs, The Quiet Crypt 1C) are always open.
 - Pumpkin Trivia at the room table: 7 Halloween questions, 15 seconds each, with points for speed, a live scoreboard, a reveal showing who picked what, and a podium. Plays against Jack O'Bot when you are alone. Keys 1–4 on desktop, a 2×2 grid on phones, and small synthesized sound effects. The server owns the questions, timer and scores, and never sends the answer before the reveal.
+- Monster Pairs (house room 1B, or any room with that activity): a turn-based memory game with the creator's monster heads. Flip two cards; a match keeps your turn. Jack O'Bot plays when you are alone and forgets some cards. The server owns the board and never sends the face of a card that is down.
+- The Ghostel Game Kit: both games run on one `GameEngine` interface, and the server hub has no game-specific code. See [docs/GAME-KIT.md](docs/GAME-KIT.md).
 - Calls in rooms and at tables: unmute to talk, a live "n in call · n connected" pill, and name tags that glow while someone speaks.
 - Lobby chat with speech bubbles above characters, recent history for late arrivals, and a phone chat sheet with an unread badge. The server normalises text, strips control and bidi-override characters and rate-limits each guest across all their tabs.
 - The Haunted Mirror (floor 2): at the Mirror of Costumes, click "Look into the mirror" and your own camera appears in the glass as a ghost: mirrored, violet-tinted, rippling, with a faint second figure behind you. The camera stays on your device and turns off when you click again or walk away.
@@ -55,8 +57,8 @@ Open http://localhost:5290. Open a second browser profile or a private window to
 ## Checks
 ```sh
 pnpm typecheck
-pnpm test         # 128 shared + 8 web unit + 87 server integration tests (needs pnpm db:up)
-pnpm test:e2e     # builds, resets ghostel_test, then 27 Playwright tests (fake microphone, camera and screen; short trivia rounds)
+pnpm test         # 136 shared + 8 web unit + 90 server integration tests (needs pnpm db:up)
+pnpm test:e2e     # builds, resets ghostel_test, then 29 Playwright tests (fake microphone, camera and screen; short games)
 pnpm test:prod    # production build with NODE_ENV=production: secure cookie, headers, CSP
 pnpm build
 ```

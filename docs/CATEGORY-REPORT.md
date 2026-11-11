@@ -21,7 +21,7 @@ Update 2026-11-10: the official page says entrants "pick a category" (search sni
 | --- | --- | --- |
 | Frankenstein | The Haunted Mirror: the guest's own webcam stitched into the 3D scene through a custom shader (ghost tint, ripple, a second figure behind you) | Browser camera, WebGL shader and a 3D game world sewn together; stays on the device |
 | Resurrection | The Night Desk: a 1987 green-screen terminal in the lobby with an original text adventure, VT323 phosphor font and scanlines | Brings back the CRT terminal and interactive fiction, a 1970s–80s genre |
-| Skeleton Crew | Not done. Owner decides later (idea: a second game on the existing `GameEngine` interface) | — |
+| Skeleton Crew | The Ghostel Game Kit (M17): one `GameEngine` interface, two very different games (Pumpkin Trivia, simultaneous quiz; Monster Pairs, turn-based memory), no game-specific code in the server hub. `docs/GAME-KIT.md` | A lean foundation shown through two distinct uses. It is one app, not a template repo with two separate apps, so it is an echo, not an entry |
 
 Frankenstein is a reasonable fallback, but its pitch would be weaker (see below). Resurrection and Skeleton Crew do not fit as the main category.
 

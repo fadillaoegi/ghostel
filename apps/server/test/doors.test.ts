@@ -240,12 +240,14 @@ describe("migration 004_room_doors", () => {
       );
     }
     for (const house of HOUSE_ROOMS) {
+      // This schema is from before migration 006, when Monster Pairs did not exist yet (1B ran Trivia then).
+      const game = house.game === "monster_pairs" ? "pumpkin_trivia" : house.game;
       await client.query("INSERT INTO rooms (id, owner_id, name, access, decor, game) VALUES ($1, $2, $3, 'open', $4, $5)", [
         house.id,
         CONCIERGE_ID,
         house.name,
         house.decor,
-        house.game,
+        game,
       ]);
     }
 

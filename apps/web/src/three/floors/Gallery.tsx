@@ -258,8 +258,8 @@ export function Gallery({ selfPos }: { selfPos: RefObject<{ x: number; z: number
   const sign = useLabelTexture("Hall of Portraits", { font: "Creepster", size: 110, color: "#ffd08a", glow: "#ff7a1a", width: 1024, height: 170 });
   return (
     <group>
-      <ambientLight intensity={0.95} color="#9a88c8" />
-      <hemisphereLight args={["#c9b0ff", "#2a1530", 0.8]} />
+      <ambientLight intensity={1.1} color="#9a88c8" />
+      <hemisphereLight args={["#c9b0ff", "#2a1530", 0.95]} />
       <directionalLight position={[4, 12, 10]} intensity={0.6} color="#ffe2c4" />
       {[-14, -7, 0, 7, 14].map((x) => (
         <pointLight key={x} position={[x, 3.6, -1.5]} intensity={9} distance={11} decay={1.5} color="#ffc47a" />

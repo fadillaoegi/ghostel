@@ -11,6 +11,7 @@
 | 7 | Decoration, atmosphere, NPC ghosts | Done 2026-11-07 |
 | 8 | Second game or proximity voice | Not started (replaced for now by the owner's requests: floors and music in M8, doors, city and monsters in M9) |
 | M16 | Haunted Mirror and Night Desk terminal | Done 2026-11-10 |
+| M17 | Ghostel Game Kit and Monster Pairs (also covers milestone 8's "second game") | Done 2026-11-10 |
 
 ## 2026-11-07 — Milestone 1 (spec `m1-check-in-and-lobby`)
 Owner-defined acceptance criteria and their evidence:
@@ -173,3 +174,22 @@ Check results, run in order on 2026-11-10 (all exit code 0):
 - production smoke test
 
 Not verified: the mirror with a real camera (only Chromium's fake camera); the terminal on a real phone keyboard.
+
+## 2026-11-10/11 — Milestone 18: brighter lighting (spec `m18-brighter-lighting`, owner request "too dark")
+
+- **What changed:**
+  - Renderer exposure went to 1.15. Signs and screens are `toneMapped={false}`, so they keep their glow.
+  - The fog now starts later (20–60 instead of 16–46).
+  - Ambient and hemisphere light went up in the lobby, rooms, gallery, greenhouse and rooftop.
+  - The lobby floor checker is lighter.
+  - No new point lights. A first version with two extra point lights slowed the browser tests, so they were removed (see `tasks.md`).
+- **Measured:** `scripts/measure-brightness.mjs` takes the mean luma of the middle of each screenshot. `docs/evidence/brightness-before-m18.txt` and `brightness-after-m18.txt` hold the numbers.
+  - Rooms went from 8.7–10.5 to 15.1–17.7.
+  - The phone lobby went from 8.0 to 27.0.
+  - Floors 2, 3 and 5 rose by 4 points each.
+  - One lobby view went from 25.4 to 23.9, because avatar positions differ between runs.
+- **Checks (2026-11-11):**
+  - typecheck exit 0; 136 shared + 8 web unit tests; 90 server integration tests; build exit 0.
+  - **Full E2E, stored run (2026-11-11 09:33, load 2.9 at the start): 29 passed, exit 0** (`docs/evidence/test-e2e.txt`). The production smoke test passed too.
+  - Earlier full and single-spec runs at load averages of 19 to 97 failed the door 2B walk in `rooms.spec.ts`. The load came from macOS storage scanning processes (`StorageManagementService`, `Storage.appex`), about 150% CPU for 1–2 days.
+  - `rooms.spec.ts` run alone passed fully in 3 of 15 runs at loads between 18 and 97. The runs covered three variants: with the extra point lights, without them, and with a test-helper change that was then reverted.

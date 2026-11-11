@@ -162,8 +162,8 @@ export function Greenhouse({ selfPos }: { selfPos: RefObject<{ x: number; z: num
   const sign = useLabelTexture("Moonlit Greenhouse", { font: "Creepster", size: 104, color: "#d4ffb0", glow: "#43ff6e", width: 1024, height: 170 });
   return (
     <group>
-      <ambientLight intensity={0.6} color="#7aa890" />
-      <hemisphereLight args={["#9ad0ff", "#10180f", 0.6]} />
+      <ambientLight intensity={0.9} color="#7aa890" />
+      <hemisphereLight args={["#9ad0ff", "#10180f", 0.85]} />
       <directionalLight position={[6, 14, -10]} intensity={0.8} color="#bcd4ff" />
       <Moon position={[-10, 16, -32]} size={4} />
       <mesh rotation={[-Math.PI / 2, 0, 0]}>

@@ -7,7 +7,8 @@ Ghostel is a virtual, low-poly 3D haunted hotel. Tagline (working): "Check in. H
 - Official deadline recorded on 2026-11-05: 2026-12-04 14:00 PT (2026-12-05 05:00 WIB). Personal target: 2026-12-03 21:00 WIB.
 - Submission requirements recorded on 2026-11-05 (re-check the official rules before submitting): meaningful Kiro usage, `.kiro` folder at repo root, working app URL, public GitHub repo with an open source license, YouTube demo video under 3 minutes.
 - Seen on 2026-11-10 in search snippets of the official Devpost page (the page itself returns 403 to Kiro): entrants "pick a category" (one per entry), and only new projects built during the submission period (2026-10-30 to 2026-12-04) are eligible. Ghostel started 2026-11-07. Public repo: https://github.com/fadillaoegi/ghostel (MIT, pushed by the owner on 2026-11-09).
-- Category plan (owner, 2026-11-10): submit to Costume Contest only. Ghostel also contains features that echo other categories (M16: Frankenstein and Resurrection; Skeleton Crew to be decided later). The write-up mentions them under "Also inside the hotel" and never claims to be entered in those categories.
+- Full rules summary read on 2026-11-10 from the AWS Japan blog post about Kiroween 2026 (it summarises the official pages as of 2026-10-31): dates, eligibility, what to submit, prizes and the five 20% judging criteria (Potential Impact, Technological Implementation, Design, Innovation/Idea, Presentation). Details and open owner checks (Indonesia eligibility, free Kiro credits by 2026-12-01 12:00 PT) are in `submission.md`.
+- Category plan (owner, 2026-11-10): submit to Costume Contest only. Ghostel also contains features that echo other categories (M16: Frankenstein and Resurrection; M17: Skeleton Crew, the Ghostel Game Kit proven by a second game). The write-up mentions them under "Also inside the hotel" and never claims to be entered in those categories.
 
 ## Product decisions (confirmed)
 - No login. Users are guests identified by an HttpOnly cookie. Identity is the guest ID, never the display name. Names can change at any time.
@@ -22,6 +23,7 @@ Ghostel is a virtual, low-poly 3D haunted hotel. Tagline (working): "Check in. H
 - Built fresh with Kiro. Do not copy code from the old Ghost Turtle Kit project.
 - Stack: option A, full TypeScript pnpm monorepo (confirmed 2026-11-07, see `architecture.md`).
 - First game: Pumpkin Trivia (Halloween quiz, playable against a bot). Confirmed by the owner on 2026-11-07 ("sesuai kamu rekomendasikan").
+- Second game (2026-11-10, owner chose idea "A"): Monster Pairs, a turn-based memory game on the same `GameEngine` kit, presented as the Ghostel Game Kit. House room 1B runs it.
 - Rooms are separate 3D scenes reached through the lobby's room doors, not areas inside the lobby. Confirmed 2026-11-07. Each room is its own realtime channel.
 - Hosting (tentative, to be verified before deploy): single Node service on Render Free serving web + API + WebSocket, PostgreSQL on Neon Free. Risk: Render Free spins down after 15 minutes without inbound HTTP or WebSocket traffic and cold starts take roughly a minute. Mitigation: "waking the ghosts" loading screen plus a scheduled ping during judging.
 
@@ -33,6 +35,6 @@ Ghostel is a virtual, low-poly 3D haunted hotel. Tagline (working): "Check in. H
 5. Voice inside rooms.
 6. One polished shared game, with a system that allows more games.
 7. Decorations, atmosphere, effects and NPC ghosts so the building never feels empty for a solo judge.
-8. If time allows: a second game or proximity voice.
+8. If time allows: a second game or proximity voice. (Second game: Monster Pairs, M17.)
 
-Owner-requested milestones added later (specs in `.kiro/specs/`): M8 floors and music, M9 room doors, night city and monster variety, M10 Ghoul's Diner and the rooftop on floor 5, M11 phone gamepad and landscape, M12 seats, table calls and the meeting view, M13 camera, M14 presentations (screen share and PDF slides), M15 provable Kiro workflow, M16 Haunted Mirror (Frankenstein echo) and Night Desk terminal (Resurrection echo).
+Owner-requested milestones added later (specs in `.kiro/specs/`): M8 floors and music, M9 room doors, night city and monster variety, M10 Ghoul's Diner and the rooftop on floor 5, M11 phone gamepad and landscape, M12 seats, table calls and the meeting view, M13 camera, M14 presentations (screen share and PDF slides), M15 provable Kiro workflow, M16 Haunted Mirror (Frankenstein echo) and Night Desk terminal (Resurrection echo), M17 Ghostel Game Kit and Monster Pairs (Skeleton Crew echo).

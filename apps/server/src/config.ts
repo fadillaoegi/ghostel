@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs";
-import { TRIVIA_DEFAULTS, TRIVIA_FAST, iceServersSchema, type IceServer, type TriviaConfig } from "@ghostel/shared";
+import { PAIRS_DEFAULTS, PAIRS_FAST, TRIVIA_DEFAULTS, TRIVIA_FAST, iceServersSchema, type IceServer, type PairsConfig, type TriviaConfig } from "@ghostel/shared";
 import { fileURLToPath } from "node:url";
 
 export interface Config {
@@ -17,8 +17,10 @@ export interface Config {
   webDist: string | null;
   /** STUN/TURN servers handed to browsers for voice (VOICE_ICE_SERVERS, JSON array). */
   voiceIceServers: IceServer[];
-  /** Pumpkin Trivia timings. TRIVIA_FAST=1 gives short rounds for automated browser tests. */
+  /** Pumpkin Trivia timings. TRIVIA_FAST=1 gives short games (Trivia and Monster Pairs) for automated browser tests. */
   trivia: TriviaConfig;
+  /** Monster Pairs size and timings (short with TRIVIA_FAST=1). */
+  pairs: PairsConfig;
 }
 
 const DEFAULT_ICE: IceServer[] = [{ urls: "stun:stun.l.google.com:19302" }];
@@ -69,5 +71,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     webDist: existsSync(webDist) ? webDist : null,
     voiceIceServers: parseIceServers(env["VOICE_ICE_SERVERS"]),
     trivia: env["TRIVIA_FAST"] === "1" ? TRIVIA_FAST : TRIVIA_DEFAULTS,
+    pairs: env["TRIVIA_FAST"] === "1" ? PAIRS_FAST : PAIRS_DEFAULTS,
   };
 }

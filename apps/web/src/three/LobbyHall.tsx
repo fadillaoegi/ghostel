@@ -17,7 +17,8 @@ const depth = b.maxZ - b.minZ;
 
 function Floor() {
   const texture = useMemo(() => {
-    const t = makeCheckerTexture("#22163a", "#140c22", "#3a2a55");
+    // M18: a little lighter than before (#22163a / #140c22); the phone camera looks mostly at this floor.
+    const t = makeCheckerTexture("#30214f", "#1e1433", "#4a3870");
     t.repeat.set(width / 3, depth / 3);
     return t;
   }, []);

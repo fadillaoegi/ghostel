@@ -3,7 +3,7 @@ import type { Result } from "./profile";
 
 export const ROOM_ACCESS = ["open", "locked", "password"] as const;
 export const ROOM_DECORS = ["crypt", "library", "ballroom"] as const;
-export const ROOM_GAMES = ["none", "pumpkin_trivia"] as const;
+export const ROOM_GAMES = ["none", "pumpkin_trivia", "monster_pairs"] as const;
 export type RoomAccess = (typeof ROOM_ACCESS)[number];
 export type RoomDecor = (typeof ROOM_DECORS)[number];
 export type RoomGame = (typeof ROOM_GAMES)[number];

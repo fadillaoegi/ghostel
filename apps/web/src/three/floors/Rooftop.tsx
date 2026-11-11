@@ -120,8 +120,8 @@ export function Rooftop() {
   const sign = useLabelTexture("Rooftop Graveyard", { font: "Creepster", size: 100, color: "#e9dcff", glow: "#8b5cf6", width: 1024, height: 170 });
   return (
     <group>
-      <ambientLight intensity={0.55} color="#7a78b8" />
-      <hemisphereLight args={["#9ab0ff", "#120a1a", 0.55]} />
+      <ambientLight intensity={0.8} color="#7a78b8" />
+      <hemisphereLight args={["#9ab0ff", "#120a1a", 0.8]} />
       <directionalLight position={[0, 18, -30]} intensity={1.1} color="#dfe6ff" />
       <Moon position={[0, 20, -42]} size={9} />
       <Stars radius={60} depth={20} count={1800} factor={3} saturation={0} fade speed={0.6} />

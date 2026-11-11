@@ -263,9 +263,10 @@ export function RoomInterior({
   const theme = THEMES[decor];
   return (
     <group>
-      <ambientLight intensity={0.85} color="#8a78b8" />
-      <hemisphereLight args={[theme.light, "#120a1a", 0.55]} />
-      <directionalLight position={[4, 10, 6]} intensity={0.5} color="#c9d4ff" />
+      {/* M18: brighter with ambient and hemisphere only; an extra point light slowed every material (see the M18 spec). */}
+      <ambientLight intensity={1.6} color="#8a78b8" />
+      <hemisphereLight args={[theme.light, "#120a1a", 1.2]} />
+      <directionalLight position={[4, 10, 6]} intensity={0.9} color="#c9d4ff" />
       <Floor theme={theme} />
       <Walls theme={theme} />
       <RoomSign name={name} theme={theme} />

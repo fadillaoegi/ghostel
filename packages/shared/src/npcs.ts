@@ -292,7 +292,7 @@ export function roomHost(game: RoomGame): NpcDef {
     id: "host",
     name: "The Host",
     scene: "room",
-    tint: game === "pumpkin_trivia" ? "#ffcf7a" : "#9affd6",
+    tint: game === "pumpkin_trivia" ? "#ffcf7a" : game === "monster_pairs" ? "#c4b5fd" : "#9affd6",
     scale: 1,
     // An ellipse around the long table and its chairs.
     pose: (t) => {
@@ -302,7 +302,9 @@ export function roomHost(game: RoomGame): NpcDef {
     lines:
       game === "pumpkin_trivia"
         ? ["Fancy a game? Press 🎃 Play Pumpkin Trivia!", "Seven questions, fifteen seconds each. No pressure… mwahaha.", "Even Jack O'Bot gets one wrong sometimes."]
-        : ["Make yourself at home. Take a seat at the long table to meet face to face.", "This room is for hanging out. Pull up a coffin."],
+        : game === "monster_pairs"
+          ? ["Press 🃏 Play Monster Pairs! Find two of the same monster.", "Match a pair and you go again. Jack O'Bot forgets things… sometimes.", "Every monster on these cards checked in once. Some never left."]
+          : ["Make yourself at home. Take a seat at the long table to meet face to face.", "This room is for hanging out. Pull up a coffin."],
   };
 }
 

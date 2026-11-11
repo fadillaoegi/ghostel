@@ -412,9 +412,13 @@ export function WorldScene({
         dpr={[1, 1.75]}
         camera={{ fov: 50, position: [0, 10, 18], near: 0.1, far: 320 }}
         gl={{ antialias: true, powerPreference: "high-performance" }}
+        // M18: a little brighter overall. Signs, screens and candles use toneMapped={false}, so they keep their glow.
+        onCreated={({ gl }) => {
+          gl.toneMappingExposure = 1.15;
+        }}
       >
         <color attach="background" args={["#0b0614"]} />
-        <fog attach="fog" args={[floor === 5 ? "#120c22" : "#0b0614", floor === 5 ? 40 : 16, floor === 5 ? 200 : 46]} />
+        <fog attach="fog" args={[floor === 5 ? "#120c22" : "#0b0614", floor === 5 ? 40 : 20, floor === 5 ? 200 : 60]} />
         <group key={sceneKey}>
           <Environment place={place} selfPos={selfPos} doors={doors} screen={screen} />
           <LocalPlayer

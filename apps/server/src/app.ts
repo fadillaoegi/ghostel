@@ -1,6 +1,6 @@
 import fastifyCookie from "@fastify/cookie";
 import fastifyStatic from "@fastify/static";
-import { ROOM_CAPACITY, createGameRegistry, isRoomId, type EnterFailCode, type TriviaConfig } from "@ghostel/shared";
+import { ROOM_CAPACITY, createGameRegistry, isRoomId, type EnterFailCode, type PairsConfig, type TriviaConfig } from "@ghostel/shared";
 import Fastify, { type FastifyInstance } from "fastify";
 import type { Config } from "./config";
 import { GuestRepository } from "./db/guests";
@@ -28,6 +28,8 @@ export interface AppOverrides {
   passwordAttemptsPerMinute?: number;
   /** Overrides config.trivia (tests). */
   trivia?: TriviaConfig;
+  /** Overrides config.pairs (tests). */
+  pairs?: PairsConfig;
   logger?: boolean;
 }
 
@@ -98,7 +100,7 @@ export async function buildApp(config: Config, overrides: AppOverrides = {}): Pr
   const hub = new PresenceHub(
     overrides.hub,
     createRoomGate(rooms, overrides.passwordAttemptsPerMinute ?? 5),
-    createGameRegistry({ trivia: overrides.trivia ?? config.trivia }),
+    createGameRegistry({ trivia: overrides.trivia ?? config.trivia, pairs: overrides.pairs ?? config.pairs }),
     { add: (guestId, candy) => guests.addCandy(guestId, candy) },
   );
   const resolveGuest = makeGuestResolver(guests, config.production);

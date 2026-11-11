@@ -1,5 +1,5 @@
 import type { AddressInfo } from "node:net";
-import { TRIVIA_DEFAULTS, type ServerMessage } from "@ghostel/shared";
+import { PAIRS_DEFAULTS, TRIVIA_DEFAULTS, type ServerMessage } from "@ghostel/shared";
 import WebSocket from "ws";
 import { buildApp, type AppOverrides, type GhostelApp } from "../src/app";
 import type { Config } from "../src/config";
@@ -24,6 +24,7 @@ export async function startServer(overrides: AppOverrides = {}, configOverrides:
     webDist: null,
     voiceIceServers: [],
     trivia: TRIVIA_DEFAULTS,
+    pairs: PAIRS_DEFAULTS,
     ...configOverrides,
   };
   const built = await buildApp(config, { logger: false, profileWritesPerMinute: 10_000, ...overrides });
