@@ -16,7 +16,7 @@ import { SnackMenu } from "./SnackMenu";
 import { NightDesk } from "./NightDesk";
 import { mirrorCam } from "./mirrorCam";
 import { HotelMusic, musicEnabled, setMusicEnabled, themeFor } from "./music";
-import { CallBar, MeetingView, useCall, voiceMarkOf, type VoiceMark } from "./MeetingView";
+import { MeetingView, useCall, voiceMarkOf, type VoiceMark } from "./MeetingView";
 import { PresentControls, PresentRequests, Stage } from "./Presentation";
 
 function useCoarsePointer(): boolean {
@@ -230,15 +230,11 @@ function LobbyView({ client, profile, onProfile }: { client: PresenceClient; pro
     return () => window.clearTimeout(timer);
   }, [mirror.status]);
 
-  // Presentation: one stage element, shown in the meeting view (seated) or a floating panel; the 3D
-  // room screen copies whatever it shows.
+  // Presentation: shown on the meeting stage while seated at a room's long table (the server only sends it
+  // to the meeting, M20); the 3D room screen copies whatever the stage shows.
   const presentation = inRoom ? presence.presentation : null;
   const [stageSource, setStageSource] = useState<HTMLVideoElement | HTMLCanvasElement | null>(null);
   const onStageSource = useCallback((el: HTMLVideoElement | HTMLCanvasElement | null) => setStageSource(el), []);
-  const [stageMin, setStageMin] = useState(false);
-  // A new presentation (or none) opens full size again.
-  const presentationKey = presentation ? `${presentation.presenter}:${presentation.mode}` : null;
-  useEffect(() => setStageMin(false), [presentationKey]);
   const stage =
     presentation && place.kind === "room" ? (
       <Stage roomId={place.room.id} view={presentation} selfId={presence.selfId} state={callState} presence={client} onSource={onStageSource} />
@@ -427,38 +423,12 @@ function LobbyView({ client, profile, onProfile }: { client: PresenceClient; pro
       </header>
 
       {inRoom && !seated && (
-        <CallBar
-          call={call}
-          state={callState}
-          extraControls={
-            <PresentControls
-              roomId={place.room.id}
-              view={presentation}
-              selfId={presence.selfId}
-              owner={place.owner}
-              call={call}
-              state={callState}
-              presence={client}
-            />
-          }
-        />
+        // M20: a room's meeting (voice, camera, presentations) is its long table. Standing guests are not in it.
+        <p className="panel meeting-hint" data-testid="meeting-hint">
+          🪑 Sit at the long table to join the meeting: voice, camera and presentations.
+        </p>
       )}
-      {inRoom && !seated && stage && (
-        // Minimized, the panel shrinks to a corner thumbnail instead of closing: the room's TV copies it.
-        <div className={stageMin ? "stage-float stage-float--min panel" : "stage-float panel"} data-testid="stage-float" data-min={stageMin ? "yes" : "no"}>
-          <button
-            type="button"
-            className="stage-toggle"
-            aria-label={stageMin ? "Show presentation" : "Minimize presentation"}
-            title={stageMin ? "Show presentation" : "Minimize: watch it on the room's TV"}
-            onClick={() => setStageMin(!stageMin)}
-          >
-            {stageMin ? "⤢" : "–"}
-          </button>
-          {stage}
-        </div>
-      )}
-      {inRoom && place.owner && <PresentRequests requests={presence.presentRequests} presence={client} />}
+      {inRoom && place.owner && seated && <PresentRequests requests={presence.presentRequests} presence={client} />}
       {seated && callState.call && (
         <MeetingView
           stage={inRoom ? (stage ?? undefined) : undefined}

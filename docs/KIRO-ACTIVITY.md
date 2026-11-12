@@ -579,3 +579,21 @@ New screenshots: `desktop-pairs-board.png`, `desktop-pairs-podium.png`, `phone-p
   - Edits to the same file in one parallel batch made `read_file` and `grep` results look stale. Kiro re-checked the file with `grep` before trusting it.
   - The image reader returned an earlier copy of a re-taken screenshot, so Kiro copied the file under a new name to view it.
 - **Environment:** load spikes up to 171 (`airportd` about 118% CPU, plus macOS storage scanning) broke one full E2E run and one probe run. Both outputs are kept as failed evidence. The re-runs at low load passed.
+
+## Session 4, continued — 2026-11-12: Milestone 20 (room meetings at the long table)
+
+- **Prompt (owner, with a screenshot of a standing guest in room 1C who still had mic, camera and "Ask to present"):** sitting at the meeting table should open the Zoom-like page and standing should leave it; a standing guest can still present, fix that first.
+- **Kiro's reading:** this is a product and security rule change, not only UI. The server put everyone in a room into one call and sent presentations to the whole room. Kiro changed the rule in steering first (`product.md`, `security.md`, `architecture.md`), marked M12 and M14 as superseded in part, and wrote the M20 spec before the code.
+- **Subagent:** a `context-gatherer` run mapped every place the old rule lived: hub call keys, presentation checks and delivery, slide authorization, web wiring, the affected tests, and the docs.
+- **Server:**
+  - The call key is now `<channel>#<table>` everywhere, including rooms.
+  - Presentations, requests and slides are limited to the meeting.
+  - Joining the meeting sends the current presentation, and leaving it ends your request and presentation.
+  - A standing guest who asks to present gets a notice rather than an "invalid" count, because a click can race the seat update.
+- **Agent mistakes, recorded as they happened:**
+  1. Kiro again put two edits to the same file in one parallel batch. It checked with `grep` each time before continuing, and then switched to one edit per step for `hub.ts`.
+  2. Kiro ran `pnpm test:server` and `pnpm build` while a full E2E run was going. The build rewrote `dist/` under the running test server, so that run is invalid. It is kept as `test-e2e-invalid-overlapping-build-2026-11-12.txt` and was not counted.
+- **Results:** see the M20 `tasks.md`. In short:
+  - Unit, integration (91), build and production smoke test pass.
+  - The last full E2E run had 3 failures while the load rose to 39. The failed specs passed 5 of 5 when re-run alone.
+  - No single full E2E run has passed since M20.

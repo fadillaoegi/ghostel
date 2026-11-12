@@ -209,3 +209,24 @@ Not verified: the mirror with a real camera (only Chromium's fake camera); the t
   - typecheck exit 0; 136 shared + 8 web unit tests; 90 integration tests; build exit 0; production smoke test 1 passed.
   - Full E2E: **29 passed** in a run started at load 2.5.
   - An earlier run during a load spike (load average up to 171; `airportd` at about 118% CPU) failed 3 browser tests. It is kept as `test-e2e-failed-under-load-2026-11-12.txt`.
+
+## 2026-11-12 — Milestone 20: room meetings happen at the long table (spec `m20-room-meetings-at-the-table`, owner request)
+
+Owner request, with a screenshot: when you sit at the meeting table you enter the Zoom-like page, and when you stand up you leave it. But a standing guest could still present.
+
+- **New rule** (it replaces the M12/M14 room rule; `product.md`, `security.md` and `architecture.md` are updated):
+  - A room's call and presentations belong to the guests seated at its long table (call key `room:<id>#long`).
+  - Standing guests have no call controls. They cannot ask, present or watch, and they cannot download the slides.
+  - Standing up ends your request and your presentation.
+- **Evidence:**
+  - `apps/server/test/calls.test.ts` "a room's call is its long table…": nobody is in a call on entering; seated guests only; a standing guest gets and sends no signals; standing leaves the call.
+  - `apps/server/test/presentations.test.ts`: the existing cases now run with seated guests. A new test covers standing guests, who cannot ask, decide or download, and a presenter who stands up, which ends the presentation.
+  - `e2e/voice.spec.ts`: the room meeting test covers the hint and no controls while standing, then sitting, mic, camera, standing up and the peer connection closing.
+  - `e2e/present.spec.ts`: both guests sit first; a folded meeting keeps a live screen share; the presenter standing up ends it.
+  - Screenshots: `desktop-room-standing.png` (the hint) and `desktop-present-folded.png`. `desktop-present-minimized.png` showed the removed floating panel and was deleted.
+- **Checks (2026-11-12):**
+  - typecheck, 136 + 8 unit tests, **91** integration tests, build and the production smoke test pass.
+  - E2E: no single full run passed after M20 (details and kept outputs in the M20 `tasks.md`).
+    - One full run is invalid: Kiro overlapped it with a build.
+    - One failed 3 tests while the machine's load rose to 39.
+    - The failed specs passed when re-run on their own (5 of 5, `test-e2e-rerun-present-rooms.txt`).

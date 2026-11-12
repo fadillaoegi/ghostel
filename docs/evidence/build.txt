@@ -1,4 +1,4 @@
-# 2026-11-12 05:22:58 WIB — $ pnpm build
+# 2026-11-12 17:24:30 WIB — $ pnpm build
 # node v24.15.0, pnpm 11.1.3, Darwin arm64
 
 $ pnpm --filter @ghostel/web build && pnpm --filter @ghostel/server build
@@ -64,17 +64,17 @@ dist/pdfjs/standard_fonts/LiberationSans-Bold.ttf            137.05 kB
 dist/pdfjs/standard_fonts/LiberationSans-Regular.ttf         139.51 kB
 dist/pdfjs/standard_fonts/LiberationSans-Italic.ttf          162.03 kB
 dist/assets/pdf.worker.min-CIqJB0yW.mjs                    1,271.91 kB
-dist/assets/index-Cb6-0lxt.css                                42.70 kB │ gzip:   9.41 kB
+dist/assets/index-0JWElHaM.css                                41.47 kB │ gzip:   9.22 kB
 dist/assets/pdf.worker.min-UqOn5EDC.js                         0.06 kB │ gzip:   0.08 kB
 dist/assets/pdf-YwugTw7Y.js                                  444.23 kB │ gzip: 133.64 kB
-dist/assets/index-8J3Qz6Z2.js                              1,484.81 kB │ gzip: 408.50 kB
+dist/assets/index-Cyw_a9Co.js                              1,483.99 kB │ gzip: 408.29 kB
 
-✓ built in 1.95s
+✓ built in 8.51s
 $ node build.mjs
 
-  dist/main.js      113.6kb
-  dist/main.js.map  265.3kb
+  dist/main.js      114.9kb
+  dist/main.js.map  268.3kb
 
-⚡ Done in 51ms
+⚡ Done in 872ms
 
 # exit code: 0

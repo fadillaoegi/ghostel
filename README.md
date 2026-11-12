@@ -15,9 +15,9 @@ Ghostel is a low-poly 3D haunted hotel in the browser. Guests build a costumed c
 - Rooms behind numbered doors: 1A–1D in the lobby, 2A–2F in the Hall of Portraits and 3A–3D in the Greenhouse, so friends can say "meet me at 2B". Each door's plaque shows its code, the room name (or "Vacant") and how many guests are inside, live; occupied doors stand ajar with light spilling out. Walk up and press E (or tap): a vacant door opens the create form for that door, a password door asks for the password, an open door lets you straight in. Leaving a room puts you back in front of its door. Rooms have a theme (crypt, haunted library, ballroom) and an access mode (open, locked, password). Each room is its own 3D scene and realtime channel, so outsiders never receive its chat or movement. Passwords are checked on the server against argon2id hashes and guessing is throttled. Guest rooms nobody used for 3 days are released so doors never run out.
 - Five floors connected by an elevator: the Grand Lobby, the Hall of Portraits (paintings whose eyes follow you, a costume runway and the Mirror of Costumes), the Moonlit Greenhouse (giant pumpkins that glow as you pass, a bubbling cauldron, fireflies), Ghoul's Diner (a canteen with a skeleton cook, a vampire waiter, a jukebox and lots of tables; order a snack at the counter and hold it for a minute so everyone sees it) and the Rooftop Graveyard (a huge moon, tombstones with honest epitaphs, and a lit night city far below with traffic, a river, a clock tower and a radio mast). Each floor is its own realtime channel with its own chat.
 - Tables for 2 and 4 on every floor: walk up to a chair and press E (or tap, or gamepad A) to sit. Everyone at the same table is in one call and the screen turns into a Zoom-like meeting: a tile per person with their costume badge or camera, a speaking glow, mic and camera buttons, and "Stand up". Only the guests at that table are connected.
-- Rooms hold 2–8 guests (chosen when the room is created) and have a long table with that many chairs. Everyone inside a room shares one call; sitting at the long table opens the meeting view.
+- Rooms hold 2–8 guests (chosen when the room is created) and have a long table with that many chairs. The room's meeting is its long table: sit down to join the call and open the meeting view, stand up to leave it (M20).
 - Camera and microphone are off until you click them (peer-to-peer WebRTC, small video tiles).
-- Presentations in rooms: the owner presents directly, other guests ask and the owner allows or refuses. Share your screen (desktop browsers) or show PDF slides (up to 10 MB, kept in server memory only, rendered with pdf.js); the presenter turns the pages for everyone. The presentation shows on the meeting stage, in a floating panel and on a big screen in the 3D room.
+- Presentations in rooms: the owner presents directly, other guests ask and the owner allows or refuses. Share your screen (desktop browsers) or show PDF slides (up to 10 MB, kept in server memory only, rendered with pdf.js); the presenter turns the pages for everyone. Presenting happens at the long table: only seated guests can ask, present or watch. The presentation shows on the meeting stage (also when the meeting view is folded) and on the big screen in the 3D room. Standing up ends your presentation.
 - Phones in portrait and landscape: an on-screen gamepad with a floating analog stick on the left and an action button on the right; panels and chat fit short landscape screens; a full-screen button on Android. Physical gamepads work too (left stick or d-pad, A to act, B to go back).
 - Candy hunt: 12 candies hidden across the floors, checked by the server (right floor, close enough) and saved to your profile. Find them all to unlock the Golden Crown.
 - Original music for every floor (a music-box waltz, a harpsichord minuet, a celesta lullaby and a theremin nocturne), performed live in the browser and cross-faded when you change floors.
@@ -57,7 +57,7 @@ Open http://localhost:5290. Open a second browser profile or a private window to
 ## Checks
 ```sh
 pnpm typecheck
-pnpm test         # 136 shared + 8 web unit + 90 server integration tests (needs pnpm db:up)
+pnpm test         # 136 shared + 8 web unit + 91 server integration tests (needs pnpm db:up)
 pnpm test:e2e     # builds, resets ghostel_test, then 29 Playwright tests (fake microphone, camera and screen; short games)
 pnpm test:prod    # production build with NODE_ENV=production: secure cookie, headers, CSP
 pnpm build
@@ -74,11 +74,11 @@ Latest real output is in [docs/evidence/](docs/evidence/).
 `render.yaml` describes one Render web service (web + API + WebSocket on one origin) using a Neon database. Follow [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## Calls, camera and privacy
-- Calls are peer-to-peer WebRTC. Like every P2P call, they show your IP address to the other people in the call. Ghostel only signals between members of the same call: the guests inside one room, or the guests seated at one table.
+- Calls are peer-to-peer WebRTC. Like every P2P call, they show your IP address to the other people in the call. Ghostel only signals between members of the same call: the guests seated at one table (in a room, its long table).
 - Microphone, camera and screen share start only after you click them, and stop when you leave the call (stand up, leave the room, change floor or close the tab).
 - The Haunted Mirror uses a separate camera stream that is never sent anywhere: no call, no server. It stops when you click again, walk away, sit down or change floor.
 - Every person sends their media to every other person in the call (a mesh), so calls stay small: tables seat 2 or 4, rooms hold up to 8 guests, and camera tiles are about 320×240. Bigger video calls would need an SFU such as LiveKit Cloud.
-- PDF slides are kept in the server's memory only, only guests inside that room can download them, and they are deleted when the presentation ends.
+- PDF slides are kept in the server's memory only, only guests seated at that room's long table can download them, and they are deleted when the presentation ends.
 - Some networks block direct connections. Set `VOICE_ICE_SERVERS` to add a TURN server. LiveKit Cloud is the planned fallback for larger calls.
 
 ## Built with Kiro

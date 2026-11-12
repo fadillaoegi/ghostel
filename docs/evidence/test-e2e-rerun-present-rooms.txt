@@ -1,0 +1,17 @@
+# 2026-11-12 17:54:33 WIB — $ pnpm exec playwright test e2e/present.spec.ts e2e/rooms.spec.ts (re-run of the specs that failed under load); load: load averages: 3.89 13.60 20.90
+
+[WebServer] Reset ghostel_test
+[WebServer] Ghostel server ready on http://127.0.0.1:2595
+
+Running 5 tests using 1 worker
+
+  ✓  1 [chromium] › e2e/present.spec.ts:74:1 › a guest asks to show PDF slides, the owner allows it, everyone at the table follows the pages (37.0s)
+  ✓  2 [chromium] › e2e/present.spec.ts:116:1 › the owner shares a screen at the table; a seated guest sees it live; standing up ends it (34.7s)
+  ✓  3 [chromium] › e2e/rooms.spec.ts:60:1 › password room behind door 2B: create, unlock, isolated chat, door prompt, lock, leave, delete (57.9s)
+  ✓  4 [chromium] › e2e/rooms.spec.ts:163:1 › phone: create an open ballroom and walk around inside (20.1s)
+  ✓  5 [chromium] › e2e/rooms.spec.ts:187:1 › doors on floor 3: book a vacant door with E, a friend finds it by its code (21.7s)
+
+  5 passed (2.9m)
+
+# exit code: 0
+# load at end: load averages: 22.56 23.00 23.91

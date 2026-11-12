@@ -1,4 +1,4 @@
-# 2026-11-12 05:21:30 WIB — $ pnpm test:unit
+# 2026-11-12 17:22:02 WIB — $ pnpm test:unit
 # node v24.15.0, pnpm 11.1.3, Darwin arm64
 
 $ pnpm --filter @ghostel/shared test && pnpm --filter @ghostel/web test
@@ -6,48 +6,51 @@ $ vitest run
 
 [1m[30m[46m RUN [49m[39m[22m [36mv5.1.0 [39m[90m/Users/boo/Github/project/Hacketon/ghostel/packages/shared[39m
 
- [32m✓[39m test/profile.test.ts [2m([22m[2m27 tests[22m[2m)[22m[32m 76[2mms[22m[39m
- [32m✓[39m test/trivia.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 318[2mms[22m[39m
- [32m✓[39m test/rooms.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 578[2mms[22m[39m
+ [32m✓[39m test/profile.test.ts [2m([22m[2m27 tests[22m[2m)[22m[33m 498[2mms[22m[39m
+ [32m✓[39m test/trivia.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 469[2mms[22m[39m
+ [32m✓[39m test/rooms.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 1181[2mms[22m[39m
    [32m✓[39m room layout [2m(3)[22m
-     [33m[2m✓[22m[39m keeps players inside the room and off the table[33m 386[2mms[22m[39m
- [32m✓[39m test/movement.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 821[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps players inside the room and off the table[33m 1118[2mms[22m[39m
+ [32m✓[39m test/movement.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 1400[2mms[22m[39m
    [32m✓[39m constrainToWorld [2m(4)[22m
-     [33m[2m✓[22m[39m never returns a point inside an obstacle or outside the walls (grid sweep)[33m 625[2mms[22m[39m
- [32m✓[39m test/npcs.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 1069[2mms[22m[39m
-   [32m✓[39m NPC ghosts [2m(5)[22m
-     [33m[2m✓[22m[39m lobby ghosts stay inside the walls and off the fountain, pillars and desk for 10 minutes[33m 853[2mms[22m[39m
- [32m✓[39m test/tables.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 1234[2mms[22m[39m
+     [33m[2m✓[22m[39m never returns a point inside an obstacle or outside the walls (grid sweep)[33m 1136[2mms[22m[39m
+ [32m✓[39m test/tables.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 1882[2mms[22m[39m
+   [32m✓[39m tables [2m(5)[22m
+     [33m[2m✓[22m[39m tables are inside the walls, apart from each other, and block walking[33m 302[2mms[22m[39m
    [32m✓[39m Ghoul's Diner [2m(4)[22m
-     [33m[2m✓[22m[39m the waiter walks the aisle without crossing tables[33m 914[2mms[22m[39m
- [32m✓[39m test/voice.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 92[2mms[22m[39m
- [32m✓[39m test/pairs.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 41[2mms[22m[39m
- [32m✓[39m test/nightdesk.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 110[2mms[22m[39m
- [32m✓[39m test/doors.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 19[2mms[22m[39m
- [32m✓[39m test/chat.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 23[2mms[22m[39m
- [32m✓[39m test/protocol.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 21[2mms[22m[39m
- [32m✓[39m test/floors.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 2312[2mms[22m[39m
+     [33m[2m✓[22m[39m the waiter walks the aisle without crossing tables[33m 1176[2mms[22m[39m
+ [32m✓[39m test/npcs.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 1860[2mms[22m[39m
+   [32m✓[39m NPC ghosts [2m(5)[22m
+     [33m[2m✓[22m[39m lobby ghosts stay inside the walls and off the fountain, pillars and desk for 10 minutes[33m 1476[2mms[22m[39m
+     [33m[2m✓[22m[39m room hosts circle the table without touching it[33m 328[2mms[22m[39m
+ [32m✓[39m test/pairs.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 95[2mms[22m[39m
+ [32m✓[39m test/voice.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 67[2mms[22m[39m
+ [32m✓[39m test/nightdesk.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 139[2mms[22m[39m
+ [32m✓[39m test/protocol.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 44[2mms[22m[39m
+ [32m✓[39m test/chat.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+ [32m✓[39m test/doors.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 39[2mms[22m[39m
+ [32m✓[39m test/floors.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 3390[2mms[22m[39m
    [32m✓[39m floors [2m(6)[22m
-     [33m[2m✓[22m[39m floor layouts keep players inside the walls (grid sweep)[33m 1932[2mms[22m[39m
+     [33m[2m✓[22m[39m floor layouts keep players inside the walls (grid sweep)[33m 3074[2mms[22m[39m
 
 [2m Test Files [22m [1m[32m13 passed[39m[22m[90m (13)[39m
 [2m      Tests [22m [1m[32m136 passed[39m[22m[90m (136)[39m
-[2m   Start at [22m 05:21:34
-[2m   Duration [22m 4.10s[2m (import 46%, tests 46%, transform 5%, worker 2%)[22m
+[2m   Start at [22m 17:22:08
+[2m   Duration [22m 6.68s[2m (tests 44%, import 43%, transform 12%, worker 1%)[22m
 
-[2m    Isolate [22m [33m13 workers spawned[39m[2m · ~809ms startup each (spawn + environment, per file)[22m
-[2m            [22m [2mat least ~693ms faster with [22m[33misolate: false[39m[2m — reuses workers across files instead of one per file[22m
+[2m    Isolate [22m [33m13 workers spawned[39m[2m · ~1.42s startup each (spawn + environment, per file)[22m
+[2m            [22m [2mat least ~1.22s faster with [22m[33misolate: false[39m[2m — reuses workers across files instead of one per file[22m
 
 $ vitest run
 
 [1m[30m[46m RUN [49m[39m[22m [36mv5.1.0 [39m[90m/Users/boo/Github/project/Hacketon/ghostel/apps/web[39m
 
- [32m✓[39m test/scores.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 32[2mms[22m[39m
+ [32m✓[39m test/scores.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 35[2mms[22m[39m
 
 [2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
 [2m      Tests [22m [1m[32m8 passed[39m[22m[90m (8)[39m
-[2m   Start at [22m 05:21:41
-[2m   Duration [22m 430ms[2m (import 36%, tests 33%, transform 22%, worker 9%)[22m
+[2m   Start at [22m 17:22:16
+[2m   Duration [22m 331ms[2m (tests 37%, import 34%, transform 19%, worker 10%)[22m
 
 
 # exit code: 0

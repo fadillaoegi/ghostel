@@ -60,13 +60,29 @@ async function openRoom(page: Page, name: string) {
   await expect(page.getByTestId("place-name")).toHaveText(new RegExp(`${name}$`));
 }
 
-test("a guest asks to show PDF slides, the owner allows it, everyone in the room follows the pages", async ({ browser }) => {
+/** A room's meeting is its long table (M20): walk up to it, sideways if that chair is taken, and sit. */
+async function sitAtLongTable(page: Page) {
+  await page.bringToFront();
+  // Long limits: with a screen share running, frames can be slow on a busy test machine.
+  if (!(await holdUntilSeat(page, "KeyW", 10_000))) {
+    if (!(await holdUntilSeat(page, "KeyD", 8000))) expect(await holdUntilSeat(page, "KeyA", 12_000)).toBe(true);
+  }
+  await page.keyboard.press("KeyE");
+  await expect(page.getByTestId("meeting")).toBeVisible();
+}
+
+test("a guest asks to show PDF slides, the owner allows it, everyone at the table follows the pages", async ({ browser }) => {
   const olga = await checkIn(browser, "Olga Owner");
   const vic = await checkIn(browser, "Vic Visitor");
   await openRoom(olga.page, "Board Meeting");
   await vic.page.getByRole("button", { name: "Rooms" }).click();
   await vic.page.getByRole("button", { name: "Enter Board Meeting" }).click();
   await expect(vic.page.getByTestId("place-name")).toHaveText(/Board Meeting$/);
+
+  // Standing, Vic cannot ask to present (M20); at the table he can.
+  await expect(vic.page.getByRole("button", { name: "Ask to present" })).toHaveCount(0);
+  await sitAtLongTable(olga.page);
+  await sitAtLongTable(vic.page);
 
   await vic.page.getByRole("button", { name: "Ask to present" }).click();
   await vic.page.getByRole("menuitem", { name: /Show PDF slides/ }).click();
@@ -97,51 +113,40 @@ test("a guest asks to show PDF slides, the owner allows it, everyone in the room
   await olga.context.close();
 });
 
-test("the owner shares a screen; a guest in the room sees it live", async ({ browser }) => {
+test("the owner shares a screen at the table; a seated guest sees it live; standing up ends it", async ({ browser }) => {
   const olga = await checkIn(browser, "Olga Owner");
   const vic = await checkIn(browser, "Vic Visitor");
   await openRoom(olga.page, "Screen Night");
   await vic.page.getByRole("button", { name: "Rooms" }).click();
   await vic.page.getByRole("button", { name: "Enter Screen Night" }).click();
   await expect(vic.page.getByTestId("place-name")).toHaveText(/Screen Night$/);
+  await sitAtLongTable(olga.page);
+  await sitAtLongTable(vic.page);
 
   await olga.page.bringToFront();
   await olga.page.getByRole("button", { name: "Present" }).click();
   await olga.page.getByRole("menuitem", { name: /Share my screen/ }).click();
   await olga.page.getByRole("button", { name: "Share your screen" }).click();
   await expect(olga.page.getByTestId("shared-screen")).toHaveAttribute("data-live", "yes", { timeout: 15_000 });
-  await expect(vic.page.getByTestId("shared-screen")).toHaveAttribute("data-live", "yes", { timeout: 20_000 });
-  await expect
-    .poll(() => vic.page.getByTestId("shared-screen").locator("video").evaluate((v: HTMLVideoElement) => v.videoWidth), { timeout: 20_000 })
-    .toBeGreaterThan(0);
+  const screen = vic.page.getByTestId("meeting").getByTestId("shared-screen");
+  await expect(screen).toHaveAttribute("data-live", "yes", { timeout: 20_000 });
+  await expect.poll(() => screen.locator("video").evaluate((v: HTMLVideoElement) => v.videoWidth), { timeout: 20_000 }).toBeGreaterThan(0);
   await vic.page.waitForTimeout(900);
   await vic.page.screenshot({ path: `${SHOTS}/desktop-present-screen.png` });
 
-  // Minimize: the panel shrinks to a corner thumbnail (the room's TV keeps showing the screen) and the video keeps playing.
-  const panel = vic.page.getByTestId("stage-float");
-  const video = vic.page.getByTestId("shared-screen").locator("video");
-  await vic.page.getByRole("button", { name: "Minimize presentation" }).click();
-  await expect(panel).toHaveAttribute("data-min", "yes");
-  expect((await panel.boundingBox())!.width).toBeLessThan(260);
-  await expect(vic.page.getByTestId("shared-screen")).toHaveAttribute("data-live", "yes");
+  // Folding the meeting to see the hotel keeps a small live stage (the room's TV copies it).
+  await vic.page.getByRole("button", { name: "Show the hotel" }).click();
+  await expect(vic.page.getByTestId("meeting")).toHaveClass(/meeting--folded/);
+  const video = screen.locator("video");
   const t0 = await video.evaluate((v: HTMLVideoElement) => v.currentTime);
   await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.currentTime), { timeout: 10_000 }).toBeGreaterThan(t0);
   await vic.page.waitForTimeout(900);
-  await vic.page.screenshot({ path: `${SHOTS}/desktop-present-minimized.png` });
-  await vic.page.getByRole("button", { name: "Show presentation" }).click();
-  await expect(panel).toHaveAttribute("data-min", "no");
-  expect((await panel.boundingBox())!.width).toBeGreaterThan(400);
+  await vic.page.screenshot({ path: `${SHOTS}/desktop-present-folded.png` });
+  await vic.page.getByRole("button", { name: "Show meeting" }).click();
+  await expect(vic.page.getByTestId("meeting")).not.toHaveClass(/meeting--folded/);
 
-  // Vic sits at the long table with the camera on: the screen moves to the meeting stage and the
-  // camera tiles below it keep the camera's 4:3 shape (not squashed into a flat strip).
+  // With the camera on, the tiles under the stage keep the camera's 4:3 shape (not squashed into a flat strip).
   await vic.page.bringToFront();
-  // Long limits: with a screen share running, frames can be slow on a busy test machine.
-  if (!(await holdUntilSeat(vic.page, "KeyW", 10_000))) {
-    if (!(await holdUntilSeat(vic.page, "KeyD", 8000))) expect(await holdUntilSeat(vic.page, "KeyA", 12_000)).toBe(true);
-  }
-  await vic.page.keyboard.press("KeyE");
-  await expect(vic.page.getByTestId("meeting")).toBeVisible();
-  await expect(vic.page.getByTestId("meeting").getByTestId("shared-screen")).toHaveAttribute("data-live", "yes", { timeout: 20_000 });
   await vic.page.getByRole("button", { name: "Turn camera on" }).click();
   const ownTile = vic.page.getByTestId("meeting-tile").filter({ hasText: "(you)" });
   await expect(ownTile).toHaveAttribute("data-cam", "on");
@@ -154,8 +159,11 @@ test("the owner shares a screen; a guest in the room sees it live", async ({ bro
   await vic.page.waitForTimeout(900);
   await vic.page.screenshot({ path: `${SHOTS}/desktop-present-meeting-camera.png` });
 
-  await olga.page.getByRole("button", { name: "Stop presenting" }).click();
+  // The presenter stands up: she leaves the meeting, so her presentation ends for everyone (M20).
+  await olga.page.getByRole("button", { name: "Stand up" }).click();
+  await expect(olga.page.getByTestId("meeting-hint")).toBeVisible();
   await expect(vic.page.getByTestId("shared-screen")).toHaveCount(0);
+  await expect(vic.page.getByTestId("meeting-count")).toHaveText("1 person");
   await vic.context.close();
   await olga.context.close();
 });

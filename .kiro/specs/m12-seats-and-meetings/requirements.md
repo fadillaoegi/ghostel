@@ -1,3 +1,5 @@
+> **Superseded in part by M20 (2026-11-12):** a room's call and its presentations now belong to the guests seated at its long table, not to everyone inside the room. See `.kiro/specs/m20-room-meetings-at-the-table/`.
+
 # Requirements — Milestone 12: seats, table calls and the meeting view
 
 > **Written after implementation.** This spec was written after the code was built (2026-11-08/09), not before it as the workflow requires. The decisions in it were agreed with the owner in chat before coding. See `docs/KIRO-ACTIVITY.md`, session 3.

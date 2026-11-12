@@ -46,20 +46,37 @@ async function openRoom(page: Page, name: string) {
   await expect(page.getByTestId("place-name")).toHaveText(new RegExp(`^🔓 [123][A-F] · ${name}$`));
 }
 
-test("a room is one call: microphone and camera only after a click, the meeting view when seated", async ({ browser }) => {
+test("a room's meeting is its long table: sit to join (mic and camera only after a click), stand to leave", async ({ browser }) => {
   const olga = await checkIn(browser, "Olga Owner");
   const vic = await checkIn(browser, "Vic Visitor");
 
   // No call in the lobby until you sit at a table.
-  await expect(olga.page.getByTestId("call-bar")).toHaveCount(0);
+  await expect(olga.page.getByTestId("meeting")).toHaveCount(0);
 
   await openRoom(olga.page, "Seance Circle");
   await vic.page.getByRole("button", { name: "Rooms" }).click();
   await vic.page.getByRole("button", { name: "Enter Seance Circle" }).click();
   await expect(vic.page.getByTestId("place-name")).toHaveText(/Seance Circle$/);
 
-  // Everyone in the room is in the call, muted until they choose otherwise.
-  await expect(olga.page.getByTestId("voice-status")).toContainText("2 in call");
+  // Standing in the room is not being in the meeting (M20): no call controls, no presenting, just a hint.
+  for (const g of [olga, vic]) {
+    await expect(g.page.getByTestId("meeting-hint")).toBeVisible();
+    await expect(g.page.getByTestId("meeting")).toHaveCount(0);
+    await expect(g.page.getByRole("button", { name: /Ask to present|^Present$/ })).toHaveCount(0);
+    await expect(g.page.getByRole("button", { name: "Unmute" })).toHaveCount(0);
+  }
+  await expect(vic.page.getByTestId("nametag").filter({ hasText: "Olga Owner" })).not.toHaveAttribute("data-voice");
+
+  // Both take a seat at the long table: the meeting view opens with one tile per person.
+  await olga.page.bringToFront();
+  await sitAtLongTable(olga.page);
+  await vic.page.bringToFront();
+  await sitAtLongTable(vic.page);
+  for (const g of [olga, vic]) {
+    await expect(g.page.getByTestId("meeting-count")).toHaveText("2 people");
+    await expect(g.page.getByTestId("meeting-tile")).toHaveCount(2);
+    await expect(g.page.getByTestId("meeting-hint")).toHaveCount(0);
+  }
   await expect(vic.page.getByTestId("nametag").filter({ hasText: "Olga Owner" })).toHaveAttribute("data-voice", "muted");
 
   // Chrome holds getUserMedia until the page has focus (real users click on a focused page).
@@ -80,16 +97,8 @@ test("a room is one call: microphone and camera only after a click, the meeting 
   await olga.page.getByRole("button", { name: "Mute" }).click();
   await expect(vic.page.getByTestId("nametag").filter({ hasText: "Olga Owner" })).toHaveAttribute("data-voice", "muted");
 
-  // Both take a seat at the long table: the meeting view opens with one tile per person.
-  await sitAtLongTable(olga.page);
-  await vic.page.bringToFront();
-  await sitAtLongTable(vic.page);
-  for (const g of [olga, vic]) {
-    await expect(g.page.getByTestId("meeting-count")).toHaveText("2 people");
-    await expect(g.page.getByTestId("meeting-tile")).toHaveCount(2);
-  }
-
   // Vic turns the camera on (Chromium's fake camera): Olga's tile for Vic shows video.
+  await vic.page.bringToFront();
   await vic.page.getByRole("button", { name: "Turn camera on" }).click();
   await expect(vic.page.getByRole("button", { name: "Turn camera off" })).toBeVisible();
   const vicTile = olga.page.getByTestId("meeting-tile").filter({ hasText: "Vic Visitor" });
@@ -100,17 +109,18 @@ test("a room is one call: microphone and camera only after a click, the meeting 
   await olga.page.waitForTimeout(800);
   await olga.page.screenshot({ path: `${SHOTS}/desktop-meeting-room.png` });
 
-  // Standing up closes the meeting view; the camera stops when Vic leaves the room.
+  // Standing up leaves the meeting: the view closes, the hint is back, the camera and the peer connection stop.
   await vic.page.getByRole("button", { name: "Stand up" }).click();
   await expect(vic.page.getByTestId("meeting")).toHaveCount(0);
-  await expect(vic.page.getByTestId("call-bar")).toBeVisible();
-  await vic.page.getByRole("button", { name: "Leave room" }).click();
-  await expect(vic.page.getByTestId("place-name")).toHaveText(/^(Grand Lobby|[23]F · .+)$/);
+  await expect(vic.page.getByTestId("meeting-hint")).toBeVisible();
   await expect(olga.page.getByTestId("meeting-count")).toHaveText("1 person");
   await expect(vicTile).toHaveCount(0);
-  expect(await vic.page.locator("audio[data-voice-peer]").count()).toBe(0);
-  const vicTracks = await vic.page.evaluate(() => document.querySelectorAll("video").length);
-  expect(vicTracks).toBe(0);
+  await expect.poll(() => vic.page.locator("audio[data-voice-peer]").count()).toBe(0);
+  await expect.poll(() => vic.page.evaluate(() => document.querySelectorAll("video").length)).toBe(0);
+  await vic.page.waitForTimeout(500);
+  await vic.page.screenshot({ path: `${SHOTS}/desktop-room-standing.png` });
+  await vic.page.getByRole("button", { name: "Leave room" }).click();
+  await expect(vic.page.getByTestId("place-name")).toHaveText(/^(Grand Lobby|[23]F · .+)$/);
 
   await vic.context.close();
   await olga.context.close();

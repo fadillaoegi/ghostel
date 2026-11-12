@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 /**
- * Calls are peer-to-peer WebRTC meshes relayed by the server. A call is either a room (everyone
- * inside) or one table on a floor (exactly the guests seated there). Members send their media
- * state; the server tells every member who else is in the call.
+ * Calls are peer-to-peer WebRTC meshes relayed by the server. A call is one table: exactly the guests
+ * seated there, on a floor or at a room's long table (a room's meeting, M20). Members send their
+ * media state; the server tells every member who else is in the call.
  */
 
 /** WebRTC MediaStream ids as browsers generate them (UUIDs, sometimes in braces). */
@@ -25,12 +25,12 @@ export interface CallMember {
 
 export interface CallState {
   kind: "room" | "table";
-  /** Table id for table calls ("long" for a room's table is not used: room calls cover the room). */
+  /** The table of the call ("long" for a room's meeting). */
   table: string | null;
   members: CallMember[];
 }
 
-/** Largest call: a full room (8) plus its owner, who may enter a full room. */
+/** Upper bound for a call. A room's meeting is at most its 8 chairs; the bound keeps one spare. */
 export const CALL_MAX_MEMBERS = 9;
 
 /** Camera tiles are small; keep the mesh light. */
@@ -45,7 +45,7 @@ export type PresentMode = (typeof PRESENT_MODES)[number];
 export const SLIDES_MAX_BYTES = 10 * 1024 * 1024;
 export const SLIDES_MAX_PAGES = 2000;
 
-/** What everyone in the room knows about the current presentation. */
+/** What the room's meeting (guests seated at its long table) knows about the current presentation. */
 export interface PresentationView {
   /** Public connection id of the presenter. */
   presenter: string;

@@ -22,5 +22,6 @@ One folder per milestone, each with `requirements.md`, `design.md` and `tasks.md
 | 17 Ghostel Game Kit and Monster Pairs (Skeleton Crew echo; second game) | `m17-game-kit-monster-pairs` | done | before code |
 | 18 Brighter lighting | `m18-brighter-lighting` | done | before code |
 | 19 Smoother frame rate | `m19-smoother` | done | before code |
+| 20 Room meetings at the long table (supersedes the M12/M14 room rule) | `m20-room-meetings-at-the-table` | done (no single full E2E pass yet, see its `tasks.md`) | before code |
 
 Milestone 8 of the original brief ("a second game or proximity voice") is covered by M17's second game.

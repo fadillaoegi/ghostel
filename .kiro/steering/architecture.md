@@ -16,7 +16,7 @@
 - The client sends its desired position at up to 20 Hz. The server validates (finite numbers, building bounds, obstacles, max speed), stores the accepted position, and broadcasts snapshots at a fixed tick. Rejected or clamped moves get a `correct` message back to the sender.
 - Presence is keyed by connection (one avatar per tab), each connection belongs to one guest. Public IDs sent to clients are per-connection random IDs, never the guest ID or cookie token.
 - Position, presence, seats, calls, running games, presentations (including PDF slides) and chat stay in server memory. PostgreSQL 18 stores guest profiles (name, look, found candies) and rooms (door, capacity, access, argon2 password hash). Migrations are append-only in `apps/server/src/db/migrate.ts`.
-- Channels: "lobby", "floor:2".."floor:5" and "room:<id>". Every broadcast goes through a channel. Calls are a room channel or one table on a floor (`<channel>#<table>`); signaling is relayed only inside one call.
+- Channels: "lobby", "floor:2".."floor:5" and "room:<id>". Every broadcast goes through a channel. Calls are one table in a channel (`<channel>#<table>`; a room's meeting is `room:<id>#long`, M20); signaling, presentation state and slides stay inside one call.
 - Media is peer-to-peer WebRTC (mesh). The server only relays signaling and announces stream ids.
 
 ## Conventions

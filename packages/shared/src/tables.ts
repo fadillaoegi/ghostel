@@ -57,6 +57,8 @@ export function roundTable(id: string, x: number, z: number, seats: 2 | 4): Tabl
 }
 
 export const ROOM_TABLE_Z = -0.5;
+/** Id of every room's long table. A room's meeting (call and presentations) is the guests seated there (M20). */
+export const ROOM_TABLE_ID = "long";
 const LONG_SEAT_SPACING = 1.25;
 
 /**
@@ -79,7 +81,7 @@ export function longTable(capacity: number): TableDef {
     seats.push({ x, z: sz, ry: side === 1 ? Math.PI : 0 });
   }
   return {
-    id: "long",
+    id: ROOM_TABLE_ID,
     shape: "long",
     x: 0,
     z,

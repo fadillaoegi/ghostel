@@ -14,7 +14,7 @@ const TOKEN = /^[A-Za-z0-9_-]{16,64}$/;
 
 /**
  * PDF slides for a room's presentation. Kept in the hub's memory only; the hub checks that the
- * uploader is the approved presenter and that downloaders are inside the room.
+ * uploader is the approved presenter and that downloaders are seated at the room's long table (M20).
  */
 export function registerSlideRoutes(app: FastifyInstance, deps: SlideRouteDeps): void {
   const uploads = new RateLimiter(deps.uploadsPerMinute, 60_000);

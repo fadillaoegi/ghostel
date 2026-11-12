@@ -178,7 +178,7 @@ describe("table calls", () => {
 });
 
 describe("room calls", () => {
-  it("everyone inside a room shares one call; the long table has one chair per guest the room holds", async () => {
+  it("a room's call is its long table: only seated guests are in it; standing up leaves it (M20)", async () => {
     const owner = await guest("Olga");
     const created = await api(server, "POST", "/api/rooms", owner, { name: "Small Talk", access: "open", decor: "crypt", game: "none", capacity: 3 });
     expect(created.json?.["room"]).toMatchObject({ capacity: 3 });
@@ -186,51 +186,69 @@ describe("room calls", () => {
     const o = await connect(owner);
     const v = await connect(await guest("Vic"));
     const w = await connect(await guest("Wes"));
+    const entered = new Map<typeof o, number>();
     for (const x of [o, v, w]) {
       const mark = x.s.messages.length;
+      entered.set(x, mark);
       x.s.send({ t: "enter", room: roomId });
       const welcome = await after(x.s, mark, "welcome", (m) => m.place.kind === "room");
       const me = welcome.players.find((p) => p.id === welcome.selfId)!;
       x.pos = { x: me.x, z: me.z };
     }
-    const call = await w.s.next("call", (m) => m.call?.members.length === 3);
-    expect(call.call).toMatchObject({ kind: "room", table: null });
+    // Entering a room puts nobody in a call.
+    await settle();
+    for (const x of [o, v, w]) expect(x.s.messages.slice(entered.get(x)).some((m) => m.t === "call" && m.call !== null)).toBe(false);
 
     // Full at three: a fourth guest is turned away.
     const late = await connect(await guest("Late Lou"));
     late.s.send({ t: "enter", room: roomId });
     expect(await late.s.next("enter_failed")).toEqual({ t: "enter_failed", code: "full", message: "This room is full (3 guests)." });
 
-    // Sitting at the long table keeps the room call and shows the seat.
+    // Olga and Vic sit at the long table (chairs 0 and 2 face south, toward the door): that is the call.
     const table = roomTable(3);
     expect(table.seats).toHaveLength(3);
-    const spot = standSpot(table, table.seats[2]!);
-    await walk(v.s, v.pos, spot);
-    const mark = v.s.messages.length;
-    v.s.send({ t: "sit", table: "long", seat: 2 });
-    await after(v.s, mark, "seat", (m) => m.id === v.id);
-    expect((await o.s.next("call", (m) => m.call?.members.some((x) => x.id === v.id && x.seat === 2) ?? false)).call?.members).toHaveLength(3);
+    for (const [x, seat] of [
+      [o, 0],
+      [v, 2],
+    ] as const) {
+      x.pos = await walk(x.s, x.pos, standSpot(table, table.seats[seat]!));
+      const mark = x.s.messages.length;
+      x.s.send({ t: "sit", table: "long", seat });
+      await after(x.s, mark, "seat", (m) => m.id === x.id && m.seat === seat);
+    }
+    const call = await o.s.next("call", (m) => m.call?.members.length === 2);
+    expect(call.call).toMatchObject({ kind: "room", table: "long" });
+    expect(call.call?.members.map((m) => m.id).sort()).toEqual([o.id, v.id].sort());
 
-    // Signals reach other members of the room call only.
+    // Signals flow between seated guests only; Wes, standing in the same room, gets none and cannot send any.
     const lobby = await connect(await guest("Larry"));
+    const wesMark = w.s.messages.length;
     o.s.send({ t: "signal", to: lobby.id, data: OFFER });
     o.s.send({ t: "signal", to: w.id, data: OFFER });
-    expect(await w.s.next("signal")).toMatchObject({ from: o.id });
+    o.s.send({ t: "signal", to: v.id, data: OFFER });
+    expect(await v.s.next("signal")).toMatchObject({ from: o.id });
+    const olgaMark = o.s.messages.length;
+    w.s.send({ t: "signal", to: o.id, data: OFFER });
     await settle();
+    expect(w.s.messages.slice(wesMark).some((m) => m.t === "signal" || (m.t === "call" && m.call !== null))).toBe(false);
+    expect(o.s.messages.slice(olgaMark).some((m) => m.t === "signal")).toBe(false);
     expect(lobby.s.messages.some((m) => m.t === "signal" || m.t === "call")).toBe(false);
 
-    // Leaving the room ends the call for that guest.
-    const exitMark = w.s.messages.length;
-    w.s.send({ t: "exit" });
-    expect(await after(w.s, exitMark, "call")).toEqual({ t: "call", call: null });
-    expect((await o.s.next("call", (m) => m.call?.members.length === 2)).call?.members.map((m) => m.id).sort()).toEqual([o.id, v.id].sort());
+    // Standing up leaves the call.
+    const standMark = v.s.messages.length;
+    v.s.send({ t: "stand" });
+    expect(await after(v.s, standMark, "call")).toEqual({ t: "call", call: null });
+    expect((await o.s.next("call", (m) => m.call?.members.length === 1)).call?.members.map((m) => m.id)).toEqual([o.id]);
+
+    // Leaving the room ends the call too.
+    const exitMark = o.s.messages.length;
+    o.s.send({ t: "exit" });
+    expect(await after(o.s, exitMark, "call")).toEqual({ t: "call", call: null });
   });
 
   it("rejects oversized SDP as an invalid message", async () => {
-    const owner = await guest("Olga");
-    const roomId = (await api(server, "POST", "/api/rooms", owner, { name: "Big Talk", access: "open", decor: "crypt", game: "none" })).json?.["room"].id;
-    const a = await connect(owner);
-    a.s.send({ t: "enter", room: roomId });
+    const a = await connect(await guest("Olga"));
+    await sitAt(a, lobbyTable, 0);
     await a.s.next("call", (m) => m.call !== null);
     for (let i = 0; i < 20; i++) a.s.send({ t: "signal", to: "x", data: { kind: "offer", sdp: "x".repeat(SDP_MAX + 1) } });
     expect((await a.s.closed).code).toBe(4001);

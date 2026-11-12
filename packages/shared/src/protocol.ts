@@ -42,7 +42,7 @@ export const clientMessageSchema = z.discriminatedUnion("t", [
   // Call media state; stream ids let others tell the camera from a screen share.
   z.strictObject({ t: z.literal("media"), mic: z.boolean(), cam: streamIdSchema.nullable(), screen: streamIdSchema.nullable() }),
   z.strictObject({ t: z.literal("signal"), to: z.string().min(1).max(32), data: voiceSignalDataSchema }),
-  // Presentations: anyone in a room may ask; only the owner decides (checked on the server).
+  // Presentations: anyone seated at a room's long table may ask; only the owner, seated, decides (checked on the server, M20).
   z.strictObject({ t: z.literal("present_request"), mode: z.enum(PRESENT_MODES) }),
   z.strictObject({ t: z.literal("present_decide"), id: z.string().min(1).max(32), allow: z.boolean() }),
   z.strictObject({ t: z.literal("present_stop") }),

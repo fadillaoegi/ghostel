@@ -26,6 +26,7 @@ import {
   SEAT_REACH,
   constrainToWorld,
   findSeat,
+  ROOM_TABLE_ID,
   seatCode,
   standSpot,
   SLIDES_MAX_BYTES,
@@ -137,7 +138,7 @@ interface Connection {
   entering: boolean;
   /** Chair this connection sits on (in its current channel). */
   seat: { table: string; seat: number } | null;
-  /** Call this connection belongs to: "room:<id>" or "<channel>#<table>"; null when in none. */
+  /** Call this connection belongs to: "<channel>#<table>" of the table it sits at (rooms: "room:<id>#long"); null when standing. */
   callKey: string | null;
   /** What it shares in that call. Reset when it leaves the call. */
   media: { mic: boolean; cam: string | null; screen: string | null };
@@ -392,12 +393,10 @@ export class PresenceHub {
     conn.lastMoveAt = this.opts.now();
     conn.dirty = false;
     this.welcome(conn);
-    // Rooms are one call for everyone inside; floors have no call until you sit at a table.
+    // No call on arrival: calls (floor tables and a room's long table) start when you sit down.
     this.syncCall(conn);
-    if (place.kind === "room") {
-      this.send(conn, { t: "presentation", p: this.presentationView(conn.channel) });
-      if (place.owner) this.sendRequests(conn.channel);
-    }
+    // Clear any presentation the client still shows from an earlier room; the current one comes when you sit.
+    if (place.kind === "room") this.send(conn, { t: "presentation", p: null });
   }
 
   private detach(conn: Connection): void {
@@ -687,8 +686,18 @@ export class PresenceHub {
   // ---- calls ----
 
   private callKeyFor(conn: Connection): string | null {
-    if (conn.place.kind === "room") return conn.channel;
+    // Floors and rooms alike: you are in a call only while seated (a room's meeting is its long table, M20).
     return conn.seat ? `${conn.channel}#${conn.seat.table}` : null;
+  }
+
+  /** Call key of a room's meeting: the guests seated at its long table. */
+  private meetingKey(channel: string): string {
+    return `${channel}#${ROOM_TABLE_ID}`;
+  }
+
+  /** Seated at the long table of the room this connection is in. */
+  private inMeeting(conn: Connection): boolean {
+    return conn.place.kind === "room" && conn.callKey === this.meetingKey(conn.channel);
   }
 
   private callMembers(key: string): Connection[] {
@@ -705,7 +714,7 @@ export class PresenceHub {
       screen: c.media.screen,
       seat: c.seat?.seat ?? null,
     }));
-    return { kind: table === null ? "room" : "table", table, members };
+    return { kind: key.startsWith("room:") ? "room" : "table", table, members };
   }
 
   private sendCall(key: string): void {
@@ -723,11 +732,21 @@ export class PresenceHub {
       if (next) this.sendCall(next);
       return;
     }
+    const wasInMeeting = !gone && conn.place.kind === "room" && prev === this.meetingKey(conn.channel);
     conn.callKey = next;
     conn.media = { ...NO_MEDIA };
     if (prev) this.sendCall(prev);
     if (next) this.sendCall(next);
     else if (!gone) this.send(conn, { t: "call", call: null });
+    // A room's presentations belong to its meeting: they arrive when you sit and stop when you stand (M20).
+    if (this.inMeeting(conn)) {
+      this.send(conn, { t: "presentation", p: this.presentationView(conn.channel) });
+      if (this.isOwner(conn)) this.sendRequests(conn.channel);
+    } else if (wasInMeeting) {
+      this.leavePresentations(conn, conn.channel);
+      this.send(conn, { t: "presentation", p: null });
+      if (this.isOwner(conn)) this.send(conn, { t: "present_requests", requests: [] });
+    }
   }
 
   /** Mic on/off and stream ids. Screen sharing only for the room's approved presenter. */
@@ -754,25 +773,30 @@ export class PresenceHub {
     return { presenter: p.presenter.publicId, name: p.presenter.profile.name, mode: p.mode, page: p.page, pages: p.pages, file: p.file?.token ?? null };
   }
 
+  /** Presentation state goes to the room's meeting only: guests seated at its long table (M20). */
   private broadcastPresentation(channel: string): void {
-    this.broadcast(channel, { t: "presentation", p: this.presentationView(channel) });
+    const payload = JSON.stringify({ t: "presentation", p: this.presentationView(channel) } satisfies ServerMessage);
+    for (const c of this.callMembers(this.meetingKey(channel))) this.sendRaw(c, payload);
   }
 
   private isOwner(conn: Connection): boolean {
     return conn.place.kind === "room" && conn.place.owner;
   }
 
+  /** Requests to present, for the room's owner while seated in the meeting. */
   private sendRequests(channel: string): void {
     const requests: PresentRequest[] = [...(this.presentRequests.get(channel) ?? new Map<Connection, PresentMode>()).entries()].map(([c, mode]) => ({
       id: c.publicId,
       name: c.profile.name,
       mode,
     }));
-    for (const c of this.members(channel)) if (this.isOwner(c)) this.send(c, { t: "present_requests", requests });
+    for (const c of this.callMembers(this.meetingKey(channel))) if (this.isOwner(c)) this.send(c, { t: "present_requests", requests });
   }
 
   private presentRequest(conn: Connection, mode: PresentMode): void {
     if (conn.place.kind !== "room") return this.send(conn, { t: "notice", message: "Presentations happen in rooms." });
+    // Not invalid: a click can race the server's seat update.
+    if (!this.inMeeting(conn)) return this.send(conn, { t: "notice", message: "Sit at the long table to join the meeting first." });
     const current = this.presentations.get(conn.channel);
     if (current) {
       if (current.presenter !== conn) this.send(conn, { t: "notice", message: `${current.presenter.profile.name} is presenting right now.` });
@@ -791,6 +815,7 @@ export class PresenceHub {
 
   private presentDecide(conn: Connection, id: string, allow: boolean): void {
     if (!this.isOwner(conn)) return this.rejectInvalid(conn);
+    if (!this.inMeeting(conn)) return; // the owner decides from the meeting (seated), see M20
     const requests = this.presentRequests.get(conn.channel);
     const entry = [...(requests?.entries() ?? [])].find(([c]) => c.publicId === id);
     if (!entry || !requests) return;
@@ -802,6 +827,8 @@ export class PresenceHub {
     if (requests.size === 0) this.presentRequests.delete(conn.channel);
     this.sendRequests(conn.channel);
     if (!allow) return this.send(requester, { t: "notice", message: "The owner said not now." });
+    // Standing up drops a request, so this only guards against a race.
+    if (!this.inMeeting(requester)) return;
     this.send(requester, { t: "notice", message: "The owner said yes: you are presenting!" });
     this.startPresentation(requester, mode);
   }
@@ -829,6 +856,7 @@ export class PresenceHub {
     const p = this.presentations.get(conn.channel);
     if (!p) return;
     if (p.presenter !== conn && !this.isOwner(conn)) return this.rejectInvalid(conn);
+    if (!this.inMeeting(conn)) return; // only from the meeting (a standing presenter has already stopped)
     this.endPresentation(conn.channel);
   }
 
@@ -870,13 +898,14 @@ export class PresenceHub {
     return { ok: true };
   }
 
-  /** The slides, only for a guest who is inside that room right now. */
+  /** The slides, only for a guest seated at that room's long table right now (M20). */
   slidesFor(guestId: string, roomId: string, token: string): Buffer | null {
     const channel = roomChannel(roomId);
     const p = this.presentations.get(channel);
     if (!p?.file || p.file.token !== token) return null;
-    const inside = [...this.conns.values()].some((c) => c.guestId === guestId && c.channel === channel);
-    return inside ? p.file.data : null;
+    const key = this.meetingKey(channel);
+    const seated = [...this.conns.values()].some((c) => c.guestId === guestId && c.callKey === key);
+    return seated ? p.file.data : null;
   }
 
   /** Signals only flow between two members of the same call. Anything else is dropped. */

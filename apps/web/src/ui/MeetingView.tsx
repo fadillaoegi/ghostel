@@ -71,7 +71,7 @@ function Tile({ member, self, state, look }: { member: CallMember; self: boolean
   );
 }
 
-export function CallControls({ call, state, compact = false }: { call: CallClient; state: CallSnapshot; compact?: boolean }) {
+export function CallControls({ call, state }: { call: CallClient; state: CallSnapshot }) {
   const micLabel = state.starting === "mic" ? "Starting microphone…" : state.mic ? "Mute" : "Unmute";
   const camLabel = state.starting === "cam" ? "Starting camera…" : state.cam ? "Turn camera off" : "Turn camera on";
   return (
@@ -85,7 +85,7 @@ export function CallControls({ call, state, compact = false }: { call: CallClien
         onClick={() => void call.toggleMic()}
       >
         {state.mic ? "🎙️" : "🔇"}
-        {!compact && <span className="btn-label">{state.mic ? "Mute" : "Unmute"}</span>}
+        <span className="btn-label">{state.mic ? "Mute" : "Unmute"}</span>
       </button>
       <button
         type="button"
@@ -96,7 +96,7 @@ export function CallControls({ call, state, compact = false }: { call: CallClien
         onClick={() => void call.toggleCam()}
       >
         {state.cam ? "🎥" : "📷"}
-        {!compact && <span className="btn-label">{state.cam ? "Camera off" : "Camera"}</span>}
+        <span className="btn-label">{state.cam ? "Camera off" : "Camera"}</span>
       </button>
     </>
   );
@@ -136,6 +136,9 @@ export function MeetingView({
         <span className="meeting-count" data-testid="meeting-count">
           {members.length} {members.length === 1 ? "person" : "people"}
         </span>
+        <span className={state.speaking.has("self") ? "meeting-voice meeting-voice--live" : "meeting-voice"} data-testid="voice-status">
+          {state.mic ? "🎙️" : "🔇"} {state.connected} connected
+        </span>
         <button type="button" className="btn btn--ghost call-btn" onClick={() => setFolded(!folded)} aria-label={folded ? "Show meeting" : "Show the hotel"}>
           {folded ? "▴" : "▾"}
         </button>
@@ -165,24 +168,5 @@ export function MeetingView({
         </button>
       </footer>
     </section>
-  );
-}
-
-/** In a room but not seated: a small call bar (everyone in the room is in the call). */
-export function CallBar({ call, state, extraControls }: { call: CallClient; state: CallSnapshot; extraControls?: ReactNode }) {
-  const n = state.call?.members.length ?? 0;
-  return (
-    <div className="hud-voice" data-testid="call-bar">
-      <span className={state.speaking.has("self") ? "panel voice-pill voice-pill--live" : "panel voice-pill"} data-testid="voice-status">
-        {state.mic ? "🎙️" : "🔇"} {n} in call · {state.connected} connected
-      </span>
-      <CallControls call={call} state={state} compact />
-      {extraControls}
-      {state.error && (
-        <p className="panel voice-error" role="alert">
-          {state.error}
-        </p>
-      )}
-    </div>
   );
 }

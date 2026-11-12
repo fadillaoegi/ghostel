@@ -1,0 +1,150 @@
+# 2026-11-12 17:21:55 WIB — $ pnpm exec playwright test (after pnpm build); load: load averages: 2.51 3.56 4.71
+# node v24.15.0, pnpm 11.1.3, Darwin arm64
+
+[WebServer] Reset ghostel_test
+[WebServer] Ghostel server ready on http://127.0.0.1:2595
+
+Running 29 tests using 1 worker
+
+  ✓   1 [chromium] › e2e/atmosphere.spec.ts:6:1 › a solo visitor finds ghosts, a greeting and house rooms (13.6s)
+  ✓   2 [chromium] › e2e/atmosphere.spec.ts:65:1 › phone: the HUD shows the room name and ghosts are visible (6.3s)
+  ✓   3 [chromium] › e2e/chat.spec.ts:22:1 › guests chat in the lobby with speech bubbles (34.7s)
+  ✓   4 [chromium] › e2e/chat.spec.ts:70:1 › flooding the chat is stopped by the server (4.1s)
+  ✓   5 [chromium] › e2e/chat.spec.ts:84:1 › phone: chat sheet with unread badge (9.2s)
+  ✘   6 [chromium] › e2e/diner.spec.ts:35:1 › Ghoul's Diner: order a snack at the counter, a friend on the floor sees it (36.5s)
+  ✘   7 [chromium] › e2e/floors.spec.ts:22:1 › the elevator connects five floors, each with its own guests, ghosts and chat (45.5s)
+  ✓   8 [chromium] › e2e/floors.spec.ts:87:1 › the welcome candy sits next to the front doors (7.3s)
+  ✓   9 [chromium] › e2e/floors.spec.ts:100:1 › phone: floors through the elevator button (10.3s)
+  ✓  10 [chromium] › e2e/lobby.spec.ts:36:1 › two guests see each other move, rename and leave in realtime (34.7s)
+  ✓  11 [chromium] › e2e/lobby.spec.ts:87:1 › invalid names are rejected with a clear message (2.5s)
+  ✓  12 [chromium] › e2e/lobby.spec.ts:114:1 › phone layout: creator, lobby and joystick movement (14.6s)
+  ✓  13 [chromium] › e2e/lobby.spec.ts:156:1 › monster costume parts are saved by the server and shown to other guests (11.2s)
+  ✓  14 [chromium] › e2e/mobile.spec.ts:33:1 › phone portrait: stick and action button; the action button calls the elevator (3.7s)
+  ✓  15 [chromium] › e2e/mobile.spec.ts:51:1 › phone landscape: creator, lobby HUD, panels and chat all fit the short screen (19.4s)
+  ✓  16 [chromium] › e2e/mobile.spec.ts:102:1 › a physical gamepad walks the character, A does the action, B closes the panel (8.7s)
+  ✓  17 [chromium] › e2e/oddities.spec.ts:57:1 › Night Desk: the lobby's 1987 terminal plays a text adventure to the end (6.1s)
+  ✓  18 [chromium] › e2e/oddities.spec.ts:101:1 › Haunted Mirror: the camera shows only after a click, stays local and stops when you walk away (17.4s)
+  ✓  19 [chromium] › e2e/pairs.spec.ts:48:1 › Monster Pairs: a solo guest plays Jack O'Bot in house room 1B to the podium (18.0s)
+  ✓  20 [chromium] › e2e/pairs.spec.ts:73:1 › phone: flip cards with taps in house room 1B; the room form offers Monster Pairs (4.6s)
+  ✓  21 [chromium] › e2e/present.spec.ts:74:1 › a guest asks to show PDF slides, the owner allows it, everyone at the table follows the pages (17.6s)
+  ✓  22 [chromium] › e2e/present.spec.ts:116:1 › the owner shares a screen at the table; a seated guest sees it live; standing up ends it (30.7s)
+  ✘  23 [chromium] › e2e/rooms.spec.ts:60:1 › password room behind door 2B: create, unlock, isolated chat, door prompt, lock, leave, delete (1.0m)
+  ✓  24 [chromium] › e2e/rooms.spec.ts:163:1 › phone: create an open ballroom and walk around inside (13.5s)
+  ✓  25 [chromium] › e2e/rooms.spec.ts:187:1 › doors on floor 3: book a vacant door with E, a friend finds it by its code (16.1s)
+  ✓  26 [chromium] › e2e/trivia.spec.ts:27:1 › solo guest plays Pumpkin Trivia against the bot to the podium (18.5s)
+  ✓  27 [chromium] › e2e/trivia.spec.ts:61:1 › two guests see the same question and each other's picks after the reveal (11.0s)
+  ✓  28 [chromium] › e2e/voice.spec.ts:49:1 › a room's meeting is its long table: sit to join (mic and camera only after a click), stand to leave (26.3s)
+  ✓  29 [chromium] › e2e/voice.spec.ts:129:1 › tables in Ghoul's Diner: sit down for a table call, stand up to leave it (10.5s)
+
+
+  1) [chromium] › e2e/diner.spec.ts:35:1 › Ghoul's Diner: order a snack at the counter, a friend on the floor sees it 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByTestId('door-prompt')
+    Expected: "🍽️ Press E to order a snack"
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByTestId('door-prompt') with timeout 15000ms
+      - waiting for getByTestId('door-prompt')
+
+
+      47 |   await walkToPrompt(hank.page, "KeyD", "counter");
+      48 |   const prompt = hank.page.getByTestId("door-prompt");
+    > 49 |   await expect(prompt).toHaveText("🍽️ Press E to order a snack");
+         |                        ^
+      50 |   await hank.page.keyboard.press("KeyE");
+      51 |   await expect(hank.page.getByTestId("snack-menu")).toBeVisible();
+      52 |   await hank.page.screenshot({ path: `${SHOTS}/desktop-diner-menu.png` });
+        at /Users/boo/Github/project/Hacketon/ghostel/e2e/diner.spec.ts:49:24
+
+    Error Context: test-results/diner-Ghoul-s-Diner-order--f91dd-friend-on-the-floor-sees-it-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/diner-Ghoul-s-Diner-order--f91dd-friend-on-the-floor-sees-it-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/diner-Ghoul-s-Diner-order--f91dd-friend-on-the-floor-sees-it-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › e2e/floors.spec.ts:22:1 › the elevator connects five floors, each with its own guests, ghosts and chat 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('candy-count')
+    Expected: "🍬 1/12"
+    Received: "🍬 0/12"
+    Timeout:  15000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('candy-count') with timeout 15000ms
+      - waiting for getByTestId('candy-count')
+        31 × locator resolved to <button type="button" class="panel hud-candies" data-testid="candy-count" title="Candies hide on every floor. Find all 12 to unlock the Golden Crown.">🍬 0/12</button>
+           - unexpected value "🍬 0/12"
+
+
+      49 |   await eve.page.waitForTimeout(400);
+      50 |   await eve.page.keyboard.up("KeyD");
+    > 51 |   await expect(eve.page.getByTestId("candy-count")).toHaveText("🍬 1/12");
+         |                                                     ^
+      52 |   await expect(eve.page.getByTestId("chat-log")).toContainText("You found a candy!");
+      53 |   await expect(eve.page.getByTestId("door-prompt")).toHaveAttribute("data-prompt", "mirror");
+      54 |   await eve.page.keyboard.press("KeyE");
+        at /Users/boo/Github/project/Hacketon/ghostel/e2e/floors.spec.ts:51:53
+
+    Error Context: test-results/floors-the-elevator-connec-9265b--own-guests-ghosts-and-chat-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/floors-the-elevator-connec-9265b--own-guests-ghosts-and-chat-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/floors-the-elevator-connec-9265b--own-guests-ghosts-and-chat-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › e2e/rooms.spec.ts:60:1 › password room behind door 2B: create, unlock, isolated chat, door prompt, lock, leave, delete 
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  getByTestId('door-prompt')
+    Expected: "2B"
+    Received: ""
+    Timeout:  15000ms
+
+    Call log:
+      - Expect "toHaveAttribute" getByTestId('door-prompt') with timeout 15000ms
+      - waiting for getByTestId('door-prompt')
+        32 × locator resolved to <button type="button" data-prompt="mirror" class="panel door-prompt" data-testid="door-prompt">…</button>
+           - unexpected value "null"
+
+
+      119 |   await walkToDoor(larry.page, "KeyD", "2B");
+      120 |   const prompt = larry.page.getByTestId("door-prompt");
+    > 121 |   await expect(prompt).toHaveAttribute("data-door", "2B");
+          |                        ^
+      122 |   await expect(prompt).toHaveText("🔑 Press E to enter 2B · Witching Hour");
+      123 |   await larry.page.waitForTimeout(500);
+      124 |   await larry.page.screenshot({ path: `${SHOTS}/desktop-door-prompt.png` });
+        at /Users/boo/Github/project/Hacketon/ghostel/e2e/rooms.spec.ts:121:24
+
+    Error Context: test-results/rooms-password-room-behind-b9f26-or-prompt-lock-leave-delete-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/rooms-password-room-behind-b9f26-or-prompt-lock-leave-delete-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/rooms-password-room-behind-b9f26-or-prompt-lock-leave-delete-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [chromium] › e2e/diner.spec.ts:35:1 › Ghoul's Diner: order a snack at the counter, a friend on the floor sees it 
+    [chromium] › e2e/floors.spec.ts:22:1 › the elevator connects five floors, each with its own guests, ghosts and chat 
+    [chromium] › e2e/rooms.spec.ts:60:1 › password room behind door 2B: create, unlock, isolated chat, door prompt, lock, leave, delete 
+  26 passed (9.8m)
+
+# exit code: 1
+# load at end: load averages: 17.95 17.83 12.90

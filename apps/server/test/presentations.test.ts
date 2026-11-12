@@ -1,4 +1,4 @@
-import { DEFAULT_LOOK, SLIDES_MAX_BYTES, type ServerMessage } from "@ghostel/shared";
+import { DEFAULT_LOOK, SLIDES_MAX_BYTES, roomTable, standSpot, type ServerMessage } from "@ghostel/shared";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { ORIGIN, api, openSocket, putMe, sessionCookie, startServer, type TestServer, type TestSocket } from "./helpers";
 
@@ -47,19 +47,59 @@ function after<T extends ServerMessage["t"]>(s: TestSocket, from: number, type: 
   });
 }
 
-/** Owner and a guest inside a fresh room, plus a lobby guest outside. */
+/** Walks in small steps inside the server's speed budget. */
+async function walk(s: TestSocket, from: { x: number; z: number }, to: { x: number; z: number }) {
+  let { x, z } = from;
+  while (Math.hypot(to.x - x, to.z - z) > 0.05) {
+    const d = Math.hypot(to.x - x, to.z - z);
+    const k = Math.min(1, 0.18 / d);
+    x += (to.x - x) * k;
+    z += (to.z - z) * k;
+    s.send({ t: "move", x, z, ry: 0 });
+    await new Promise((r) => setTimeout(r, 40));
+  }
+  await settle(120);
+  return { x, z };
+}
+
+type Guest = { s: TestSocket; id: string; pos: { x: number; z: number } };
+/** South-facing chairs of an 8-seat long table (0, 2, 4, 6 face the door). */
+const TABLE = roomTable(8);
+
+/** Into the room, standing where the server put us. */
+async function enter(c: { s: TestSocket; id: string }, roomId: string): Promise<Guest> {
+  const mark = c.s.messages.length;
+  c.s.send({ t: "enter", room: roomId });
+  const welcome = await after(c.s, mark, "welcome", (m) => m.place.kind === "room");
+  const me = welcome.players.find((p) => p.id === welcome.selfId)!;
+  return { ...c, pos: { x: me.x, z: me.z } };
+}
+
+/** Walks up to a chair of the long table and sits: that joins the room's meeting (M20). */
+async function sit(c: Guest, seat: number): Promise<void> {
+  c.pos = await walk(c.s, c.pos, standSpot(TABLE, TABLE.seats[seat]!));
+  const mark = c.s.messages.length;
+  c.s.send({ t: "sit", table: "long", seat });
+  await after(c.s, mark, "call", (m) => m.call?.members.some((x) => x.id === c.id) ?? false);
+}
+
+async function stand(c: Guest): Promise<void> {
+  const mark = c.s.messages.length;
+  c.s.send({ t: "stand" });
+  const back = await after(c.s, mark, "correct");
+  c.pos = { x: back.x, z: back.z };
+}
+
+/** Owner and a guest seated at a fresh room's long table, plus a lobby guest outside. */
 async function setup() {
   const ownerCookie = await guest("Olga Owner");
   const vicCookie = await guest("Vic Visitor");
   const roomId = (await api(server, "POST", "/api/rooms", ownerCookie, { name: "Slide Show", access: "open", decor: "library", game: "none" })).json?.["room"].id as string;
-  const owner = await connect(ownerCookie);
-  const vic = await connect(vicCookie);
+  const owner = await enter(await connect(ownerCookie), roomId);
+  const vic = await enter(await connect(vicCookie), roomId);
   const lobby = await connect(await guest("Larry Lobby"));
-  for (const c of [owner, vic]) {
-    const mark = c.s.messages.length;
-    c.s.send({ t: "enter", room: roomId });
-    await after(c.s, mark, "presentation");
-  }
+  await sit(owner, 0);
+  await sit(vic, 2);
   return { roomId, owner, vic, lobby, ownerCookie, vicCookie };
 }
 
@@ -187,6 +227,63 @@ describe("presentations", () => {
     owner.s.send({ t: "exit" });
     expect(await after(vic.s, mark, "presentation")).toEqual({ t: "presentation", p: null });
     expect((await fetch(`${server.base}/api/rooms/${roomId}/slides/${token}`, { headers: { cookie: vicCookie } })).status).toBe(404);
+  });
+
+  it("standing guests are out of the meeting: they cannot ask, decide or download, and standing up ends your presentation (M20)", async () => {
+    const { roomId, owner, vic, ownerCookie, vicCookie } = await setup();
+    const samCookie = await guest("Sam Standing");
+    const sam = await enter(await connect(samCookie), roomId);
+
+    // A standing guest asks: told to sit first, and the owner hears nothing.
+    let mark = owner.s.messages.length;
+    sam.s.send({ t: "present_request", mode: "pdf" });
+    expect(await after(sam.s, 0, "notice", (m) => m.message.includes("long table"))).toMatchObject({ message: "Sit at the long table to join the meeting first." });
+    await settle();
+    expect(owner.s.messages.slice(mark).some((m) => m.t === "present_requests" && m.requests.length > 0)).toBe(false);
+
+    // The owner presents slides: seated Vic gets them, standing Sam gets nothing and cannot download.
+    const samMark = sam.s.messages.length;
+    owner.s.send({ t: "present_request", mode: "pdf" });
+    await vic.s.next("presentation", (m) => m.p !== null);
+    expect((await upload(roomId, ownerCookie, PDF)).status).toBe(204);
+    const token = (await vic.s.next("presentation", (m) => (m.p?.file ?? null) !== null)).p?.file as string;
+    expect((await fetch(`${server.base}/api/rooms/${roomId}/slides/${token}`, { headers: { cookie: vicCookie } })).status).toBe(200);
+    expect((await fetch(`${server.base}/api/rooms/${roomId}/slides/${token}`, { headers: { cookie: samCookie } })).status).toBe(404);
+    await settle();
+    expect(sam.s.messages.slice(samMark).some((m) => m.t === "presentation" && m.p !== null)).toBe(false);
+
+    // The presenter stands up: the presentation ends for the meeting, and the slides are gone.
+    mark = vic.s.messages.length;
+    const ownerMark = owner.s.messages.length;
+    await stand(owner);
+    expect(await after(vic.s, mark, "presentation")).toEqual({ t: "presentation", p: null });
+    expect(await after(owner.s, ownerMark, "presentation")).toEqual({ t: "presentation", p: null });
+    expect((await fetch(`${server.base}/api/rooms/${roomId}/slides/${token}`, { headers: { cookie: vicCookie } })).status).toBe(404);
+
+    // Vic asks while the owner stands: the owner does not see it, and deciding from standing does nothing.
+    mark = owner.s.messages.length;
+    vic.s.send({ t: "present_request", mode: "screen" });
+    await settle();
+    expect(owner.s.messages.slice(mark).some((m) => m.t === "present_requests" && m.requests.length > 0)).toBe(false);
+    const vicMark = vic.s.messages.length;
+    owner.s.send({ t: "present_decide", id: vic.id, allow: true });
+    await settle();
+    expect(vic.s.messages.slice(vicMark).some((m) => m.t === "presentation" && m.p !== null)).toBe(false);
+
+    // The owner sits again: the waiting request shows, and allowing it starts Vic's presentation.
+    mark = owner.s.messages.length;
+    await sit(owner, 0);
+    expect(await after(owner.s, mark, "present_requests", (m) => m.requests.length === 1)).toMatchObject({ requests: [{ id: vic.id, mode: "screen" }] });
+    owner.s.send({ t: "present_decide", id: vic.id, allow: true });
+    await vic.s.next("presentation", (m) => m.p?.presenter === vic.id);
+
+    // Vic stands up: his presentation ends and his own view is cleared.
+    mark = owner.s.messages.length;
+    const vicStand = vic.s.messages.length;
+    await stand(vic);
+    expect(await after(owner.s, mark, "presentation")).toEqual({ t: "presentation", p: null });
+    expect(await after(vic.s, vicStand, "call")).toEqual({ t: "call", call: null });
+    expect(await after(vic.s, vicStand, "presentation")).toEqual({ t: "presentation", p: null });
   });
 
   it("uploads need an allowed Origin", async () => {
