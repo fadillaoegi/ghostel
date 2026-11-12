@@ -90,7 +90,7 @@ export function NightDeskModel({ minX, maxX, maxZ }: { minX: number; maxX: numbe
         <boxGeometry args={[0.6, 0.035, 0.18]} />
         <meshStandardMaterial color="#b9ae94" flatShading />
       </mesh>
-      <pointLight position={[0, 1.05, 0.7]} color="#43ff6e" intensity={2.6} distance={3.6} decay={1.6} />
+      {/* No point light (M19): the screen is meshBasicMaterial and glows by itself; each point light costs every lit pixel. */}
     </group>
   );
 }

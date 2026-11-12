@@ -4,6 +4,7 @@ import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import { makeCheckerTexture, useLabelTexture } from "./textures";
 import { NightDeskModel } from "./NightDesk";
+import { place, useMergedParts, within, type StaticPart } from "./merge";
 
 const WALL = "#2a1b3d";
 const WAINSCOT = "#1a1026";
@@ -57,31 +58,43 @@ function Floor() {
   );
 }
 
-function ArchedWindow({ position, rotationY = 0 }: { position: [number, number, number]; rotationY?: number }) {
+/** The hall's 8 arched windows, merged into one mesh per material (M19: 40 draws became 3). */
+const WINDOW_SPOTS: readonly { position: [number, number, number]; rotationY: number }[] = [
+  ...[-10, -5.5, 5.5, 10].map((x) => ({ position: [x, 2.6, b.minZ + 0.05] as [number, number, number], rotationY: 0 })),
+  ...[-6, 6].map((z) => ({ position: [b.minX + 0.05, 2.6, z] as [number, number, number], rotationY: Math.PI / 2 })),
+  ...[-6, 6].map((z) => ({ position: [b.maxX - 0.05, 2.6, z] as [number, number, number], rotationY: -Math.PI / 2 })),
+];
+
+function Windows() {
+  const merged = useMergedParts(() => {
+    const pane = new THREE.BoxGeometry(1.7, 2.4, 0.08);
+    const arch = new THREE.CylinderGeometry(0.85, 0.85, 0.08, 10, 1, false, -Math.PI / 2, Math.PI);
+    const bar = new THREE.BoxGeometry(0.08, 3.2, 0.06);
+    const crossbar = new THREE.BoxGeometry(1.7, 0.08, 0.06);
+    const sill = new THREE.BoxGeometry(2, 0.12, 0.3);
+    return WINDOW_SPOTS.flatMap((w): StaticPart[] => {
+      const at = place(w.position, [0, w.rotationY, 0]);
+      return [
+        { geometry: pane, matrix: at, material: "glass" },
+        { geometry: arch, matrix: within(at, place([0, 1.2, 0], [Math.PI / 2, 0, 0])), material: "glass" },
+        { geometry: bar, matrix: within(at, place([0, 0.3, 0.06])), material: "frame" },
+        { geometry: crossbar, matrix: within(at, place([0, 0.4, 0.06])), material: "frame" },
+        { geometry: sill, matrix: within(at, place([0, -1.25, 0.12])), material: "sill" },
+      ];
+    });
+  });
   return (
-    <group position={position} rotation={[0, rotationY, 0]}>
-      <mesh>
-        <boxGeometry args={[1.7, 2.4, 0.08]} />
+    <>
+      <mesh geometry={merged.get("glass")}>
         <meshStandardMaterial color="#20304f" emissive="#6fa8ff" emissiveIntensity={0.55} flatShading />
       </mesh>
-      <mesh position={[0, 1.2, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.85, 0.85, 0.08, 10, 1, false, -Math.PI / 2, Math.PI]} />
-        <meshStandardMaterial color="#20304f" emissive="#6fa8ff" emissiveIntensity={0.55} flatShading />
-      </mesh>
-      {/* frame bars */}
-      <mesh position={[0, 0.3, 0.06]}>
-        <boxGeometry args={[0.08, 3.2, 0.06]} />
+      <mesh geometry={merged.get("frame")}>
         <meshStandardMaterial color={WAINSCOT} />
       </mesh>
-      <mesh position={[0, 0.4, 0.06]}>
-        <boxGeometry args={[1.7, 0.08, 0.06]} />
-        <meshStandardMaterial color={WAINSCOT} />
-      </mesh>
-      <mesh position={[0, -1.25, 0.12]}>
-        <boxGeometry args={[2, 0.12, 0.3]} />
+      <mesh geometry={merged.get("sill")}>
         <meshStandardMaterial color={TRIM} />
       </mesh>
-    </group>
+    </>
   );
 }
 
@@ -109,33 +122,37 @@ function Wall({ position, size }: { position: [number, number, number]; size: [n
   );
 }
 
-function Pillar({ x, z, r }: { x: number; z: number; r: number }) {
+/** The six pillars with their wall lanterns, merged into one mesh per material (M19: 30 draws became 4). */
+function Pillars() {
+  const merged = useMergedParts(() =>
+    LOBBY_OBSTACLES.flatMap((o): StaticPart[] => {
+      if (o.kind !== "circle" || o.label !== "pillar") return [];
+      const { r } = o;
+      const at = place([o.x, 0, o.z]);
+      return [
+        { geometry: new THREE.BoxGeometry(r * 2.4, 0.4, r * 2.4), matrix: within(at, place([0, 0.2, 0])), material: "stone" },
+        { geometry: new THREE.CylinderGeometry(r * 0.85, r, WALL_HEIGHT, 6), matrix: within(at, place([0, WALL_HEIGHT / 2, 0])), material: "column" },
+        { geometry: new THREE.BoxGeometry(r * 2.3, 0.3, r * 2.3), matrix: within(at, place([0, WALL_HEIGHT - 0.15, 0])), material: "stone" },
+        { geometry: new THREE.BoxGeometry(0.26, 0.38, 0.26), matrix: within(at, place([0, 2.6, r + 0.15])), material: "lantern" },
+        { geometry: new THREE.BoxGeometry(0.2, 0.3, 0.28), matrix: within(at, place([0, 2.6, r + 0.15])), material: "glow" },
+      ];
+    }),
+  );
   return (
-    <group position={[x, 0, z]}>
-      <mesh position={[0, 0.2, 0]}>
-        <boxGeometry args={[r * 2.4, 0.4, r * 2.4]} />
+    <>
+      <mesh geometry={merged.get("stone")}>
         <meshStandardMaterial color={STONE} flatShading />
       </mesh>
-      <mesh position={[0, WALL_HEIGHT / 2, 0]}>
-        <cylinderGeometry args={[r * 0.85, r, WALL_HEIGHT, 6]} />
+      <mesh geometry={merged.get("column")}>
         <meshStandardMaterial color="#5a4c6e" flatShading roughness={0.9} />
       </mesh>
-      <mesh position={[0, WALL_HEIGHT - 0.15, 0]}>
-        <boxGeometry args={[r * 2.3, 0.3, r * 2.3]} />
-        <meshStandardMaterial color={STONE} flatShading />
+      <mesh geometry={merged.get("lantern")}>
+        <meshStandardMaterial color="#120a1a" flatShading />
       </mesh>
-      {/* wall lantern */}
-      <group position={[0, 2.6, r + 0.15]}>
-        <mesh>
-          <boxGeometry args={[0.26, 0.38, 0.26]} />
-          <meshStandardMaterial color="#120a1a" flatShading />
-        </mesh>
-        <mesh>
-          <boxGeometry args={[0.2, 0.3, 0.28]} />
-          <meshStandardMaterial color="#ffb347" emissive="#ff9a2e" emissiveIntensity={2.2} toneMapped={false} />
-        </mesh>
-      </group>
-    </group>
+      <mesh geometry={merged.get("glow")}>
+        <meshStandardMaterial color="#ffb347" emissive="#ff9a2e" emissiveIntensity={2.2} toneMapped={false} />
+      </mesh>
+    </>
   );
 }
 
@@ -335,19 +352,11 @@ export function LobbyHall() {
         </group>
       ))}
 
-      {[-10, -5.5, 5.5, 10].map((x) => (
-        <ArchedWindow key={x} position={[x, 2.6, b.minZ + 0.05]} />
-      ))}
-      {[-6, 6].map((z) => (
-        <ArchedWindow key={`w${z}`} position={[b.minX + 0.05, 2.6, z]} rotationY={Math.PI / 2} />
-      ))}
-      {[-6, 6].map((z) => (
-        <ArchedWindow key={`e${z}`} position={[b.maxX - 0.05, 2.6, z]} rotationY={-Math.PI / 2} />
-      ))}
+      <Windows />
       <HotelSign />
 
+      <Pillars />
       {LOBBY_OBSTACLES.map((o, i) => {
-        if (o.kind === "circle" && o.label === "pillar") return <Pillar key={i} x={o.x} z={o.z} r={o.r} />;
         if (o.kind === "circle" && o.label === "fountain") return <Fountain key={i} r={o.r} />;
         if (o.kind === "box" && o.label === "reception") return <Reception key={i} {...o} />;
         if (o.kind === "box" && o.label === "night-desk") return <NightDeskModel key={i} minX={o.minX} maxX={o.maxX} maxZ={o.maxZ} />;

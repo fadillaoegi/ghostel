@@ -21,5 +21,6 @@ One folder per milestone, each with `requirements.md`, `design.md` and `tasks.md
 | 16 Haunted Mirror (camera, Frankenstein echo) and Night Desk terminal (Resurrection echo) | `m16-mirror-and-night-desk` | done | before code |
 | 17 Ghostel Game Kit and Monster Pairs (Skeleton Crew echo; second game) | `m17-game-kit-monster-pairs` | done | before code |
 | 18 Brighter lighting | `m18-brighter-lighting` | done | before code |
+| 19 Smoother frame rate | `m19-smoother` | done | before code |
 
 Milestone 8 of the original brief ("a second game or proximity voice") is covered by M17's second game.

@@ -1,0 +1,14 @@
+# 2026-11-12 03:06:24 WIB — $ node scripts/load-probe.mjs 30 40 ; node scripts/load-probe.mjs 60 40
+# node v24.15.0, Darwin arm64, Apple M1, load: load averages: 1.83 2.91 2.85
+
+guests=30 open_at_end=30 seconds=40
+server idle: rss=88 MB
+server loaded: rss max=103 MB, cpu avg=4% (of one core), cpu max=16%
+downstream per guest: avg=116 kbit/s; total server out ≈ 3.47 Mbit/s
+
+guests=60 open_at_end=60 seconds=40
+server idle: rss=84 MB
+server loaded: rss max=105 MB, cpu avg=5% (of one core), cpu max=9%
+downstream per guest: avg=228 kbit/s; total server out ≈ 13.70 Mbit/s
+
+# exit codes: 0 0

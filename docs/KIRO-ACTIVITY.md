@@ -552,3 +552,30 @@ New screenshots: `desktop-pairs-board.png`, `desktop-pairs-podium.png`, `phone-p
 | `pnpm exec playwright test` | 29 passed (7.5 min) |
 | `pnpm test:prod` | 1 passed |
 | `scripts/measure-brightness.mjs` | `brightness-before-m18.txt`, `brightness-after-m18.txt` |
+
+### Session 4, continued — 2026-11-12: VPS sizing from measurements
+
+- **Prompt (owner):** "give me the VPS specs for hosting this app". The owner had said earlier that he has his own VPS.
+- **Measured on this machine (Apple M1):**
+  - `pnpm build` peak resident memory 417 MB (`/usr/bin/time -l`), 3.5 s.
+  - `apps/web/dist` 4.5 MB on disk. First load without pdf.js: JS, CSS and HTML are 411 kB gzipped against 1.5 MB raw. The server does not compress, so the reverse proxy should.
+  - PostgreSQL container 107 MiB, dev database 7.9 MB.
+- **New script:** `scripts/load-probe.mjs` starts the built server on port 2597 against `ghostel_test`. It connects N real WebSocket guests (cookie and Origin as in the browser) that walk the lobby at 20 Hz while one chats every second, and samples the server's RSS and CPU. The output is in `docs/evidence/load-probe.txt`:
+  - 30 guests in one lobby: server RSS max 103 MB, CPU about 4% of one core, about 116 kbit/s to each guest (3.5 Mbit/s in total).
+  - 60 guests in one lobby: RSS max 105 MB, CPU about 5%, about 228 kbit/s per guest (13.7 Mbit/s in total). Traffic per guest grows with the number of guests in the same scene.
+- The owner first rejected the evidence run, then approved it ("lanjut approve").
+- Not measured: WebRTC media. It is peer-to-peer and does not pass through the server unless a TURN relay is added.
+
+## Session 4, continued — 2026-11-12: Milestone 19 (smoother frame rate)
+
+- **Prompt (owner):** "the app lags a bit, can you make it smoother?"
+- **Measured before changing anything:**
+  - Kiro wrote `scripts/perf-probe.mjs`. It records fps, frame-time percentiles, Chrome DevTools Protocol main-thread metrics, an optional JS CPU profile (`PROFILE=1`) and a WebGL draw-call counter injected as test-only instrumentation.
+  - On Retina, the lobby ran at 35 fps with a 50 ms 95th-percentile frame and 450 draws per frame. At scale 1 every scene ran at 60 fps.
+  - The JS profile showed mostly three.js per-object work. Movement snapshots do not cause React re-renders (positions are mutated in place).
+- **Spec:** `.kiro/specs/m19-smoother/`, written before the code. Every step was measured, and the table is in `tasks.md`.
+- **What helped most:** removing three point lights (39 → 56 fps). The pixel ratio cap and `PerformanceMonitor` brought the other floors to 57–60 fps. Merging 14 static props cut draws by 12%.
+- **Agent pitfalls seen again:**
+  - Edits to the same file in one parallel batch made `read_file` and `grep` results look stale. Kiro re-checked the file with `grep` before trusting it.
+  - The image reader returned an earlier copy of a re-taken screenshot, so Kiro copied the file under a new name to view it.
+- **Environment:** load spikes up to 171 (`airportd` about 118% CPU, plus macOS storage scanning) broke one full E2E run and one probe run. Both outputs are kept as failed evidence. The re-runs at low load passed.

@@ -20,6 +20,7 @@ Ghostel targets the Costume Contest category, so every scene should look deliber
 
 ## Light and effects
 - Each floor sets its own ambient + hemisphere + one directional light and a few point lights. Lit jack-o'-lanterns (`Pumpkin lit`) add a point light each: keep them to about 3 per scene.
+- **Light budget:** each point or spot light costs every lit pixel (M19 measured 39 → 56 fps in the lobby on Retina by going from 8 to 5 point lights). Keep about 5 per scene and prefer emissive or `meshBasicMaterial` glows. Merge repeated static props with `three/merge.ts`.
 - Sparkles and bats for life; slow, subtle animation (sin/cos of elapsed time), never flashing.
 
 ## Performance budget

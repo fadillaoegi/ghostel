@@ -26,6 +26,7 @@ import {
   findSeat,
 } from "@ghostel/shared";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { PerformanceMonitor } from "@react-three/drei";
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import * as THREE from "three";
 import { readMoveVector } from "../input/controls";
@@ -53,6 +54,9 @@ const FLOOR_PALETTE: Record<1 | 2 | 3 | 5, TablePalette> = {
   5: TABLE_PALETTES.rooftop,
 };
 import { RoomDoors } from "./RoomDoors";
+
+/** Highest render pixel ratio (M19). Retina screens at 2 cost about 1.8 times the pixels of 1.5. */
+const MAX_DPR = 1.5;
 
 function lerpAngle(from: number, to: number, t: number): number {
   let d = (to - from) % (Math.PI * 2);
@@ -404,12 +408,15 @@ export function WorldScene({
   }, [sceneKey, say]);
   const collect = useCallback((id: string) => client.sendCollect(id), [client]);
   const promptForScene = useCallback((p: ScenePrompt | null) => onPrompt(p ? { scene: sceneKey, ...p } : null), [onPrompt, sceneKey]);
+  // M19: render at most 1.5 device pixels per CSS pixel, and step down to 1 when frames come too slowly.
+  const maxDpr = typeof window === "undefined" ? 1 : Math.min(window.devicePixelRatio || 1, MAX_DPR);
+  const [dpr, setDpr] = useState(maxDpr);
 
   return (
     <div className="lobby-stage">
       <Canvas
         className="lobby-canvas"
-        dpr={[1, 1.75]}
+        dpr={dpr}
         camera={{ fov: 50, position: [0, 10, 18], near: 0.1, far: 320 }}
         gl={{ antialias: true, powerPreference: "high-performance" }}
         // M18: a little brighter overall. Signs, screens and candles use toneMapped={false}, so they keep their glow.
@@ -418,6 +425,12 @@ export function WorldScene({
         }}
       >
         <color attach="background" args={["#0b0614"]} />
+        <PerformanceMonitor
+          flipflops={4}
+          onDecline={() => setDpr((d) => Math.max(1, Math.round((d - 0.25) * 4) / 4))}
+          onIncline={() => setDpr((d) => Math.min(maxDpr, Math.round((d + 0.25) * 4) / 4))}
+          onFallback={() => setDpr(1)}
+        />
         <fog attach="fog" args={[floor === 5 ? "#120c22" : "#0b0614", floor === 5 ? 40 : 20, floor === 5 ? 200 : 60]} />
         <group key={sceneKey}>
           <Environment place={place} selfPos={selfPos} doors={doors} screen={screen} />

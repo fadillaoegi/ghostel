@@ -1,0 +1,135 @@
+# 2026-11-12 05:33:18 WIB — $ pnpm exec playwright test (after pnpm build); load: load averages: 7.90 6.28 5.67
+# node v24.15.0, pnpm 11.1.3, Darwin arm64
+
+[WebServer] Reset ghostel_test
+[WebServer] Ghostel server ready on http://127.0.0.1:2595
+
+Running 29 tests using 1 worker
+
+  ✓   1 [chromium] › e2e/atmosphere.spec.ts:6:1 › a solo visitor finds ghosts, a greeting and house rooms (7.8s)
+  ✓   2 [chromium] › e2e/atmosphere.spec.ts:65:1 › phone: the HUD shows the room name and ghosts are visible (3.3s)
+  ✓   3 [chromium] › e2e/chat.spec.ts:22:1 › guests chat in the lobby with speech bubbles (42.2s)
+  ✓   4 [chromium] › e2e/chat.spec.ts:70:1 › flooding the chat is stopped by the server (2.4s)
+  ✓   5 [chromium] › e2e/chat.spec.ts:84:1 › phone: chat sheet with unread badge (8.7s)
+  ✓   6 [chromium] › e2e/diner.spec.ts:35:1 › Ghoul's Diner: order a snack at the counter, a friend on the floor sees it (14.4s)
+  ✓   7 [chromium] › e2e/floors.spec.ts:22:1 › the elevator connects five floors, each with its own guests, ghosts and chat (35.8s)
+  ✓   8 [chromium] › e2e/floors.spec.ts:87:1 › the welcome candy sits next to the front doors (3.5s)
+  ✓   9 [chromium] › e2e/floors.spec.ts:100:1 › phone: floors through the elevator button (7.2s)
+  ✓  10 [chromium] › e2e/lobby.spec.ts:36:1 › two guests see each other move, rename and leave in realtime (23.6s)
+  ✓  11 [chromium] › e2e/lobby.spec.ts:87:1 › invalid names are rejected with a clear message (2.3s)
+  ✓  12 [chromium] › e2e/lobby.spec.ts:114:1 › phone layout: creator, lobby and joystick movement (9.7s)
+  ✓  13 [chromium] › e2e/lobby.spec.ts:156:1 › monster costume parts are saved by the server and shown to other guests (11.0s)
+  ✓  14 [chromium] › e2e/mobile.spec.ts:33:1 › phone portrait: stick and action button; the action button calls the elevator (3.0s)
+  ✓  15 [chromium] › e2e/mobile.spec.ts:51:1 › phone landscape: creator, lobby HUD, panels and chat all fit the short screen (12.1s)
+  ✓  16 [chromium] › e2e/mobile.spec.ts:102:1 › a physical gamepad walks the character, A does the action, B closes the panel (8.8s)
+  ✓  17 [chromium] › e2e/oddities.spec.ts:57:1 › Night Desk: the lobby's 1987 terminal plays a text adventure to the end (5.2s)
+  ✓  18 [chromium] › e2e/oddities.spec.ts:101:1 › Haunted Mirror: the camera shows only after a click, stays local and stops when you walk away (16.0s)
+  ✓  19 [chromium] › e2e/pairs.spec.ts:48:1 › Monster Pairs: a solo guest plays Jack O'Bot in house room 1B to the podium (13.5s)
+  ✓  20 [chromium] › e2e/pairs.spec.ts:73:1 › phone: flip cards with taps in house room 1B; the room form offers Monster Pairs (3.1s)
+  ✓  21 [chromium] › e2e/present.spec.ts:63:1 › a guest asks to show PDF slides, the owner allows it, everyone in the room follows the pages (9.2s)
+  ✓  22 [chromium] › e2e/present.spec.ts:100:1 › the owner shares a screen; a guest in the room sees it live (15.6s)
+  ✓  23 [chromium] › e2e/rooms.spec.ts:60:1 › password room behind door 2B: create, unlock, isolated chat, door prompt, lock, leave, delete (1.3m)
+  ✓  24 [chromium] › e2e/rooms.spec.ts:163:1 › phone: create an open ballroom and walk around inside (8.7s)
+  ✓  25 [chromium] › e2e/rooms.spec.ts:187:1 › doors on floor 3: book a vacant door with E, a friend finds it by its code (17.3s)
+  ✓  26 [chromium] › e2e/trivia.spec.ts:27:1 › solo guest plays Pumpkin Trivia against the bot to the podium (16.3s)
+  ✘  27 [chromium] › e2e/trivia.spec.ts:61:1 › two guests see the same question and each other's picks after the reveal (16.8s)
+  ✘  28 [chromium] › e2e/voice.spec.ts:49:1 › a room is one call: microphone and camera only after a click, the meeting view when seated (24.7s)
+  ✘  29 [chromium] › e2e/voice.spec.ts:119:1 › tables in Ghoul's Diner: sit down for a table call, stand up to leave it (1.4m)
+
+
+  1) [chromium] › e2e/trivia.spec.ts:61:1 › two guests see the same question and each other's picks after the reveal 
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  getByTestId('trivia')
+    Expected: "reveal"
+    Received: "question"
+    Timeout:  3000ms
+
+    Call log:
+      - Expect "toHaveAttribute" getByTestId('trivia') with timeout 3000ms
+      - waiting for getByTestId('trivia')
+        9 × locator resolved to <section class="panel trivia" data-testid="trivia" data-phase="question" aria-label="Pumpkin Trivia">…</section>
+          - unexpected value "question"
+
+
+      84 |   await vic.page.getByTestId("trivia-option").nth(1).click();
+      85 |   // Both answered: the reveal comes at once and shows who picked what.
+    > 86 |   await expect(vic.page.getByTestId("trivia")).toHaveAttribute("data-phase", "reveal", { timeout: 3000 });
+         |                                                ^
+      87 |   await expect(vic.page.getByTestId("trivia-option").nth(0)).toContainText("Olga Owner");
+      88 |   await expect(olga.page.getByTestId("trivia-option").nth(1)).toContainText("Vic Visitor");
+      89 |   await vic.page.screenshot({ path: `${SHOTS}/phone-trivia-reveal.png` });
+        at /Users/boo/Github/project/Hacketon/ghostel/e2e/trivia.spec.ts:86:48
+
+    Error Context: test-results/trivia-two-guests-see-the--d99c8-er-s-picks-after-the-reveal-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/trivia-two-guests-see-the--d99c8-er-s-picks-after-the-reveal-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/trivia-two-guests-see-the--d99c8-er-s-picks-after-the-reveal-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › e2e/voice.spec.ts:49:1 › a room is one call: microphone and camera only after a click, the meeting view when seated 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      32 | async function sitAtLongTable(page: Page) {
+      33 |   if (!(await holdUntilSeat(page, "KeyW", 4000))) {
+    > 34 |     if (!(await holdUntilSeat(page, "KeyD", 3000))) expect(await holdUntilSeat(page, "KeyA", 5000)).toBe(true);
+         |                                                                                                     ^
+      35 |   }
+      36 |   await page.keyboard.press("KeyE");
+      37 |   await expect(page.getByTestId("meeting")).toBeVisible();
+        at sitAtLongTable (/Users/boo/Github/project/Hacketon/ghostel/e2e/voice.spec.ts:34:101)
+        at /Users/boo/Github/project/Hacketon/ghostel/e2e/voice.spec.ts:86:3
+
+    Error Context: test-results/voice-a-room-is-one-call-m-42d88-he-meeting-view-when-seated-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/voice-a-room-is-one-call-m-42d88-he-meeting-view-when-seated-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/voice-a-room-is-one-call-m-42d88-he-meeting-view-when-seated-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › e2e/voice.spec.ts:119:1 › tables in Ghoul's Diner: sit down for a table call, stand up to leave it 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      126 |   }
+      127 |   // From the elevator, south along the west aisle to the first table's chair.
+    > 128 |   expect(await holdUntilSeat(dot.page, "KeyS", 8000)).toBe(true);
+          |                                                       ^
+      129 |   await expect(dot.page.getByTestId("door-prompt")).toHaveText("🪑 Press E to sit down");
+      130 |   await dot.page.keyboard.press("KeyE");
+      131 |   await expect(dot.page.getByTestId("meeting")).toBeVisible();
+        at /Users/boo/Github/project/Hacketon/ghostel/e2e/voice.spec.ts:128:55
+
+    Error Context: test-results/voice-tables-in-Ghoul-s-Di-0326d-e-call-stand-up-to-leave-it-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/voice-tables-in-Ghoul-s-Di-0326d-e-call-stand-up-to-leave-it-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/voice-tables-in-Ghoul-s-Di-0326d-e-call-stand-up-to-leave-it-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [chromium] › e2e/trivia.spec.ts:61:1 › two guests see the same question and each other's picks after the reveal 
+    [chromium] › e2e/voice.spec.ts:49:1 › a room is one call: microphone and camera only after a click, the meeting view when seated 
+    [chromium] › e2e/voice.spec.ts:119:1 › tables in Ghoul's Diner: sit down for a table call, stand up to leave it 
+  26 passed (9.1m)
+
+# exit code: 1
+# load at end: load averages: 170.88 78.91 37.81

@@ -1,0 +1,20 @@
+# 2026-11-12 05:30:39 WIB — $ node scripts/perf-probe.mjs 2 5 ; node scripts/perf-probe.mjs 1 5  (after M19)
+# Darwin arm64, Apple M1, load: load averages: 1.82 4.14 4.91
+
+deviceScaleFactor 2, 5 s per scene, viewport 1366x820
+lobby      | fps 57.0 | p50 16.7 ms | p95 16.8 ms | max 117 ms | >25ms 7 | longtasks 0 | script 182 ms/s | task 207 ms/s | draws/frame 397 | canvas 2049x1230
+floor 2    | fps 59.4 | p50 16.7 ms | p95 16.8 ms | max 33 ms | >25ms 3 | longtasks 0 | script 84 ms/s | task 117 ms/s | draws/frame 112 | canvas 2049x1230
+floor 3    | fps 58.4 | p50 16.7 ms | p95 16.8 ms | max 83 ms | >25ms 4 | longtasks 1 | script 106 ms/s | task 138 ms/s | draws/frame 121 | canvas 1366x820
+floor 4    | fps 60.0 | p50 16.7 ms | p95 16.7 ms | max 17 ms | >25ms 0 | longtasks 0 | script 85 ms/s | task 123 ms/s | draws/frame 79 | canvas 1366x820
+floor 5    | fps 60.0 | p50 16.7 ms | p95 16.8 ms | max 17 ms | >25ms 0 | longtasks 0 | script 84 ms/s | task 120 ms/s | draws/frame 134 | canvas 1366x820
+room 1A    | fps 60.0 | p50 16.7 ms | p95 16.7 ms | max 17 ms | >25ms 0 | longtasks 0 | script 67 ms/s | task 102 ms/s | draws/frame 132 | canvas 1366x820
+
+deviceScaleFactor 1, 5 s per scene, viewport 1366x820
+lobby      | fps 60.0 | p50 16.7 ms | p95 16.8 ms | max 33 ms | >25ms 1 | longtasks 0 | script 163 ms/s | task 187 ms/s | draws/frame 397 | canvas 1366x820
+floor 2    | fps 60.0 | p50 16.7 ms | p95 16.8 ms | max 17 ms | >25ms 0 | longtasks 0 | script 233 ms/s | task 305 ms/s | draws/frame 142 | canvas 1366x820
+floor 3    | fps 60.0 | p50 16.7 ms | p95 16.8 ms | max 17 ms | >25ms 0 | longtasks 0 | script 190 ms/s | task 256 ms/s | draws/frame 125 | canvas 1366x820
+floor 4    | fps 60.0 | p50 16.7 ms | p95 16.8 ms | max 17 ms | >25ms 0 | longtasks 0 | script 82 ms/s | task 121 ms/s | draws/frame 74 | canvas 1366x820
+floor 5    | fps 60.0 | p50 16.7 ms | p95 16.7 ms | max 17 ms | >25ms 0 | longtasks 0 | script 67 ms/s | task 100 ms/s | draws/frame 117 | canvas 1366x820
+room 1A    | fps 60.2 | p50 16.7 ms | p95 16.7 ms | max 17 ms | >25ms 0 | longtasks 0 | script 80 ms/s | task 120 ms/s | draws/frame 132 | canvas 1366x820
+
+# exit codes: 0 0

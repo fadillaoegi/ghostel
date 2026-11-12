@@ -193,3 +193,19 @@ Not verified: the mirror with a real camera (only Chromium's fake camera); the t
   - **Full E2E, stored run (2026-11-11 09:33, load 2.9 at the start): 29 passed, exit 0** (`docs/evidence/test-e2e.txt`). The production smoke test passed too.
   - Earlier full and single-spec runs at load averages of 19 to 97 failed the door 2B walk in `rooms.spec.ts`. The load came from macOS storage scanning processes (`StorageManagementService`, `Storage.appex`), about 150% CPU for 1–2 days.
   - `rooms.spec.ts` run alone passed fully in 3 of 15 runs at loads between 18 and 97. The runs covered three variants: with the extra point lights, without them, and with a test-helper change that was then reverted.
+
+## 2026-11-12 — Milestone 19: smoother frame rate (spec `m19-smoother`, owner request "the app lags a bit")
+
+- **Measured first:** `scripts/perf-probe.mjs` visits every scene in Chromium (Metal) and reports fps, frame-time percentiles, main-thread time and WebGL draw calls per frame. The before and after numbers are in `docs/evidence/perf-before-m19.txt` and `perf-after-m19.txt`.
+- **Changes:**
+  - The render pixel ratio is at most 1.5 (it was up to 1.75), and drei `PerformanceMonitor` steps it down to 1 when frames come too slowly.
+  - The lobby has 5 point lights instead of 8: the two far corner pumpkins and the Night Desk no longer cast light, but still glow.
+  - The lobby's 8 windows and 6 pillars are merged into one mesh per material (`apps/web/src/three/merge.ts`).
+- **Result (Retina, Apple M1):**
+  - Lobby: 35.0 → 57.0 fps, and the 95th-percentile frame went from 50 ms to 16.8 ms.
+  - Other scenes: 44–56 → 58–60 fps.
+  - Lobby draws per frame: 450 → 397.
+- **Checks (2026-11-12):**
+  - typecheck exit 0; 136 shared + 8 web unit tests; 90 integration tests; build exit 0; production smoke test 1 passed.
+  - Full E2E: **29 passed** in a run started at load 2.5.
+  - An earlier run during a load spike (load average up to 171; `airportd` at about 118% CPU) failed 3 browser tests. It is kept as `test-e2e-failed-under-load-2026-11-12.txt`.

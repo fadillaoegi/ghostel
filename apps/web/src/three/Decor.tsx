@@ -146,10 +146,10 @@ export function Decor() {
   return (
     <group>
       <Moon />
-      {/* corner clusters */}
-      <Pumpkin position={[-12.8, 0, -8.6]} scale={1.3} rotationY={0.6} lit />
+      {/* corner clusters (M19: the far corner pumpkins glow without casting light, to save a point light each) */}
+      <Pumpkin position={[-12.8, 0, -8.6]} scale={1.3} rotationY={0.6} />
       <Pumpkin position={[-12, 0, -9.2]} scale={0.8} rotationY={0.2} />
-      <Pumpkin position={[12.8, 0, -8.6]} scale={1.3} rotationY={-0.6} lit />
+      <Pumpkin position={[12.8, 0, -8.6]} scale={1.3} rotationY={-0.6} />
       <Pumpkin position={[12.1, 0, -9.3]} scale={0.7} rotationY={-0.2} />
       <Pumpkin position={[-12.9, 0, 8.7]} scale={1.1} rotationY={2.4} />
       <Pumpkin position={[12.9, 0, 8.7]} scale={1.1} rotationY={-2.4} />
