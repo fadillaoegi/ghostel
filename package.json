@@ -11,6 +11,7 @@
     "db:up": "docker compose up -d --wait postgres",
     "db:down": "docker compose stop postgres",
     "dev": "pnpm --parallel --filter @ghostel/server --filter @ghostel/web dev",
+    "dev:lan": "node scripts/dev-lan.mjs",
     "typecheck": "pnpm -r --workspace-concurrency=1 typecheck && tsc -p tsconfig.json",
     "test": "pnpm --filter @ghostel/shared test && pnpm --filter @ghostel/web test && pnpm --filter @ghostel/server test",
     "test:unit": "pnpm --filter @ghostel/shared test && pnpm --filter @ghostel/web test",

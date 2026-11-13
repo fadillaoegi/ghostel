@@ -54,6 +54,16 @@ pnpm dev          # server :2590 + web :5290
 ```
 Open http://localhost:5290. Open a second browser profile or a private window to see a second guest.
 
+### Try it from a phone on the same Wi-Fi
+```sh
+pnpm dev:lan      # web on https://<this-machine's-LAN-IP>:5290, API still on 127.0.0.1 behind the Vite proxy
+```
+- The script prints the address to open, for example `https://192.168.1.20:5290`.
+- It uses a self-signed HTTPS certificate (`@vitejs/plugin-basic-ssl`), because browsers allow camera, microphone and screen share only on HTTPS or localhost. Accept the browser's certificate warning once.
+- It adds the LAN addresses to `ALLOWED_ORIGINS` for that run only; `.env` is not changed.
+- If macOS asks whether `node` may accept incoming connections, allow it.
+- This is for local testing only: the certificate is not trusted, and the dev server is not hardened for the internet.
+
 ## Checks
 ```sh
 pnpm typecheck

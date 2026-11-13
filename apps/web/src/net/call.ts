@@ -88,13 +88,30 @@ export class CallClient {
   /** Signals are handled strictly in order so ICE never races its description. */
   private queue: Promise<void> = Promise.resolve();
   private callKey: string | null = null;
+  /** The handler this client installed on the presence client, while attached. */
+  private attached: ((event: CallEvent) => void) | null = null;
 
-  constructor(private readonly presence: PresenceClient) {
-    presence.callHandler = (event) => {
+  constructor(private readonly presence: PresenceClient) {}
+
+  /**
+   * Starts receiving this guest's call messages (and replays the latest one). Called from an effect, so
+   * React StrictMode's mount → unmount → mount in development leaves it attached (see `detach`).
+   */
+  attach(): void {
+    const handler = (event: CallEvent) => {
       this.queue = this.queue.then(() => this.handle(event)).catch(() => undefined);
     };
-    const last = presence.latestCall();
-    if (last) presence.callHandler(last);
+    this.presence.callHandler = handler;
+    this.attached = handler;
+    const last = this.presence.latestCall();
+    if (last) handler(last);
+  }
+
+  /** Stops receiving call messages and leaves the call (mic, camera, screen and peers stop). */
+  detach(): void {
+    if (this.attached && this.presence.callHandler === this.attached) this.presence.callHandler = null;
+    this.attached = null;
+    this.endCall();
   }
 
   subscribe = (listener: () => void) => {
@@ -103,11 +120,6 @@ export class CallClient {
   };
 
   getSnapshot = () => this.snapshot;
-
-  dispose(): void {
-    if (this.presence.callHandler) this.presence.callHandler = null;
-    this.endCall();
-  }
 
   /** Call from a click (or key press): lets the AudioContext start so remote voices can be analysed. */
   prime(): void {

@@ -79,6 +79,7 @@ Start Kiro from this folder so `.kiro/steering`, `AGENTS.md` and `.kiro/hooks` l
 - Touch gamepad: `apps/web/src/ui/Joystick.tsx` (floating stick zone, A button); gamepad polling in `apps/web/src/input/controls.ts`.
 - E2E resets `ghostel_test` before starting the server (`apps/server/scripts/reset-test-db.mjs`, refuses other databases).
 - Agent note: tool calls in one batch can run in parallel. Do not write a file and run tests that need it in the same batch (this caused stale test counts and one stale build in this session).
+- `pnpm dev` runs React StrictMode (double mount in development); E2E runs the production build and does not see StrictMode bugs. Anything that registers handlers must do it in an effect with a matching cleanup (see `CallClient.attach`/`detach`, fixed 2026-11-12 after the meeting view never opened in dev).
 - pnpm 11 needs `allowBuilds` in `pnpm-workspace.yaml` for esbuild's postinstall.
 - `TRUST_PROXY` is a hop count (0 locally, 1 on Render), never "trust all", so clients cannot spoof their IP for rate limits (`apps/server/test/proxy.test.ts`).
 - `pnpm test:prod` runs the production build with `NODE_ENV=production` on http://localhost:2597 (`playwright.prod.config.ts`, `e2e-prod/`).

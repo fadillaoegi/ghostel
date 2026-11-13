@@ -186,9 +186,13 @@ function LobbyView({ client, profile, onProfile }: { client: PresenceClient; pro
           ? seatPromptText(prompt.code ?? "", presence.players)
           : PROMPT_TEXT[prompt.kind];
 
-  // One call client for the whole visit: the server decides which call (room or table) we are in.
+  // One call client for the whole visit: the server decides which call (which table) we are in.
+  // Attached in an effect so React StrictMode's double mount (development) leaves it working.
   const [call] = useState(() => new CallClient(client));
-  useEffect(() => () => call.dispose(), [call]);
+  useEffect(() => {
+    call.attach();
+    return () => call.detach();
+  }, [call]);
   // Browsers only let audio analysis start after a gesture: the first tap or key press does it.
   useEffect(() => {
     const prime = () => call.prime();

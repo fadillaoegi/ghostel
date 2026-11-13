@@ -597,3 +597,44 @@ New screenshots: `desktop-pairs-board.png`, `desktop-pairs-podium.png`, `phone-p
   - Unit, integration (91), build and production smoke test pass.
   - The last full E2E run had 3 failures while the load rose to 39. The failed specs passed 5 of 5 when re-run alone.
   - No single full E2E run has passed since M20.
+
+### Session 4, continued — 2026-11-12: testing on the local network (`pnpm dev:lan`)
+
+- **Prompt (owner):** can the app be tried on localhost from the same network with `pnpm run dev --host`? If so, configure it.
+- **Kiro's analysis:** `--host` alone is not enough.
+  1. The server's Origin check refuses a phone's `http://<ip>:5290`.
+  2. Browsers allow camera, microphone and screen share only on HTTPS or localhost.
+- **Change:**
+  - `pnpm dev:lan` (`scripts/dev-lan.mjs`) finds the LAN IPv4 addresses and adds `https://<ip>:5290` to `ALLOWED_ORIGINS` for that run only. Environment variables win over `.env`, so `.env` was not changed.
+  - It starts `pnpm dev` with `GHOSTEL_LAN=1`. `vite.config.ts` then listens on `0.0.0.0` and turns on `@vitejs/plugin-basic-ssl` (a self-signed certificate).
+  - The API server stays on `127.0.0.1` behind the Vite proxy.
+  - Plain `pnpm dev` is unchanged.
+- **Verified:**
+  - Kiro stopped the earlier `pnpm dev` it had started and started `pnpm dev:lan` detached. Vite printed `Network: https://172.20.10.4:5290/`.
+  - A headless Chromium opened `https://172.20.10.4:5290/` (certificate errors ignored, as a user accepting the warning would), checked in and reached `Live`.
+  - The script printed `isSecureContext` true, and `getUserMedia({video})` returned 1 track (fake camera), with 0 page errors.
+  - `pnpm typecheck` passed.
+  - macOS firewall: `socketfilterfw --getglobalstate` returned "Firewall is disabled".
+- **Not verified:** a real phone on the same network. `172.20.10.x` is the address range of an iPhone Personal Hotspot, so the laptop seems to be on a phone's hotspot.
+
+### Session 4, continued — 2026-11-12: the meeting view did not open in `pnpm dev`, and phones needed desktop mode
+
+- **Prompt (owner):** with a friend on two devices over the local link, the room's meeting view did not appear. Is that because of localhost? Also, on a phone Chrome first had to be switched to desktop mode. The attached screenshot reached Kiro only as a generic PNG icon.
+- **Reproduced first:** a throwaway Playwright probe (not kept) used a desktop guest and a phone guest (`devices["Pixel 7"]`) on `https://172.20.10.4:5290` (the `pnpm dev:lan` server). Both created or entered one room and sat at the long table. Result: `meeting elements=0` on both devices, so the bug was not specific to phones.
+- **Cause 1 (both devices, development only):**
+  - The web app renders in React `StrictMode`, which in development mounts, unmounts and mounts effects again.
+  - `CallClient` installed its call handler in its constructor, and the `Lobby` effect cleanup (`dispose`) removed it. After StrictMode's simulated unmount the handler was gone for good, so `call` messages were dropped. The meeting view only renders when there is a call.
+  - The E2E tests run the production build, where effects run once, so they never saw it.
+  - **Fix:** `CallClient.attach()` and `detach()` run in the `Lobby` effect, so a re-mount attaches again.
+  - **After:** the probe showed `meeting elements=1`, "2 people", on both devices.
+- **Cause 2 (phones):**
+  - On phone-sized screens the meeting is full-screen (`inset: 0`) with `backdrop-filter: blur(8px)` over the WebGL canvas. In the phone probe's screenshot the meeting did not show, even though `elementFromPoint` hit the meeting grid.
+  - With the blur turned off in the probe, the meeting showed, but the HUD (joystick, Stand button, name tags) showed through the 88% background.
+  - **Fix:** in the phone media query the meeting gets a solid background and `backdrop-filter: none`.
+  - **After:** the phone screenshot showed the full meeting view (tiles, "0 connected", buttons).
+  - This also explains why "desktop mode" worked: a wide viewport uses the windowed meeting layout, not the full-screen one.
+- **Checks:**
+  - typecheck exit 0; 136 + 8 unit tests; build exit 0.
+  - `voice.spec.ts`, `present.spec.ts` and `mobile.spec.ts`: 7 passed, started at load 17.
+  - No new automated test: the E2E suite uses the production build, which has no StrictMode re-mount.
+- **Not verified:** voice and camera between the owner's two real devices over the hotspot. The probe's "0 connected" is from two headless pages without unmuting, not a measured failure.

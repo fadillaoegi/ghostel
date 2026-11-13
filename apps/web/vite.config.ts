@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import react from "@vitejs/plugin-react";
+import basicSsl from "@vitejs/plugin-basic-ssl";
 import { defineConfig, type Plugin } from "vite";
 
 /**
@@ -32,10 +33,18 @@ function pdfStandardFonts(): Plugin {
 
 const server = "http://127.0.0.1:2590";
 
+/**
+ * `pnpm dev:lan` sets GHOSTEL_LAN=1: the dev web server listens on the local network (so a phone on the
+ * same Wi-Fi can open it) and uses HTTPS with a self-signed certificate, because browsers only allow
+ * camera, microphone and screen share on HTTPS (or localhost). The API server itself stays on 127.0.0.1;
+ * only this proxy is reachable from the network.
+ */
+const lan = process.env["GHOSTEL_LAN"] === "1";
+
 export default defineConfig({
-  plugins: [react(), pdfStandardFonts()],
+  plugins: [react(), pdfStandardFonts(), ...(lan ? [basicSsl({ name: "ghostel-dev" })] : [])],
   server: {
-    host: "127.0.0.1",
+    host: lan ? "0.0.0.0" : "127.0.0.1",
     port: 5290,
     strictPort: true,
     proxy: {
