@@ -67,7 +67,7 @@ pnpm dev:lan      # web on https://<this-machine's-LAN-IP>:5290, API still on 12
 ## Checks
 ```sh
 pnpm typecheck
-pnpm test         # 136 shared + 8 web unit + 91 server integration tests (needs pnpm db:up)
+pnpm test         # 136 shared + 8 web unit + 95 server integration tests (needs pnpm db:up)
 pnpm test:e2e     # builds, resets ghostel_test, then 29 Playwright tests (fake microphone, camera and screen; short games)
 pnpm test:prod    # production build with NODE_ENV=production: secure cookie, headers, CSP
 pnpm build
@@ -81,7 +81,7 @@ Latest real output is in [docs/evidence/](docs/evidence/).
 - Room passwords are hashed with argon2id (`@node-rs/argon2`), never returned by any API or WebSocket message, and limited to 5 guesses per minute per guest and room. Only the owner (by session) can change or delete a room.
 
 ## Deploy
-`render.yaml` describes one Render web service (web + API + WebSocket on one origin) using a Neon database. Follow [docs/DEPLOY.md](docs/DEPLOY.md).
+Production settings: copy `.env.production.example` to `.env` on the server and fill it in (see [docs/DEPLOY.md](docs/DEPLOY.md)). `render.yaml` describes one Render web service (web + API + WebSocket on one origin) using a Neon database, as an alternative to an own VPS.
 
 ## Calls, camera and privacy
 - Calls are peer-to-peer WebRTC. Like every P2P call, they show your IP address to the other people in the call. Ghostel only signals between members of the same call: the guests seated at one table (in a room, its long table).

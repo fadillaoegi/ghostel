@@ -1,5 +1,17 @@
 # Deploying Ghostel
 
+## Production environment (`.env.production.example`)
+The server reads its settings from environment variables, or from `.env` next to `package.json` (`pnpm start` loads it).
+1. On the server: `cp .env.production.example .env`, then `chmod 600 .env`.
+2. Fill in the values:
+   - `POSTGRES_PASSWORD` and the same password in `DATABASE_URL` (generate with `openssl rand -base64 32 | tr -d '/+=' | cut -c1-32`).
+   - `ALLOWED_ORIGINS`: the exact public `https://` address.
+   - `TRUST_PROXY=1` behind one reverse proxy (Caddy or nginx on the same machine).
+3. The server refuses to start in production when an origin is not `https://` (except `http://localhost` for the local smoke test), when an origin has a path or trailing slash, or when `TRIVIA_FAST=1` is set. Tests: `apps/server/test/config.test.ts`.
+4. Keep `HOST=127.0.0.1` so only the reverse proxy reaches Node, and keep PostgreSQL off the internet.
+
+The Render and Neon steps below are an alternative to an own VPS.
+
 One Render web service serves the web app, API and WebSocket from a single HTTPS origin. PostgreSQL runs on Neon.
 
 Free-tier facts checked on 2026-11-07 (check again before you rely on them):

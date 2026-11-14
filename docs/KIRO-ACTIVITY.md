@@ -638,3 +638,18 @@ New screenshots: `desktop-pairs-board.png`, `desktop-pairs-podium.png`, `phone-p
   - `voice.spec.ts`, `present.spec.ts` and `mobile.spec.ts`: 7 passed, started at load 17.
   - No new automated test: the E2E suite uses the production build, which has no StrictMode re-mount.
 - **Not verified:** voice and camera between the owner's two real devices over the hotspot. The probe's "0 connected" is from two headless pages without unmuting, not a measured failure.
+
+### Session 4, continued — 2026-11-14: production environment file
+
+- **Earlier the same session:** the owner's own `pnpm dev` failed with "Port 5290 is already in use". The port was held by the `pnpm dev:lan` server Kiro had left running in the background since 2026-11-12 18:41. The owner asked Kiro to stop it ("ya matikan yaa kalau masih jalan haduuh"). Kiro stopped it, checked ports 5290, 2590, 2595 and 2597 were free, and said it will not leave dev servers running again unless asked.
+- **Prompt (owner):** "create the env configuration for production".
+- **Added:**
+  - `.env.production.example`: placeholders only, with a command to generate the database password, `HOST=127.0.0.1` behind a reverse proxy, `TRUST_PROXY=1`, and an https `ALLOWED_ORIGINS`.
+  - A `.gitignore` exception so the example can be committed; the filled-in `.env` stays ignored.
+  - A section in `docs/DEPLOY.md` and a line in `README.md`.
+- **Server safety check (`apps/server/src/config.ts`):** in production the server refuses to start with a non-https origin (except `http://localhost`, which the local smoke test uses), an origin with a path or trailing slash, or `TRIVIA_FAST=1`. Kiro added this without being asked; the reason is that a wrong `ALLOWED_ORIGINS` or a test flag would otherwise only show up as broken logins or 3-question trivia on the live site.
+- **Verified:**
+  - Loading `.env.production.example` itself through `node --env-file` gave `production: true`, host `127.0.0.1`, port 2590, origin `https://ghostel.example.com`, `trustProxy` 1.
+  - New `apps/server/test/config.test.ts`: 4 tests pass.
+  - Typecheck exit 0; server integration tests 12 files, 95 passed; `pnpm test:prod` 1 passed (`docs/evidence/`).
+- The owner's own dev servers on 2590 and 5290 were running during these checks; Kiro did not touch them. The dev server runs with `--watch`, so it probably restarted when `config.ts` changed; Kiro did not check.

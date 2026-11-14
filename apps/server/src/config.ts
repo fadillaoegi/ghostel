@@ -51,6 +51,26 @@ function required(env: NodeJS.ProcessEnv, key: string): string {
   return value;
 }
 
+/**
+ * Production must be served over HTTPS (Secure `__Host-` cookie, camera and microphone). Only
+ * http://localhost and http://127.0.0.1 are accepted as well, for the local production smoke test.
+ */
+function checkProductionOrigins(origins: readonly string[]): void {
+  for (const origin of origins) {
+    let url: URL;
+    try {
+      url = new URL(origin);
+    } catch {
+      throw new Error(`ALLOWED_ORIGINS has an invalid entry "${origin}". Use the full address, e.g. https://ghostel.example.com`);
+    }
+    const local = url.hostname === "localhost" || url.hostname === "127.0.0.1";
+    if (url.protocol !== "https:" && !(url.protocol === "http:" && local)) {
+      throw new Error(`ALLOWED_ORIGINS must use https:// in production, got "${origin}".`);
+    }
+    if (url.origin !== origin) throw new Error(`ALLOWED_ORIGINS entries are bare origins without a path or trailing slash: use "${url.origin}".`);
+  }
+}
+
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const production = env["NODE_ENV"] === "production";
   const port = Number(env["PORT"] ?? "2590");
@@ -61,6 +81,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     .filter(Boolean);
   const defaultDist = fileURLToPath(new URL("../../web/dist", import.meta.url));
   const webDist = env["WEB_DIST"] ?? defaultDist;
+  if (production) {
+    checkProductionOrigins(origins);
+    if (env["TRIVIA_FAST"] === "1") throw new Error("TRIVIA_FAST is for automated tests only. Remove it from the production environment.");
+  }
   return {
     production,
     host: env["HOST"] ?? (production ? "0.0.0.0" : "127.0.0.1"),
