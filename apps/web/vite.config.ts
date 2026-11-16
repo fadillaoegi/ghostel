@@ -31,7 +31,7 @@ function pdfStandardFonts(): Plugin {
   };
 }
 
-const server = "http://127.0.0.1:2590";
+const server = "http://127.0.0.1:8108";
 
 /**
  * `pnpm dev:lan` sets GHOSTEL_LAN=1: the dev web server listens on the local network (so a phone on the
@@ -45,7 +45,7 @@ export default defineConfig({
   plugins: [react(), pdfStandardFonts(), ...(lan ? [basicSsl({ name: "ghostel-dev" })] : [])],
   server: {
     host: lan ? "0.0.0.0" : "127.0.0.1",
-    port: 5290,
+    port: 8109,
     strictPort: true,
     proxy: {
       "/api": { target: server },

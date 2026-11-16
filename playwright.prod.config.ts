@@ -1,5 +1,12 @@
 import { defineConfig, devices } from "@playwright/test";
 
+// TEST_DATABASE_URL (with the database password) comes from .env when it is not already set.
+try {
+  process.loadEnvFile(".env");
+} catch {
+  // No .env: fall back to the default below.
+}
+
 // Smoke test of the production build with NODE_ENV=production (`__Host-` Secure cookie, CSP, logging).
 // Uses http://localhost, which Chromium treats as a secure origin, so Secure cookies work without TLS.
 const PORT = 2597;
@@ -31,7 +38,7 @@ export default defineConfig({
       HOST: "127.0.0.1",
       PORT: String(PORT),
       DATABASE_URL:
-        process.env["TEST_DATABASE_URL"] ?? "postgres://ghostel:ghostel_local_only@127.0.0.1:5490/ghostel_test",
+        process.env["TEST_DATABASE_URL"] ?? "postgres://ghostel:ghostel_local_only@127.0.0.1:8100/ghostel_test",
       ALLOWED_ORIGINS: BASE,
       TRUST_PROXY: "1",
     },

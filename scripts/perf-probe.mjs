@@ -2,7 +2,7 @@
 // measures frames for a few seconds each. Prints fps, frame-time percentiles, long tasks and main-thread
 // time per second (Chrome DevTools Protocol metrics).
 // Usage: node scripts/perf-probe.mjs [deviceScaleFactor=2] [seconds=5]
-// Needs `pnpm build` and `pnpm db:up`; starts its own server on port 2597 against ghostel_test.
+// Needs `pnpm build` and TEST_DATABASE_URL in .env; starts its own server on port 2597 against ghostel_test.
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { chromium } from "@playwright/test";
@@ -14,6 +14,11 @@ const PROFILE = process.env["PROFILE"] === "1";
 const PORT = 2597;
 const BASE = `http://127.0.0.1:${PORT}`;
 const root = fileURLToPath(new URL("..", import.meta.url));
+
+// TEST_DATABASE_URL (with the database password) comes from .env when it is not already set.
+try {
+  process.loadEnvFile(new URL("../.env", import.meta.url));
+} catch {}
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const server = spawn("node", ["apps/server/dist/main.js"], {
@@ -23,7 +28,7 @@ const server = spawn("node", ["apps/server/dist/main.js"], {
     NODE_ENV: "development",
     HOST: "127.0.0.1",
     PORT: String(PORT),
-    DATABASE_URL: "postgres://ghostel:ghostel_local_only@127.0.0.1:5490/ghostel_test",
+    DATABASE_URL: process.env.TEST_DATABASE_URL ?? "postgres://ghostel:ghostel_local_only@127.0.0.1:8100/ghostel_test",
     ALLOWED_ORIGINS: BASE,
   },
   stdio: ["ignore", "ignore", "inherit"],

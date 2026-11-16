@@ -10,7 +10,7 @@ import { networkInterfaces } from "node:os";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
-const PORT = 5290;
+const PORT = 8109;
 
 /** Private IPv4 addresses of this machine (Wi-Fi, Ethernet, hotspot). */
 function lanAddresses() {

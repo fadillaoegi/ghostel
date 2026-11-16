@@ -1,5 +1,12 @@
 import { defineConfig, devices } from "@playwright/test";
 
+// TEST_DATABASE_URL (with the database password) comes from .env when it is not already set.
+try {
+  process.loadEnvFile(".env");
+} catch {
+  // No .env: fall back to the default below.
+}
+
 // E2E runs against the production build (server serves web + API + WebSocket on one origin),
 // on its own port and the test database so it never touches dev data.
 const PORT = 2595;
@@ -40,7 +47,7 @@ export default defineConfig({
       HOST: "127.0.0.1",
       PORT: String(PORT),
       DATABASE_URL:
-        process.env["TEST_DATABASE_URL"] ?? "postgres://ghostel:ghostel_local_only@127.0.0.1:5490/ghostel_test",
+        process.env["TEST_DATABASE_URL"] ?? "postgres://ghostel:ghostel_local_only@127.0.0.1:8100/ghostel_test",
       ALLOWED_ORIGINS: BASE,
       // Short Pumpkin Trivia rounds so browser tests finish quickly.
       TRIVIA_FAST: "1",

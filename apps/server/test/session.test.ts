@@ -80,7 +80,7 @@ describe("guest session", () => {
     expect((await getMe(server, forged)).json.guest).toBeNull();
 
     // The API has no way to address another guest by ID.
-    const byId = await fetch(`${server.base}/api/guests/whatever`, { method: "PUT", headers: { origin: "http://localhost:5290" } });
+    const byId = await fetch(`${server.base}/api/guests/whatever`, { method: "PUT", headers: { origin: "http://localhost:8109" } });
     expect(byId.status).toBe(404);
   });
 

@@ -10,6 +10,21 @@ The server reads its settings from environment variables, or from `.env` next to
 3. The server refuses to start in production when an origin is not `https://` (except `http://localhost` for the local smoke test), when an origin has a path or trailing slash, or when `TRIVIA_FAST=1` is set. Tests: `apps/server/test/config.test.ts`.
 4. Keep `HOST=127.0.0.1` so only the reverse proxy reaches Node, and keep PostgreSQL off the internet.
 
+## Own VPS (`compose.vps.yaml`)
+The VPS also runs other apps on ports 8100–8107 and its Docker bridge network is broken, so Ghostel uses the host network like they do:
+
+| Port | Service | Reachable from |
+|---|---|---|
+| 8108 | Node server (`app`): web build, API, WebSocket | 127.0.0.1 only |
+| 8109 | nginx (`web`, `deploy/nginx.conf`): public entry, proxies everything to 8108 | all interfaces (Cloudflare Tunnel) |
+| 8100 | the existing PostgreSQL 18 server: own role `ghostel`, databases `ghostel` and `ghostel_test` | 127.0.0.1 |
+
+1. `cp .env.vps.example .env.vps`, `chmod 600 .env.vps`, then fill in `POSTGRES_PASSWORD` (the `ghostel` role password) and `ALLOWED_ORIGINS` (the exact public `https://` hostname).
+2. `docker compose -f compose.vps.yaml --env-file .env.vps up -d --build`
+3. In Cloudflare Tunnel, point the public hostname to `http://localhost:8109`.
+4. nginx takes the visitor's address from `CF-Connecting-IP` only when the connection comes from 127.0.0.1 (a tunnel connector on this machine). If the connector runs elsewhere, every visitor shares one rate-limit bucket; add its address to `set_real_ip_from`.
+5. nginx forwards the WebSocket upgrade and keeps idle connections open for up to 1 hour.
+
 The Render and Neon steps below are an alternative to an own VPS.
 
 One Render web service serves the web app, API and WebSocket from a single HTTPS origin. PostgreSQL runs on Neon.

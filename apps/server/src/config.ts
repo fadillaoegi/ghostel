@@ -73,7 +73,7 @@ function checkProductionOrigins(origins: readonly string[]): void {
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const production = env["NODE_ENV"] === "production";
-  const port = Number(env["PORT"] ?? "2590");
+  const port = Number(env["PORT"] ?? "8108");
   if (!Number.isInteger(port) || port <= 0 || port > 65535) throw new Error(`Invalid PORT: ${env["PORT"]}`);
   const origins = required(env, "ALLOWED_ORIGINS")
     .split(",")

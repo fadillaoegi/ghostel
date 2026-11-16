@@ -5,8 +5,8 @@ import { buildApp, type AppOverrides, type GhostelApp } from "../src/app";
 import type { Config } from "../src/config";
 
 export const TEST_DATABASE_URL =
-  process.env["TEST_DATABASE_URL"] ?? "postgres://ghostel:ghostel_local_only@127.0.0.1:5490/ghostel_test";
-export const ORIGIN = "http://localhost:5290";
+  process.env["TEST_DATABASE_URL"] ?? "postgres://ghostel:ghostel_local_only@127.0.0.1:8100/ghostel_test";
+export const ORIGIN = "http://localhost:8109";
 
 export interface TestServer extends GhostelApp {
   base: string;

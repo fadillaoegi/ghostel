@@ -1,5 +1,5 @@
 // Load probe (M18 hosting sizing): N guests walk around the lobby at 20 Hz and one chats every second.
-// Usage: node scripts/load-probe.mjs <guests> <seconds>   (needs pnpm build and pnpm db:up; uses ghostel_test on port 2597)
+// Usage: node scripts/load-probe.mjs <guests> <seconds>   (needs pnpm build and TEST_DATABASE_URL in .env; uses ghostel_test on port 2597)
 // Measures what the server process uses (RSS, CPU) and how many bytes each guest receives.
 import { execSync, spawn } from "node:child_process";
 import { createRequire } from "node:module";
@@ -14,6 +14,11 @@ const PORT = 2597;
 const BASE = `http://127.0.0.1:${PORT}`;
 const root = fileURLToPath(new URL("..", import.meta.url));
 
+// TEST_DATABASE_URL (with the database password) comes from .env when it is not already set.
+try {
+  process.loadEnvFile(new URL("../.env", import.meta.url));
+} catch {}
+
 const server = spawn("node", ["apps/server/dist/main.js"], {
   cwd: root,
   env: {
@@ -21,7 +26,7 @@ const server = spawn("node", ["apps/server/dist/main.js"], {
     NODE_ENV: "development",
     HOST: "127.0.0.1",
     PORT: String(PORT),
-    DATABASE_URL: "postgres://ghostel:ghostel_local_only@127.0.0.1:5490/ghostel_test",
+    DATABASE_URL: process.env.TEST_DATABASE_URL ?? "postgres://ghostel:ghostel_local_only@127.0.0.1:8100/ghostel_test",
     ALLOWED_ORIGINS: BASE,
   },
   stdio: ["ignore", "ignore", "inherit"],

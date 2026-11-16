@@ -23,5 +23,5 @@
 ## Conventions
 - TypeScript `strict`, no `eval`, no `any` unless justified in a comment.
 - ESM everywhere. Node 24.
-- Local ports (avoid 5178, 5179, 8098, 5478 used by the old project): web 5290, server 2590, PostgreSQL 18 in Docker 5490, E2E server 2595, production smoke test 2597.
+- Local ports (avoid 5178, 5179, 8098, 5478 used by the old project): web 8109, server (backend) 8108, PostgreSQL 18 on the shared server at 8100 (own role "ghostel", databases ghostel and ghostel_test), E2E server 2595, production smoke test 2597. Ports 8100-8107 belong to other projects on this machine.
 - Tests: Vitest for unit and server integration (real PostgreSQL), Playwright for browser tests (fake microphone, camera and screen), `node --test` for the Kiro hook scripts.

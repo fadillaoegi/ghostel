@@ -15,7 +15,10 @@ Start Kiro from this folder so `.kiro/steering`, `AGENTS.md` and `.kiro/hooks` l
   - Confirm that he is eligible for the Remotion Free License (as an individual).
   - Record the screen capture. With the intro and outro, the video has at most 2 min 46 s left for the screen recording.
   - After the deploy, re-render the outro with `--props='{"appUrl":"https://…"}'`.
-- **Hosting:** the owner has his own VPS. Kiro is still waiting for its OS, RAM, domain, open ports 80/443, location and access mode. The plan is Docker Compose with Caddy and PostgreSQL 18 (sizing in `docs/evidence/load-probe.txt`: 2 vCPU, 2 GB RAM). The Render and Neon notes in item 4 are only an alternative.
+- **Hosting (2026-11-16):** the VPS is this machine (`fldev-vps`). `compose.vps.yaml` runs the Node server on 127.0.0.1:8108 and nginx on 8109 (public entry for Cloudflare Tunnel), with the database on the shared PostgreSQL 18 at 8100. See `docs/DEPLOY.md` → "Own VPS".
+  - Verified: the image builds, and a temporary run against `ghostel_test` behind nginx returned `/api/health` `{"ok":true}`, the CSP header, the SPA fallback and the WebSocket upgrade reaching the server (401 without a session). Those containers were stopped afterwards.
+  - Not yet started for real. The owner still has to pick the public hostname, write `.env.vps`, run `docker compose -f compose.vps.yaml --env-file .env.vps up -d --build` and add the Cloudflare Tunnel route to `http://localhost:8109`.
+  - The Render and Neon notes in item 4 are only an alternative.
 0. **`pnpm dev` smoke-tested on 2026-11-10.** It was started detached with `nohup` (the agent shell refuses `pnpm dev` directly). `/api/health` through the Vite proxy on :5290 returned `{"ok":true}`. A headless Chromium checked in at http://localhost:5290 and reached "Live" in the Grand Lobby with 0 page errors. The dev database applied migration `006_monster_pairs`, and house room 1B now runs Monster Pairs.
 1. **Verify the remaining Kiro hooks (M15 task 3).**
    - The guard hook is **proven**: on 2026-11-09 it blocked a real tool call in Kiro (log line in `docs/evidence/kiro-hooks.log`).
@@ -65,7 +68,7 @@ Start Kiro from this folder so `.kiro/steering`, `AGENTS.md` and `.kiro/hooks` l
   - `hub.ts` was not changed. How to add a game: `docs/GAME-KIT.md`.
   - Before the migration, the dev database was backed up to `backups/ghostel-pg18-before-006-20261110-142214.dump` (gitignored).
   - A dev server (PID 27722, started 2026-11-09 20:25, not by Kiro in this session) still runs the old build against the dev database. After a restart it applies migration 006 and switches house room 1B to Monster Pairs.
-- Ports: web 5290, server 2590, PostgreSQL 5490, E2E server 2595.
+- Ports (changed 2026-11-16): web 8109, server 8108, PostgreSQL 8100 (shared PostgreSQL 18.6 in container `bisik_postgres`; role `ghostel`, databases `ghostel` and `ghostel_test`, password only in `.env`), E2E server 2595. Ports 8100-8107 belong to other projects (bisik, bacabertahap, tasteLingo, swaplook). `docker-compose.yml` (5490) is now optional and unused here.
 - The server registers static files at startup: after `pnpm build`, restart it, or new asset names fall through to `index.html`. Old project ports 5178, 5179, 8098, 5478 are avoided.
 - Databases: `ghostel` (dev) and `ghostel_test` (integration + E2E), both in the `ghostel-postgres-1` container (PostgreSQL 18, `postgres:18-alpine`), volume `ghostel_ghostel_pg18` mounted at `/var/lib/postgresql` (18+ keeps data in `/var/lib/postgresql/18/docker`). The old PostgreSQL 17 volume `ghostel_ghostel_pg` was removed on 2026-11-09 at the owner's request, after a `pg_dump` to `backups/` (gitignored) that was restored into 18.
 - E2E uses ANGLE Metal on macOS. SwiftShader is far too slow for the lobby (2–5 fps).

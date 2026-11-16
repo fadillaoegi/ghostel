@@ -22,10 +22,10 @@ Instructions for AI coding agents (Kiro and others) working on Ghostel.
 ## Commands
 ```sh
 pnpm install
-pnpm db:up            # PostgreSQL 18 in Docker on 127.0.0.1:5490
-pnpm dev              # server on :2590, web on :5290 (open http://localhost:5290)
+# PostgreSQL 18 runs on 127.0.0.1:8100 (shared server; role "ghostel", databases ghostel + ghostel_test; URLs in .env)
+pnpm dev              # server on :8108, web on :8109 (open http://localhost:8109)
 pnpm typecheck
-pnpm test             # unit + server integration (needs db:up)
+pnpm test             # unit + server integration (needs PostgreSQL on 8100)
 pnpm test:e2e         # Playwright, two browser contexts
 pnpm build
 pnpm test:hooks       # tests for the Kiro hook scripts in scripts/kiro-hooks/

@@ -5,7 +5,7 @@ const BASE = { DATABASE_URL: "postgres://u:p@127.0.0.1:5432/ghostel", ALLOWED_OR
 
 describe("production configuration", () => {
   it("accepts the values from .env.production.example", () => {
-    const c = loadConfig({ ...BASE, NODE_ENV: "production", HOST: "127.0.0.1", PORT: "2590", TRUST_PROXY: "1" });
+    const c = loadConfig({ ...BASE, NODE_ENV: "production", HOST: "127.0.0.1", PORT: "8108", TRUST_PROXY: "1" });
     expect(c.production).toBe(true);
     expect([...c.allowedOrigins]).toEqual(["https://ghostel.example.com"]);
     expect(c.trustProxy).toBe(1);
@@ -23,7 +23,7 @@ describe("production configuration", () => {
 
   it("refuses TRIVIA_FAST in production, allows it in development", () => {
     expect(() => loadConfig({ ...BASE, NODE_ENV: "production", TRIVIA_FAST: "1" })).toThrow("automated tests only");
-    expect(() => loadConfig({ ...BASE, NODE_ENV: "development", TRIVIA_FAST: "1", ALLOWED_ORIGINS: "http://localhost:5290" })).not.toThrow();
+    expect(() => loadConfig({ ...BASE, NODE_ENV: "development", TRIVIA_FAST: "1", ALLOWED_ORIGINS: "http://localhost:8109" })).not.toThrow();
   });
 
   it("still requires DATABASE_URL and ALLOWED_ORIGINS", () => {

@@ -51,16 +51,16 @@ Needs Node 24+, pnpm 11 and Docker.
 ```sh
 cp .env.example .env
 pnpm install
-pnpm db:up        # PostgreSQL 18 on 127.0.0.1:5490
-pnpm dev          # server :2590 + web :5290
+# PostgreSQL 18 on 127.0.0.1:8100 (shared server, role "ghostel", databases ghostel + ghostel_test; URLs in .env)
+pnpm dev          # server :8108 + web :8109
 ```
-Open http://localhost:5290. Open a second browser profile or a private window to see a second guest.
+Open http://localhost:8109. Open a second browser profile or a private window to see a second guest.
 
 ### Try it from a phone on the same Wi-Fi
 ```sh
-pnpm dev:lan      # web on https://<this-machine's-LAN-IP>:5290, API still on 127.0.0.1 behind the Vite proxy
+pnpm dev:lan      # web on https://<this-machine's-LAN-IP>:8109, API still on 127.0.0.1 behind the Vite proxy
 ```
-- The script prints the address to open, for example `https://192.168.1.20:5290`.
+- The script prints the address to open, for example `https://192.168.1.20:8109`.
 - It uses a self-signed HTTPS certificate (`@vitejs/plugin-basic-ssl`), because browsers allow camera, microphone and screen share only on HTTPS or localhost. Accept the browser's certificate warning once.
 - It adds the LAN addresses to `ALLOWED_ORIGINS` for that run only; `.env` is not changed.
 - If macOS asks whether `node` may accept incoming connections, allow it.
