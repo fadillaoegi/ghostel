@@ -653,3 +653,28 @@ New screenshots: `desktop-pairs-board.png`, `desktop-pairs-podium.png`, `phone-p
   - New `apps/server/test/config.test.ts`: 4 tests pass.
   - Typecheck exit 0; server integration tests 12 files, 95 passed; `pnpm test:prod` 1 passed (`docs/evidence/`).
 - The owner's own dev servers on 2590 and 5290 were running during these checks; Kiro did not touch them. The dev server runs with `--watch`, so it probably restarted when `config.ts` changed; Kiro did not check.
+
+### Session 4, continued — 2026-11-14/15: Milestone 21 (demo video intro and outro with Remotion)
+
+- **Prompt (owner, Indonesian):** make an intro and closing animation for the start of the video, with attractive, deep 3D motion and sound that fits the app, put it in the `submission` folder, use an explode animation if possible, and use Remotion.
+- **Research before code:**
+  - Kiro read Remotion's `LICENSE.md` in the installed package. Remotion is source-available, not open source, and free for individuals and companies of up to 3 people. `@remotion/three` is MIT.
+  - It also read the `@remotion/three` `ThreeCanvas` source. In rendering mode the canvas uses `frameloop="never"` and advances once per frame in an effect. So the scenes set the camera in a layout effect and never use `useFrame`.
+  - In 4.0.543 `Audio` is deprecated in favour of `Html5Audio`.
+- **Spec first:** `.kiro/specs/m21-video-intro-outro/` (requirements, design, tasks) was written before the code.
+- **Decisions:**
+  - Shards are separate declarative meshes, not an InstancedMesh, so every frame is reproducible.
+  - No drei and no postprocessing.
+  - The sound is synthesized offline into WAV by a `tsx` script that imports the app's lobby theme (`scores.ts`). Picture and sound share one timeline file.
+  - The neon flicker is one function, `signFlicker`, used by both the picture and the hum.
+- **What Kiro looked at:** stills of each phase, combined into contact sheets with ImageMagick, and then one frame per second extracted from the finished MP4s with ffmpeg. Kiro cannot hear audio. It measured loudness in time windows instead, both on the WAVs and on the audio decoded back out of the MP4s.
+- **Fixes after looking:**
+  - The hotel windows showed through the sign's letters, so the sign got a dark backing.
+  - The mix had a quiet hole after the explosion, so the effects were made louder.
+- **Agent mistakes, recorded as they happened:**
+  - Kiro again put two edits to the same file in one parallel batch, twice (`CameraRig.tsx`, `make-audio.ts`). Both times it re-read or grepped the file before continuing, and both edits had landed.
+  - Kiro also chained the `ffprobe` evidence step with a frame extraction that used `-vsync`, an option this ffmpeg no longer accepts. The `ffprobe` part had already been written to the evidence file. The extraction was re-run with `-fps_mode vfr`.
+  - The first still timed out (Chrome did not answer within 25 s), and that run left a Chrome Headless Shell (PID 50857, started 2026-11-14 17:28:11) running with no parent. Kiro found it in its final process check and stopped it. No port was involved.
+- **Owner interaction:** the owner rejected one tool call (the `ffprobe` and frame extraction step) by mistake and then approved it ("lanjut approve tadi salah pilih").
+- **Results:** see the M21 `tasks.md`. Both MP4s rendered (exit 0, 210 frames each, 7.02 s), typecheck exit 0, `docs/evidence/video-render.txt`.
+- **Not verified:** listening to the sound by ear, and the owner's Remotion license eligibility. No dev server or Remotion Studio was started.

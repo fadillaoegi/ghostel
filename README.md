@@ -34,6 +34,8 @@ Ghostel is a low-poly 3D haunted hotel in the browser. Guests build a costumed c
 
 Coming next: the public HTTPS deployment (see [docs/DEPLOY.md](docs/DEPLOY.md)), then submission material. See [docs/PROGRESS.md](docs/PROGRESS.md).
 
+The demo video's 7-second intro and outro are ready in [`submission/`](submission/README.md). They were made with Remotion (`submission/video`), with 3D scenes built in code and sound synthesized from the lobby theme.
+
 ## Stack
 pnpm monorepo, TypeScript strict everywhere.
 

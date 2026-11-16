@@ -230,3 +230,16 @@ Owner request, with a screenshot: when you sit at the meeting table you enter th
     - One full run is invalid: Kiro overlapped it with a build.
     - One failed 3 tests while the machine's load rose to 39.
     - The failed specs passed when re-run on their own (5 of 5, `test-e2e-rerun-present-rooms.txt`).
+
+## 2026-11-14/15 — Milestone 21: intro and outro for the demo video (spec `m21-video-intro-outro`, owner request)
+
+Owner request: an intro and a closing animation for the demo video, with deep 3D motion, an explosion and sound that fits the app, made with Remotion, in the `submission` folder.
+
+- **New package** `submission/video` (`@ghostel/video`): Remotion 4.0.543 with `@remotion/three`, two compositions (`Intro`, `Outro`), each 7 s at 1920×1080 and 30 fps.
+  - Intro: the camera flies down a graveyard path to a jack-o'-lantern, with a dolly zoom while it charges. The pumpkin explodes into 420 shards, and the shards fly together into the "GHOSTEL" sign. Then the tagline.
+  - Outro: the lit sign flickers and explodes into embers and bats, then the credits.
+  - Every frame is a pure function of the frame number (seeded randomness).
+- **Sound:** an offline synthesizer script plays the app's lobby waltz on the same music-box and celesta recipes as the app. Around it are a boom, crackles, a riser, a whoosh and a neon hum that follows the sign's flicker frame by frame. No samples.
+- **Output:** `submission/ghostel-intro.mp4` and `submission/ghostel-outro.mp4`, plus `submission/README.md` (timeline, re-render, licenses).
+- **Checks:** both renders exit 0. `ffprobe`: 210 frames, 7.02 s, H.264 and AAC stereo. Root typecheck exit 0. One frame per second was reviewed (`docs/evidence/screenshots/video-*-frames.jpg`). Details are in the M21 `tasks.md`.
+- **License:** Remotion is not open source (free for individuals and companies of up to 3 people); recorded in `docs/ASSETS.md`. The owner still has to confirm he is eligible.

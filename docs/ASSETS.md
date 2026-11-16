@@ -49,3 +49,12 @@ Direct runtime dependencies (React, three.js, React Three Fiber, drei, Fastify, 
 Added on 2026-11-08: `pdfjs-dist` 6.5.438 (Apache-2.0, Mozilla), a direct dependency of the web app for PDF slides. Checked in the build on 2026-11-09: the copied worker (`pdf.worker.min-*.mjs`) keeps Mozilla's Apache-2.0 notice. The main pdf.js chunk bundled by Vite does not keep it, so this entry is the notice for that code (Copyright Mozilla Foundation, Apache License 2.0, https://www.apache.org/licenses/LICENSE-2.0).
 
 Added on 2026-11-12: `@vitejs/plugin-basic-ssl` 2.3.0 (MIT, its `LICENSE` checked), a dev dependency of the web app. It is used only by `pnpm dev:lan` to serve the dev server over HTTPS with a self-signed certificate. It is not part of the production build.
+
+## Demo video intro and outro (M21, 2026-11-14)
+- **Visuals:** made in code in `submission/video/src/three/` from three.js primitives (graveyard, hotel, pumpkin, bats, ghosts, shards) and canvas text (the "GHOSTEL" sign in Creepster). No model, texture, image or video files. MIT.
+- **Sound:** `submission/video/scripts/make-audio.ts` synthesizes it offline from oscillators and seeded noise, with a Schroeder reverb. The melody is the lobby theme "Waltz of the Lost Keys" from `apps/web/src/ui/scores.ts`, composed for Ghostel. No samples or recordings. MIT. The generated WAVs are gitignored; the MP4s in `submission/` contain the audio.
+- **Fonts:** Creepster and Nunito from `@fontsource` 5.3.0 (OFL 1.1, see Fonts above).
+- **Remotion 4.0.543** (`remotion`, `@remotion/cli`): the **Remotion License** (`LICENSE.md` in the package, read on 2026-11-14). It is source-available, **not open source**. The Free License covers individuals, for-profit organizations with up to 3 employees, non-profits, and evaluation; it allows commercial and non-commercial use for creating videos. Others need a Company License. The owner still has to confirm that he is eligible (as an individual). Remotion is used only to render the two MP4s; it is not part of the app or its production build.
+- **`@remotion/three` 4.0.543:** MIT (its `package.json`).
+- three.js 0.187.0, React Three Fiber 9.8.2, React 19.3.1: MIT, the same versions as the app.
+- **Chrome Headless Shell:** downloaded by Remotion on the first render (about 140 MB) into `node_modules`. It is a render tool and is not distributed with the repo.

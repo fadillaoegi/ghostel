@@ -1,6 +1,6 @@
 # Handoff
 
-Last session: 2026-11-10. Milestones 1–7, the owner's milestones M8–M14, M16 and M17 are implemented and tested. M8 is floors and music, M9 room doors, night city and monsters, M10 Ghoul's Diner and the rooftop on floor 5, M11 phone gamepad and landscape, M12 seats, table calls and the meeting view, M13 camera, M14 presentations. Specs are in `.kiro/specs/` (`m1-check-in-and-lobby` covers milestones 1 and 2). The category report is in `docs/CATEGORY-REPORT.md`.
+Last session: 2026-11-09 → 2026-11-15 (session 4). Milestones 1–7 and the owner's milestones M8–M21 are implemented. M18 is brighter lighting, M19 a smoother frame rate, M20 room meetings at the long table, and M21 the demo video intro and outro (`submission/`). M8 is floors and music, M9 room doors, night city and monsters, M10 Ghoul's Diner and the rooftop on floor 5, M11 phone gamepad and landscape, M12 seats, table calls and the meeting view, M13 camera, M14 presentations. Specs are in `.kiro/specs/` (`m1-check-in-and-lobby` covers milestones 1 and 2). The category report is in `docs/CATEGORY-REPORT.md`.
 
 ## Start the next session
 ```sh
@@ -10,6 +10,12 @@ kiro-cli
 Start Kiro from this folder so `.kiro/steering`, `AGENTS.md` and `.kiro/hooks` load.
 
 ## Open items
+- **M21 video (2026-11-15):** `submission/ghostel-intro.mp4` and `ghostel-outro.mp4` are rendered (see `submission/README.md`). Still for the owner:
+  - Listen to both files. Kiro only measured their loudness.
+  - Confirm that he is eligible for the Remotion Free License (as an individual).
+  - Record the screen capture. With the intro and outro, the video has at most 2 min 46 s left for the screen recording.
+  - After the deploy, re-render the outro with `--props='{"appUrl":"https://…"}'`.
+- **Hosting:** the owner has his own VPS. Kiro is still waiting for its OS, RAM, domain, open ports 80/443, location and access mode. The plan is Docker Compose with Caddy and PostgreSQL 18 (sizing in `docs/evidence/load-probe.txt`: 2 vCPU, 2 GB RAM). The Render and Neon notes in item 4 are only an alternative.
 0. **`pnpm dev` smoke-tested on 2026-11-10.** It was started detached with `nohup` (the agent shell refuses `pnpm dev` directly). `/api/health` through the Vite proxy on :5290 returned `{"ok":true}`. A headless Chromium checked in at http://localhost:5290 and reached "Live" in the Grand Lobby with 0 page errors. The dev database applied migration `006_monster_pairs`, and house room 1B now runs Monster Pairs.
 1. **Verify the remaining Kiro hooks (M15 task 3).**
    - The guard hook is **proven**: on 2026-11-09 it blocked a real tool call in Kiro (log line in `docs/evidence/kiro-hooks.log`).
@@ -39,6 +45,12 @@ Start Kiro from this folder so `.kiro/steering`, `AGENTS.md` and `.kiro/hooks` l
 8. **Room doors (M9):** the stale-room cleanup (3 days unused) is tested at repository level, not through the hourly timer. Door labels in the hub are loaded at startup and kept in sync by the room routes; a manual SQL change to `rooms` needs a server restart to show on doors.
 
 ## Things to know
+- M21 (2026-11-15):
+  - The video package is `submission/video`. Its timeline (`src/timeline.ts`) drives both picture and sound.
+  - Run `pnpm --filter @ghostel/video audio` before rendering. The WAVs are gitignored.
+  - Renders use `--gl=angle`. The first render downloads Chrome Headless Shell, and the first launch can time out once; just retry.
+  - Never use `useFrame` or a clock in the scenes: every value must come from `useCurrentFrame()`.
+  - Do not start Remotion Studio (a dev server) unless the owner asks.
 - M16 (2026-11-10):
   - The Night Desk terminal is the `night-desk` obstacle in `layout.ts` (its box reaches into the wall on purpose). The `terminal` prompt is in front of it.
   - The story rules are in `packages/shared/src/nightdesk.ts`, and the UI in `apps/web/src/ui/NightDesk.tsx`.

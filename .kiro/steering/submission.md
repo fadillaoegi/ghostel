@@ -31,6 +31,9 @@ inclusion: manual
 - [ ] A working app URL. If a login were needed, credentials would go in the private judges' field; Ghostel needs none (guest check-in).
 - [ ] A text description of the features.
 - [ ] A demo video **under 3 minutes** on YouTube, showing the project running. No unlicensed third-party trademarks or copyrighted music. Ghostel's music is original, so it can be used.
+  - Ready (M21, 2026-11-14): `submission/ghostel-intro.mp4` and `submission/ghostel-outro.mp4`, 7 s each, made with Remotion, with synthesized sound from the lobby theme. That leaves at most 2 min 46 s for the screen recording. See `submission/README.md`.
+  - Still to do: the screen recording, the edit, and the YouTube upload. Once the app is deployed, re-render the outro with `appUrl` set.
+  - Remotion is not open source (Remotion License; free for individuals). The owner confirms he is eligible before the video is published.
 - [ ] A write-up of how Kiro was used. The source lists example topics:
   - which Kiro (IDE, CLI, Web, Crew)
   - custom agents

@@ -14,3 +14,12 @@ playwright-report/
 test-results/
 apps/web/.vite/
 backups/
+# Video files and M21 Remotion generated audio / render cache
+*.mp4
+*.mov
+*.webm
+*.mkv
+*.avi
+*.m4v
+submission/video/public/*.wav
+submission/video/out/

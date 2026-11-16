@@ -4,6 +4,7 @@
 - `packages/shared` — domain rules, validation (zod), wire protocol types, building layout, movement rules, later game rules. Pure TypeScript. Must not import React, DOM APIs, `ws`, `pg` or any Node-only module.
 - `apps/server` — Node + TypeScript. Fastify for HTTP (`/api/*`), `ws` for realtime (`/ws`), `pg` for PostgreSQL. In production it also serves the built web app so everything is same-origin.
 - `apps/web` — React + TypeScript strict + Vite + React Three Fiber (`@react-three/fiber`, `@react-three/drei`).
+- `submission/video` (`@ghostel/video`, M21) — the Remotion project for the demo video's intro and outro, using `@remotion/three` and an offline audio script. It is a workspace package so `pnpm typecheck` covers it. It is not part of the app build, and the app must never import it. It may import pure data from the app (`apps/web/src/ui/scores.ts`) but nothing with side effects.
 
 ## Server layering
 - `domain` logic lives in `packages/shared`.

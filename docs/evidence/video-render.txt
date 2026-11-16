@@ -1,0 +1,67 @@
+# 2026-11-14 22:13:54 +0700 — $ pnpm --filter @ghostel/video audio
+$ tsx scripts/make-audio.ts
+intro.wav: 1313 KiB, 7.00 s, 48000 Hz 16-bit stereo, 2.3 s to make
+outro.wav: 1313 KiB, 7.00 s, 48000 Hz 16-bit stereo, 1.7 s to make
+# exit code: 0
+
+# 2026-11-14 22:14:01 +0700 — $ pnpm --filter @ghostel/video render:intro
+$ remotion render src/index.ts Intro ../ghostel-intro.mp4 --gl=angle --crf=18
+Getting composition
+Composition          Intro
+Codec                h264
+Output               ../ghostel-intro.mp4
+Concurrency          4x
+[Tab 1, ../../node_modules/.pnpm/three@0.187.0/node_modules/three/build/three.core.js:2014] THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.
+[Tab 3, ../../node_modules/.pnpm/three@0.187.0/node_modules/three/build/three.core.js:2014] THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.
+[Tab 0, ../../node_modules/.pnpm/three@0.187.0/node_modules/three/build/three.core.js:2014] THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.
+[Tab 2, ../../node_modules/.pnpm/three@0.187.0/node_modules/three/build/three.core.js:2014] THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.
++                    ../ghostel-intro.mp4 5.9 MB
+# exit code: 0
+
+# 2026-11-14 22:15:12 +0700 — $ pnpm --filter @ghostel/video render:outro
+$ remotion render src/index.ts Outro ../ghostel-outro.mp4 --gl=angle --crf=18
+Getting composition
+Composition          Outro
+Codec                h264
+Output               ../ghostel-outro.mp4
+Concurrency          4x
+[Tab 3, ../../node_modules/.pnpm/three@0.187.0/node_modules/three/build/three.core.js:2014] THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.
+[Tab 0, ../../node_modules/.pnpm/three@0.187.0/node_modules/three/build/three.core.js:2014] THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.
+[Tab 1, ../../node_modules/.pnpm/three@0.187.0/node_modules/three/build/three.core.js:2014] THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.
+[Tab 2, ../../node_modules/.pnpm/three@0.187.0/node_modules/three/build/three.core.js:2014] THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.
++                    ../ghostel-outro.mp4 4.5 MB
+# exit code: 0
+
+# 2026-11-14 23:00:11 +0700 — $ ffprobe (Homebrew) on both files
+## submission/ghostel-intro.mp4 (5866488 bytes)
+codec_name=h264
+codec_type=video
+width=1920
+height=1080
+pix_fmt=yuv420p
+r_frame_rate=30/1
+nb_frames=210
+codec_name=aac
+codec_type=audio
+sample_rate=48000
+channels=2
+r_frame_rate=0/0
+nb_frames=331
+duration=7.019000
+# exit code: 0
+## submission/ghostel-outro.mp4 (4497153 bytes)
+codec_name=h264
+codec_type=video
+width=1920
+height=1080
+pix_fmt=yuv420p
+r_frame_rate=30/1
+nb_frames=210
+codec_name=aac
+codec_type=audio
+sample_rate=48000
+channels=2
+r_frame_rate=0/0
+nb_frames=331
+duration=7.019000
+# exit code: 0
