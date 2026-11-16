@@ -69,7 +69,7 @@ pnpm dev:lan      # web on https://<this-machine's-LAN-IP>:5290, API still on 12
 ## Checks
 ```sh
 pnpm typecheck
-pnpm test         # 136 shared + 8 web unit + 95 server integration tests (needs pnpm db:up)
+pnpm test         # 136 shared + 8 web unit + 100 server integration tests (needs pnpm db:up)
 pnpm test:e2e     # builds, resets ghostel_test, then 29 Playwright tests (fake microphone, camera and screen; short games)
 pnpm test:prod    # production build with NODE_ENV=production: secure cookie, headers, CSP
 pnpm build
@@ -91,7 +91,7 @@ Production settings: copy `.env.production.example` to `.env` on the server and 
 - The Haunted Mirror uses a separate camera stream that is never sent anywhere: no call, no server. It stops when you click again, walk away, sit down or change floor.
 - Every person sends their media to every other person in the call (a mesh), so calls stay small: tables seat 2 or 4, rooms hold up to 8 guests, and camera tiles are about 320×240. Bigger video calls would need an SFU such as LiveKit Cloud.
 - PDF slides are kept in the server's memory only, only guests seated at that room's long table can download them, and they are deleted when the presentation ends.
-- Some networks block direct connections. Set `VOICE_ICE_SERVERS` to add a TURN server. LiveKit Cloud is the planned fallback for larger calls.
+- Some networks block direct connections (mobile data often does). Run the TURN relay in `deploy/coturn/` and set `TURN_URLS` and `TURN_SECRET` (see `docs/DEPLOY.md`). The server then gives each checked-in guest short-lived relay credentials. LiveKit Cloud is the planned fallback for larger calls.
 
 ## Built with Kiro
 Specs live in `.kiro/specs/`, steering rules in `.kiro/steering/`, hooks in `.kiro/hooks/`. The session log is in [docs/KIRO-ACTIVITY.md](docs/KIRO-ACTIVITY.md).

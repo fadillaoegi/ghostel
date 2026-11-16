@@ -1,0 +1,42 @@
+# 2026-11-16 13:13:19 +0700 — $ pnpm test
+ [32m✓[39m test/presentations.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 12950[2mms[22m[39m
+   [32m✓[39m presentations [2m(5)[22m
+     [33m[2m✓[22m[39m guests ask, only the owner decides, one presenter at a time[33m 2370[2mms[22m[39m
+     [33m[2m✓[22m[39m a refused guest hears 'not now'; only the approved presenter may share a screen[33m 2539[2mms[22m[39m
+     [33m[2m✓[22m[39m PDF slides: only the approved presenter uploads; only guests inside download; gone when it ends[33m 2633[2mms[22m[39m
+     [33m[2m✓[22m[39m standing guests are out of the meeting: they cannot ask, decide or download, and standing up ends your presentation (M20)[33m 3237[2mms[22m[39m
+     [33m[2m✓[22m[39m uploads need an allowed Origin[33m 2069[2mms[22m[39m
+ [32m✓[39m test/games.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 8192[2mms[22m[39m
+   [32m✓[39m pumpkin trivia on the server [2m(6)[22m
+     [33m[2m✓[22m[39m a solo guest plays a full game against the bot without ever seeing answers early[33m 2309[2mms[22m[39m
+     [33m[2m✓[22m[39m two players share questions, picks stay private until the reveal, spectators cannot answer[33m 437[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps game traffic inside the room[33m 671[2mms[22m[39m
+   [32m✓[39m monster pairs on the same game kit [2m(2)[22m
+     [33m[2m✓[22m[39m two players take turns; faces of cards that are down are never sent; only the current player flips[33m 1278[2mms[22m[39m
+     [33m[2m✓[22m[39m a solo guest plays Jack O'Bot; a late spectator cannot act; malformed actions are invalid[33m 3022[2mms[22m[39m
+ [32m✓[39m test/rooms.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 2603[2mms[22m[39m
+   [32m✓[39m entering rooms [2m(7)[22m
+     [33m[2m✓[22m[39m password rooms: required, wrong, right, and throttled guessing[33m 304[2mms[22m[39m
+     [33m[2m✓[22m[39m isolates chat and movement between the lobby and rooms[33m 373[2mms[22m[39m
+     [33m[2m✓[22m[39m room movement uses the room's walls[33m 701[2mms[22m[39m
+ [32m✓[39m test/doors.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 1607[2mms[22m[39m
+   [32m✓[39m room doors [2m(10)[22m
+     [33m[2m✓[22m[39m door labels reach only the guests on that floor, live[33m 428[2mms[22m[39m
+ [32m✓[39m test/presence.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 1976[2mms[22m[39m
+   [32m✓[39m presence [2m(6)[22m
+     [33m[2m✓[22m[39m never lets a fake position leave the building[33m 1231[2mms[22m[39m
+ [32m✓[39m test/chat.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 1806[2mms[22m[39m
+   [32m✓[39m lobby chat [2m(6)[22m
+     [33m[2m✓[22m[39m drops messages that try to pick their own sender[33m 375[2mms[22m[39m
+     [33m[2m✓[22m[39m rejects empty and too-long messages with a reason and never broadcasts them[33m 389[2mms[22m[39m
+     [33m[2m✓[22m[39m rate limits per guest, even across several tabs[33m 685[2mms[22m[39m
+ [32m✓[39m test/session.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 245[2mms[22m[39m
+ [32m✓[39m test/turn.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 102[2mms[22m[39m
+ [32m✓[39m test/proxy.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 133[2mms[22m[39m
+ [32m✓[39m test/house.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 134[2mms[22m[39m
+ [32m✓[39m test/config.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+[2m Test Files [22m [1m[32m13 passed[39m[22m[90m (13)[39m
+[2m      Tests [22m [1m[32m100 passed[39m[22m[90m (100)[39m
+[2m   Start at [22m 13:13:24
+[2m   Duration [22m 74.92s[2m (tests 97%, import 3%)[22m
+# exit code: 0

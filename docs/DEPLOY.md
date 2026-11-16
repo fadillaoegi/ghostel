@@ -39,7 +39,37 @@ Free-tier facts checked on 2026-11-07 (check again before you rely on them):
 - Check in, reload, and confirm the name and costume are kept.
 - Open a second browser or phone and confirm you see each other.
 - Create a password room, enter it from the other device, and try Pumpkin Trivia together.
-- Join voice from two devices on **different networks** (for example a phone on mobile data and a laptop on Wi-Fi). If they never reach "1 connected", the network needs TURN. Add a TURN server to `VOICE_ICE_SERVERS` and redeploy.
+- Join voice from two devices on **different networks** (for example a phone on mobile data and a laptop on Wi-Fi). If they never reach "1 connected", the network needs TURN: see "TURN relay" below.
+
+## TURN relay for calls (own VPS, M22)
+Calls are peer-to-peer. With only STUN, two guests on different networks often cannot reach each other: mobile data in particular uses carrier-grade NAT. The meeting then shows "0 connected", the other tile stays black and there is no sound. A TURN relay forwards the media when a direct path fails.
+
+1. **DNS:** add an `A` record `turn.<your-domain>` → the VPS's public IP. In Cloudflare set it to **DNS only** (grey cloud). Cloudflare's proxy only carries HTTP and WebSocket, not TURN. The app's own record can stay proxied.
+2. **Firewall** on the VPS (and in the provider's panel, if it has one): open `3478/udp`, `3478/tcp` and `49160-49200/udp`. Also open `5349/tcp` if you enable TLS.
+3. **Secret:** `openssl rand -hex 32`. Put it in Ghostel's `.env` as `TURN_SECRET`, and in `turnserver.conf` as `static-auth-secret`.
+4. **coturn:**
+   ```sh
+   cd deploy/coturn
+   cp turnserver.conf.example turnserver.conf
+   # fill in static-auth-secret and realm (turn.<your-domain>), and external-ip if the VPS has a private address
+   chmod 600 turnserver.conf
+   docker compose up -d
+   docker compose logs | grep -i -E "error|bad config"   # should print nothing
+   ```
+   The example refuses to relay to private, loopback, CGNAT and link-local addresses, so the relay cannot reach PostgreSQL or the Ghostel server on the VPS. It also has bandwidth quotas.
+5. **Ghostel `.env`:**
+   ```sh
+   VOICE_ICE_SERVERS=[{"urls":"stun:turn.<your-domain>:3478"}]
+   TURN_URLS=turn:turn.<your-domain>:3478?transport=udp,turn:turn.<your-domain>:3478?transport=tcp
+   TURN_SECRET=<the same secret>
+   ```
+   Restart the Ghostel server. It refuses to start if only one of `TURN_URLS`/`TURN_SECRET` is set, if a URL is not `turn:`/`turns:`, or if the secret is shorter than 32 characters.
+6. **Check:**
+   - From your laptop: `TURN_URLS=turn:turn.<your-domain>:3478?transport=udp TURN_SECRET=<secret> apps/server/node_modules/.bin/tsx scripts/turn-probe.ts`. It must print a `relay` candidate with the right secret, none with a wrong one, and `RESULT: OK`. Add `--connect` to also send data through the relay.
+   - Then test a call between a phone on mobile data and a laptop on Wi-Fi. Both should reach "1 connected".
+7. **Optional, TLS (`turns:` on 5349):** helps on networks that block everything except HTTPS-like traffic. Get a certificate for `turn.<your-domain>` (for example certbot with a DNS challenge), uncomment the `tls-listening-port`, `cert` and `pkey` lines, mount the certificate folder in `docker-compose.yml`, and add `turns:turn.<your-domain>:5349` to `TURN_URLS`.
+
+Bandwidth: a relayed call with camera uses about 1–2 Mbit/s per person in each direction. Only calls that cannot connect directly use the relay.
 
 ## 4. Keep it awake during judging
 1. In GitHub: **Settings → Secrets and variables → Actions → Variables**, add `GHOSTEL_URL` = `https://<your-app>`.

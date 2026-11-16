@@ -17,6 +17,8 @@ export interface Config {
   webDist: string | null;
   /** STUN/TURN servers handed to browsers for voice (VOICE_ICE_SERVERS, JSON array). */
   voiceIceServers: IceServer[];
+  /** Own TURN relay (coturn with use-auth-secret): short-lived credentials per request. Null when not configured. */
+  turn: TurnConfig | null;
   /** Pumpkin Trivia timings. TRIVIA_FAST=1 gives short games (Trivia and Monster Pairs) for automated browser tests. */
   trivia: TriviaConfig;
   /** Monster Pairs size and timings (short with TRIVIA_FAST=1). */
@@ -24,6 +26,35 @@ export interface Config {
 }
 
 const DEFAULT_ICE: IceServer[] = [{ urls: "stun:stun.l.google.com:19302" }];
+
+export interface TurnConfig {
+  urls: string[];
+  secret: string;
+  ttlSeconds: number;
+}
+
+/** TURN_URLS + TURN_SECRET (+ TURN_TTL_SECONDS): both or neither, turn:/turns: URLs only, a long secret in production. */
+function parseTurn(env: NodeJS.ProcessEnv, production: boolean): TurnConfig | null {
+  const rawUrls = env["TURN_URLS"]?.trim() ?? "";
+  const secret = env["TURN_SECRET"] ?? "";
+  if (rawUrls === "" && secret === "") return null;
+  if (rawUrls === "" || secret === "") throw new Error("TURN_URLS and TURN_SECRET must be set together (or both left empty).");
+  const urls = rawUrls
+    .split(",")
+    .map((u) => u.trim())
+    .filter(Boolean);
+  if (urls.length > 5) throw new Error("TURN_URLS takes at most 5 URLs.");
+  for (const u of urls) {
+    if (!/^turns?:[^\s]+$/.test(u) || u.length > 300) throw new Error(`TURN_URLS entries must start with turn: or turns:, got "${u}".`);
+  }
+  if (production && secret.length < 32) throw new Error("TURN_SECRET must be at least 32 characters in production (e.g. openssl rand -hex 32).");
+  const ttlRaw = env["TURN_TTL_SECONDS"];
+  const ttlSeconds = ttlRaw === undefined || ttlRaw === "" ? 6 * 3600 : Number(ttlRaw);
+  if (!Number.isInteger(ttlSeconds) || ttlSeconds < 600 || ttlSeconds > 86_400) {
+    throw new Error(`TURN_TTL_SECONDS must be a whole number of seconds from 600 to 86400, got "${ttlRaw}".`);
+  }
+  return { urls, secret, ttlSeconds };
+}
 
 function parseHops(raw: string | undefined): number {
   if (raw === undefined || raw === "") return 0;
@@ -94,6 +125,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     trustProxy: parseHops(env["TRUST_PROXY"]),
     webDist: existsSync(webDist) ? webDist : null,
     voiceIceServers: parseIceServers(env["VOICE_ICE_SERVERS"]),
+    turn: parseTurn(env, production),
     trivia: env["TRIVIA_FAST"] === "1" ? TRIVIA_FAST : TRIVIA_DEFAULTS,
     pairs: env["TRIVIA_FAST"] === "1" ? PAIRS_FAST : PAIRS_DEFAULTS,
   };

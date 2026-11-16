@@ -1,0 +1,17 @@
+# 2026-11-16 17:11:43 +0700 — $ pnpm build
+dist/pdfjs/standard_fonts/LiberationSans-Regular.ttf         139.51 kB
+dist/pdfjs/standard_fonts/LiberationSans-Italic.ttf          162.03 kB
+dist/assets/pdf.worker.min-CIqJB0yW.mjs                    1,271.91 kB
+dist/assets/index-grNQbKQr.css                                41.52 kB │ gzip:   9.23 kB
+dist/assets/pdf.worker.min-UqOn5EDC.js                         0.06 kB │ gzip:   0.08 kB
+dist/assets/pdf-YwugTw7Y.js                                  444.23 kB │ gzip: 133.64 kB
+dist/assets/index-BYl9JlM6.js                              1,484.29 kB │ gzip: 408.41 kB
+
+✓ built in 5.75s
+$ node build.mjs
+
+  dist/main.js      117.4kb
+  dist/main.js.map  273.6kb
+
+⚡ Done in 25ms
+# exit code: 0
