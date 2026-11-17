@@ -678,3 +678,19 @@ New screenshots: `desktop-pairs-board.png`, `desktop-pairs-podium.png`, `phone-p
 - **Owner interaction:** the owner rejected one tool call (the `ffprobe` and frame extraction step) by mistake and then approved it ("lanjut approve tadi salah pilih").
 - **Results:** see the M21 `tasks.md`. Both MP4s rendered (exit 0, 210 frames each, 7.02 s), typecheck exit 0, `docs/evidence/video-render.txt`.
 - **Not verified:** listening to the sound by ear, and the owner's Remotion license eligibility. No dev server or Remotion Studio was started.
+
+### Session 4, continued — 2026-11-16: Milestone 22 (TURN relay), from a bug on the live site
+
+- **Prompt (owner, Indonesian, with a screenshot of https://ghostel.fldev.co.id):** it is hosted now, but the call shows no "connected", voice has no sound, and the camera does not show in realtime.
+- **Diagnosis before code:**
+  - Kiro only made read-only requests to the live site: `/api/health`, the headers (Cloudflare in front, CSP), and `/api/voice` without a cookie (401). It did not check in on the owner's production site.
+  - Together with the screenshot (2 people and tiles, but "0 connected"), this placed the fault in the peer connection, not in signaling.
+  - The code showed that production only gets Google's STUN server. Kiro searched the web for Cloudflare's TURN pricing as an alternative ($0.05/GB per Cloudflare's docs). The owner cancelled a page fetch and said "lanjut", and Kiro continued with its own coturn on the VPS.
+- **Spec first:** `.kiro/specs/m22-turn-relay/`. A security rule for TURN was added to `security.md`.
+- **Implementation:** TURN config checks, short-lived credentials in `/api/voice`, the browser refreshing the list, `deploy/coturn/` (relaying to private addresses blocked, quotas), and the `.env.production.example` and `DEPLOY.md` sections.
+- **Proof:**
+  - `apps/server/test/turn.test.ts` and new config tests; 100 integration tests pass.
+  - `scripts/turn-probe.ts` against a real coturn 4.7 in Docker. Right secret: relay candidate. Wrong secret: none. Data went through the relay in run 5.
+  - All five runs are kept in `docs/evidence/turn-probe.txt`, including the three that failed (two because of bugs in the probe, two because of Docker Desktop's NAT).
+- **Kiro's own fixes:** coturn 4.7 rejected `no-tlsv1` and `no-tlsv1_1` from Kiro's first example config, so they were removed. Kiro started `pnpm db:up` (Ghostel's own container) for the tests. It removed its coturn test containers and the temporary secret afterwards.
+- **Not verified:** anything on the VPS, and a real call between mobile data and Wi-Fi.

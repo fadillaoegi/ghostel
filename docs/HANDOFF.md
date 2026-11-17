@@ -10,6 +10,14 @@ kiro-cli
 Start Kiro from this folder so `.kiro/steering`, `AGENTS.md` and `.kiro/hooks` load.
 
 ## Open items
+- **Calls on the live site (M22, 2026-11-16):** https://ghostel.fldev.co.id showed "0 connected" because production had STUN only. The repo now supports a TURN relay. The owner still has to:
+  1. Add DNS `turn.fldev.co.id` → the VPS IP, set to **DNS only** in Cloudflare.
+  2. Open `3478/udp`, `3478/tcp` and `49160-49200/udp`.
+  3. Run `deploy/coturn` with the secret, and set `VOICE_ICE_SERVERS`, `TURN_URLS` and `TURN_SECRET` in `.env`.
+  4. Deploy this code, restart, and run `scripts/turn-probe.ts` against it.
+  5. Test mobile data against Wi-Fi.
+  
+  Steps are in `docs/DEPLOY.md` "TURN relay". Kiro does not know how the owner deployed (Docker, PM2, …) and has no access to the VPS.
 - **M21 video (2026-11-15):** `submission/ghostel-intro.mp4` and `ghostel-outro.mp4` are rendered (see `submission/README.md`). Still for the owner:
   - Listen to both files. Kiro only measured their loudness.
   - Confirm that he is eligible for the Remotion Free License (as an individual).

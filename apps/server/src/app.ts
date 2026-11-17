@@ -134,7 +134,7 @@ export async function buildApp(config: Config, overrides: AppOverrides = {}): Pr
     resolveGuest,
   });
   registerRoomRoutes(app, { rooms, hub, resolveGuest, writesPerMinute: overrides.roomWritesPerMinute ?? 30 });
-  registerVoiceRoutes(app, { resolveGuest, iceServers: config.voiceIceServers });
+  registerVoiceRoutes(app, { resolveGuest, iceServers: config.voiceIceServers, turn: config.turn });
   registerSlideRoutes(app, { hub, resolveGuest, uploadsPerMinute: overrides.slideUploadsPerMinute ?? 6 });
 
   if (config.webDist) {

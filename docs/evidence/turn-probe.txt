@@ -1,0 +1,64 @@
+# 2026-11-16 13:25:23 +0700 — local coturn/coturn:4.7 (4.7.0-r4) in Docker, ports 3478 and 49160-49170 mapped; test config = deploy/coturn/turnserver.conf.example with a random secret, external-ip=127.0.0.1, allow-loopback-peers and the denied-peer-ip lines removed (so two relay addresses on this Mac can reach each other)
+# $ TURN_URLS=turn:127.0.0.1:3478?transport=udp TURN_SECRET=<random> apps/server/node_modules/.bin/tsx scripts/turn-probe.ts --connect
+right secret: 1 candidate(s) [ 'relay udp 127.0.0.1' ]
+wrong secret: 0 candidate(s) []
+connect: { message: '(timeout)', state: 'failed/failed', pair: '' }
+FAIL: no message through the relay
+RESULT: FAIL
+# exit code: 1
+
+# Run 1 above failed only in the --connect step: the probe trickled candidates before the remote description was set (a bug in the probe, not in Ghostel). The probe now waits for ICE gathering to complete. Run 2:
+# 2026-11-16 13:37:34 +0700 — same coturn container and config
+right secret: 1 candidate(s) [ 'relay udp 127.0.0.1' ]
+wrong secret: 0 candidate(s) []
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+page.evaluate: ReferenceError: __name is not defined
+    at eval (eval at evaluate (:370:30), <anonymous>:1:154)
+    at UtilityScript.evaluate (<anonymous>:372:16)
+    at UtilityScript.<anonymous> (<anonymous>:1:44)
+    at <anonymous> (/Users/boo/Github/project/Hacketon/ghostel/scripts/turn-probe.ts:64:29) {
+  log: []
+}
+
+Node.js v24.15.0
+# exit code: 1
+
+# Run 2 above crashed in the probe itself (tsx's __name helper is missing inside page.evaluate). Fixed with an init script. Run 3:
+# 2026-11-16 14:02:05 +0700 — same coturn container and config
+right secret: 1 candidate(s) [ 'relay udp 127.0.0.1' ]
+wrong secret: 0 candidate(s) []
+connect: { message: '(timeout)', state: 'failed/failed', pair: '' }
+FAIL: no message through the relay
+RESULT: FAIL
+# exit code: 1
+
+# Run 3 above: credentials OK, but the relay-to-relay test failed with external-ip=127.0.0.1 (no coturn error; Chrome most likely does not pair loopback relay addresses). Run 4: external-ip set to this Mac's LAN address, allow-loopback-peers removed, denied-peer-ip still removed for this local test only.
+# 2026-11-16 14:06:32 +0700
+right secret: 1 candidate(s) [ 'relay udp <mac-lan-ip>' ]
+wrong secret: 0 candidate(s) []
+connect: { message: '(timeout)', state: 'failed/failed', pair: '' }
+FAIL: no message through the relay
+RESULT: FAIL
+# exit code: 1
+
+# Run 4 above: same result as run 3 (both sides relay-only through Docker Desktop's NAT on one Mac). Run 5: the probe's connect step now has one side relay-only (like a phone on carrier-grade NAT) and the other side unrestricted (like a laptop on Wi-Fi).
+# 2026-11-16 14:44:31 +0700
+right secret: 1 candidate(s) [ 'relay udp <mac-lan-ip>' ]
+wrong secret: 0 candidate(s) []
+connect: {
+  message: 'boo through the relay',
+  state: 'connected/connected',
+  pair: 'prflx -> relay'
+}
+RESULT: OK
+# exit code: 0
+
+# 2026-11-16 14:49:58 +0700 — the real deploy/coturn/turnserver.conf.example (secret and realm filled in, denied-peer-ip lines kept), relay ports not mapped: credential check only
+right secret: 1 candidate(s) [ 'relay udp 172.17.0.2' ]
+wrong secret: 0 candidate(s) []
+RESULT: OK
+# exit code: 0
+# coturn config warnings after removing no-tlsv1/no-tlsv1_1 (coturn 4.7 reported them as 'Bad configuration format'): 6 in the full log of this container, of which the lines before the restart are from the old file

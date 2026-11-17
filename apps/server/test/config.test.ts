@@ -31,3 +31,28 @@ describe("production configuration", () => {
     expect(() => loadConfig({ NODE_ENV: "production", DATABASE_URL: "postgres://x" })).toThrow("ALLOWED_ORIGINS");
   });
 });
+
+describe("TURN configuration (M22)", () => {
+  const LONG = "a".repeat(64);
+  const prod = (extra: Record<string, string>) => () => loadConfig({ ...BASE, NODE_ENV: "production", ...extra });
+
+  it("is off when neither TURN_URLS nor TURN_SECRET is set", () => {
+    expect(loadConfig({ ...BASE, NODE_ENV: "production" }).turn).toBeNull();
+  });
+
+  it("parses URLs and the TTL (default 6 hours)", () => {
+    const c = loadConfig({ ...BASE, NODE_ENV: "production", TURN_URLS: "turn:t.example.com:3478?transport=udp, turns:t.example.com:5349", TURN_SECRET: LONG });
+    expect(c.turn).toEqual({ urls: ["turn:t.example.com:3478?transport=udp", "turns:t.example.com:5349"], secret: LONG, ttlSeconds: 21_600 });
+    expect(loadConfig({ ...BASE, TURN_URLS: "turn:t:3478", TURN_SECRET: "x", TURN_TTL_SECONDS: "900" }).turn?.ttlSeconds).toBe(900);
+  });
+
+  it("refuses half a configuration, non-TURN URLs, short secrets in production and odd TTLs", () => {
+    expect(prod({ TURN_URLS: "turn:t:3478" })).toThrow("set together");
+    expect(prod({ TURN_SECRET: LONG })).toThrow("set together");
+    expect(prod({ TURN_URLS: "stun:t:3478", TURN_SECRET: LONG })).toThrow("turn: or turns:");
+    expect(prod({ TURN_URLS: "https://t", TURN_SECRET: LONG })).toThrow("turn: or turns:");
+    expect(prod({ TURN_URLS: "turn:t:3478", TURN_SECRET: "short" })).toThrow("at least 32");
+    expect(prod({ TURN_URLS: "turn:t:3478", TURN_SECRET: LONG, TURN_TTL_SECONDS: "60" })).toThrow("600 to 86400");
+    expect(prod({ TURN_URLS: "turn:t:3478", TURN_SECRET: LONG, TURN_TTL_SECONDS: "1.5" })).toThrow("600 to 86400");
+  });
+});

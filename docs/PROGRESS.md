@@ -243,3 +243,15 @@ Owner request: an intro and a closing animation for the demo video, with deep 3D
 - **Output:** `submission/ghostel-intro.mp4` and `submission/ghostel-outro.mp4`, plus `submission/README.md` (timeline, re-render, licenses).
 - **Checks:** both renders exit 0. `ffprobe`: 210 frames, 7.02 s, H.264 and AAC stereo. Root typecheck exit 0. One frame per second was reviewed (`docs/evidence/screenshots/video-*-frames.jpg`). Details are in the M21 `tasks.md`.
 - **License:** Remotion is not open source (free for individuals and companies of up to 3 people); recorded in `docs/ASSETS.md`. The owner still has to confirm he is eligible.
+
+## 2026-11-16 — Milestone 22: TURN relay so calls connect across networks (spec `m22-turn-relay`, bug report)
+
+The owner deployed Ghostel at https://ghostel.fldev.co.id (behind Cloudflare). At a table, both guests saw each other's tiles, but the pill said "0 connected", the other camera stayed black and there was no sound.
+
+- **Cause:** the site and WebSocket work (health OK, Live, chat arrives), so signaling is fine. The peer connection itself never connects. Production only had Google's STUN server, which cannot get through carrier-grade or symmetric NAT (common on mobile data). That needs a TURN relay.
+- **Change:**
+  - The server hands out short-lived TURN credentials (`TURN_URLS`, `TURN_SECRET`, `TURN_TTL_SECONDS`, coturn `use-auth-secret`), only to checked-in guests and without the guest ID. It refuses bad TURN settings at startup.
+  - The browser fetches the ICE list again after half the TTL.
+  - `deploy/coturn/`: an example config that blocks relaying to private addresses and sets quotas, plus a compose file. `docs/DEPLOY.md` has a TURN section (Cloudflare "DNS only", firewall, check).
+- **Checks:** 100 integration tests, typecheck and build pass. Against a local coturn, `scripts/turn-probe.ts` got a relay candidate with the right secret, none with a wrong one, and sent data through the relay. Details are in the M22 `tasks.md`.
+- **Open:** the owner deploys coturn on the VPS and tests mobile data against Wi-Fi.

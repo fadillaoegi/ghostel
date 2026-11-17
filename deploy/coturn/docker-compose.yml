@@ -1,0 +1,14 @@
+# TURN relay for Ghostel calls (M22). Run on the VPS next to Ghostel:
+#   cp turnserver.conf.example turnserver.conf   # then fill in the CHANGE_ME values
+#   docker compose up -d
+# Host networking: the relay port range does not go through Docker's port mapping (slow with many ports).
+services:
+  coturn:
+    image: coturn/coturn:4.7
+    network_mode: host
+    restart: unless-stopped
+    command: ["-c", "/etc/coturn/turnserver.conf"]
+    volumes:
+      - ./turnserver.conf:/etc/coturn/turnserver.conf:ro
+      # For turns: on 5349, mount the certificate folder as well, e.g.:
+      # - /etc/letsencrypt/live/turn.example.com:/etc/coturn/certs:ro

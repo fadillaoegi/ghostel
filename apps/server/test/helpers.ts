@@ -23,6 +23,7 @@ export async function startServer(overrides: AppOverrides = {}, configOverrides:
     trustProxy: 0,
     webDist: null,
     voiceIceServers: [],
+    turn: null,
     trivia: TRIVIA_DEFAULTS,
     pairs: PAIRS_DEFAULTS,
     ...configOverrides,

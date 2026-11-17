@@ -82,6 +82,9 @@ export class CallClient {
   private ctx: AudioContext | null = null;
   private selfAnalyser: AnalyserNode | null = null;
   private iceServers: IceServer[] | null = null;
+  /** When the ICE list was fetched and how long its TURN credentials last (ms); refetched after half of that. */
+  private iceFetchedAt = 0;
+  private iceTtlMs = Infinity;
   private levelTimer: number | null = null;
   private lastLoud = new Map<string, number>();
   private buffer = new Uint8Array(1024);
@@ -246,11 +249,16 @@ export class CallClient {
     }
     if (this.callKey !== null && this.callKey !== key) this.endCall();
     this.callKey = key;
-    if (this.iceServers === null) {
-      this.iceServers = [];
+    if (this.iceServers === null || Date.now() - this.iceFetchedAt > this.iceTtlMs / 2) {
+      this.iceServers ??= [];
+      this.iceFetchedAt = Date.now();
       try {
         const res = await fetch("/api/voice", { credentials: "same-origin", cache: "no-store" });
-        if (res.ok) this.iceServers = ((await res.json()) as { iceServers: IceServer[] }).iceServers;
+        if (res.ok) {
+          const body = (await res.json()) as { iceServers: IceServer[]; ttl?: number };
+          this.iceServers = body.iceServers;
+          this.iceTtlMs = typeof body.ttl === "number" && body.ttl > 0 ? body.ttl * 1000 : Infinity;
+        }
       } catch {
         // Host candidates only; fine on one network.
       }
