@@ -24,3 +24,7 @@ backups/
 *.m4v
 submission/video/public/*.wav
 submission/video/out/
+# Machine-specific server config. Commit only the *.example templates.
+compose.vps.yaml
+deploy/nginx.conf
+deploy/coturn/turnserver.conf

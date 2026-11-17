@@ -19,7 +19,7 @@ The VPS also runs other apps on ports 8100–8107 and its Docker bridge network 
 | 8109 | nginx (`web`, `deploy/nginx.conf`): public entry, proxies everything to 8108 | all interfaces (Cloudflare Tunnel) |
 | 8100 | the existing PostgreSQL 18 server: own role `ghostel`, databases `ghostel` and `ghostel_test` | 127.0.0.1 |
 
-1. `cp .env.vps.example .env.vps`, `chmod 600 .env.vps`, then fill in `POSTGRES_PASSWORD` (the `ghostel` role password) and `ALLOWED_ORIGINS` (the exact public `https://` hostname).
+1. `cp compose.vps.example.yaml compose.vps.yaml` and `cp deploy/nginx.conf.example deploy/nginx.conf` (both are git-ignored, so per-machine changes never conflict on `git pull`). Then `cp .env.vps.example .env.vps`, `chmod 600 .env.vps`, then fill in `POSTGRES_PASSWORD` (the `ghostel` role password) and `ALLOWED_ORIGINS` (the exact public `https://` hostname).
 2. `docker compose -f compose.vps.yaml --env-file .env.vps up -d --build`
 3. In Cloudflare Tunnel, point the public hostname to `http://localhost:8109`.
 4. nginx takes the visitor's address from `CF-Connecting-IP` only when the connection comes from 127.0.0.1 (a tunnel connector on this machine). If the connector runs elsewhere, every visitor shares one rate-limit bucket; add its address to `set_real_ip_from`.

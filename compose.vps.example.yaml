@@ -2,7 +2,8 @@
 #   Backend (Node)    127.0.0.1:8108  (web build + API + WebSocket; only the frontend proxy reaches it)
 #   Frontend (nginx)  0.0.0.0:8109    (public entry for Cloudflare Tunnel; proxies everything to 8108)
 #   PostgreSQL        existing server on 127.0.0.1:8100, own role "ghostel" and database "ghostel"
-# Usage: cp .env.vps.example .env.vps (fill it in, chmod 600), then
+# Usage: cp compose.vps.example.yaml compose.vps.yaml and cp deploy/nginx.conf.example deploy/nginx.conf
+#        (both are git-ignored, adjust them for this machine), cp .env.vps.example .env.vps (fill it in, chmod 600), then
 #        docker compose -f compose.vps.yaml --env-file .env.vps up -d --build
 # The Docker bridge network on this machine is broken, so builds and containers use the host network.
 name: ghostel-prod
