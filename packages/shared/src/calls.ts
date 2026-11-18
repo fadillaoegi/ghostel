@@ -35,7 +35,13 @@ export const CALL_MAX_MEMBERS = 9;
 
 /** Camera tiles are small; keep the mesh light. */
 export const CAMERA_CONSTRAINTS = { width: { ideal: 320 }, height: { ideal: 240 }, frameRate: { ideal: 15, max: 20 } } as const;
-export const SCREEN_CONSTRAINTS = { width: { ideal: 1280, max: 1920 }, height: { ideal: 720, max: 1080 }, frameRate: { ideal: 8, max: 15 } } as const;
+/** Screen share (M25: a higher frame rate, so a shared video plays smoothly). */
+export const SCREEN_CONSTRAINTS = { width: { ideal: 1280, max: 1920 }, height: { ideal: 720, max: 1080 }, frameRate: { ideal: 15, max: 30 } } as const;
+/**
+ * Audio shared with the screen (M25): a tab's or the system's sound, e.g. a video. Speech processing is off,
+ * because it is music and film sound, not a voice.
+ */
+export const SCREEN_AUDIO = { echoCancellation: false, noiseSuppression: false, autoGainControl: false } as const;
 
 // ---- presentations (rooms only) ----
 

@@ -146,14 +146,85 @@ export function Stage({
   const isPresenter = view.presenter === selfId;
   if (view.mode === "pdf") return <PdfStage roomId={roomId} view={view} isPresenter={isPresenter} presence={presence} onCanvas={onSource} />;
   const stream = isPresenter ? state.localScreen : (state.remote.get(view.presenter)?.screen ?? null);
+  // M25: the presenter's screen stream can carry the tab's or system's sound (e.g. a video).
+  const withSound = isPresenter ? state.localScreenAudio : (stream?.getAudioTracks().length ?? 0) > 0;
   return (
     <div className="stage-screen" data-testid="shared-screen" data-live={stream ? "yes" : "no"}>
       {stream ? (
-        <ScreenVideo stream={stream} name={view.name} onVideo={onSource} />
+        <>
+          <ScreenVideo stream={stream} name={view.name} onVideo={onSource} />
+          <div className="stage-sound" data-testid="present-sound" data-sound={withSound ? "yes" : "no"}>
+            {withSound ? (
+              isPresenter ? (
+                <span>🔊 Sharing sound</span>
+              ) : (
+                <ScreenSound stream={stream} />
+              )
+            ) : (
+              <span>{isPresenter ? "🔇 No sound. To share a video's sound, share a tab and tick “Share tab audio”." : "🔇 no sound"}</span>
+            )}
+          </div>
+        </>
       ) : (
         <p className="stage-wait">{isPresenter ? "Press “Share your screen” to start." : `Waiting for ${view.name}'s screen…`}</p>
       )}
     </div>
+  );
+}
+
+/** Plays the presentation's sound for a viewer, with its own volume (the presenter's tab plays it for them). */
+function ScreenSound({ stream }: { stream: MediaStream }) {
+  const el = useRef<HTMLAudioElement>(null);
+  const [volume, setVolume] = useState(80);
+  const [muted, setMuted] = useState(false);
+  const [blocked, setBlocked] = useState(false);
+  const play = () => {
+    const a = el.current;
+    if (!a) return;
+    a.play().then(
+      () => setBlocked(false),
+      () => setBlocked(true),
+    );
+  };
+  useEffect(() => {
+    const a = el.current;
+    if (!a) return;
+    a.srcObject = stream;
+    play();
+    return () => {
+      a.srcObject = null;
+    };
+  }, [stream]);
+  useEffect(() => {
+    if (el.current) el.current.volume = volume / 100;
+  }, [volume]);
+  useEffect(() => {
+    if (el.current) el.current.muted = muted;
+  }, [muted]);
+  return (
+    <>
+      <audio ref={el} autoPlay playsInline data-testid="present-audio" />
+      {blocked ? (
+        <button type="button" className="btn btn--primary stage-sound-btn" onClick={play}>
+          🔊 Tap to hear the video
+        </button>
+      ) : (
+        <>
+          <button type="button" className="stage-sound-btn" aria-label={muted ? "Unmute presentation sound" : "Mute presentation sound"} aria-pressed={muted} onClick={() => setMuted(!muted)}>
+            {muted ? "🔇" : "🔊"}
+          </button>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={volume}
+            aria-label="Presentation volume"
+            data-testid="present-volume"
+            onChange={(e) => setVolume(Number(e.target.value))}
+          />
+        </>
+      )}
+    </>
   );
 }
 

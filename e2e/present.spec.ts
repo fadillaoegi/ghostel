@@ -2,8 +2,34 @@ import { expect, test, type Browser, type Page } from "@playwright/test";
 
 const SHOTS = "docs/evidence/screenshots";
 
-async function checkIn(browser: Browser, name: string) {
+async function checkIn(browser: Browser, name: string, options: { tabAudio?: boolean } = {}) {
   const context = await browser.newContext({ permissions: ["microphone", "camera"] });
+  if (options.tabAudio) {
+    // M25: like ticking "Share tab audio" in Chrome's picker. Chromium's fake screen capture has no sound, so the
+    // shared stream gets a quiet 440 Hz tone from Web Audio when the browser returns none.
+    await context.addInitScript(() => {
+      const original = navigator.mediaDevices.getDisplayMedia.bind(navigator.mediaDevices);
+      navigator.mediaDevices.getDisplayMedia = async (opts?: DisplayMediaStreamOptions) => {
+        const stream = await original(opts);
+        const w = window as unknown as { __screenAudio?: string };
+        if (opts?.audio && stream.getAudioTracks().length === 0) {
+          const ctx = new AudioContext();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          gain.gain.value = 0.05;
+          const dest = ctx.createMediaStreamDestination();
+          osc.connect(gain).connect(dest);
+          osc.start();
+          const track = dest.stream.getAudioTracks()[0];
+          if (track) stream.addTrack(track);
+          w.__screenAudio = "injected";
+        } else {
+          w.__screenAudio = stream.getAudioTracks().length > 0 ? "native" : "none";
+        }
+        return stream;
+      };
+    });
+  }
   const page = await context.newPage();
   await page.goto("/");
   await page.getByLabel("Your name").fill(name);
@@ -114,7 +140,7 @@ test("a guest asks to show PDF slides, the owner allows it, everyone at the tabl
 });
 
 test("the owner shares a screen at the table; a seated guest sees it live; standing up ends it", async ({ browser }) => {
-  const olga = await checkIn(browser, "Olga Owner");
+  const olga = await checkIn(browser, "Olga Owner", { tabAudio: true });
   const vic = await checkIn(browser, "Vic Visitor");
   await openRoom(olga.page, "Screen Night");
   await vic.page.getByRole("button", { name: "Rooms" }).click();
@@ -131,6 +157,35 @@ test("the owner shares a screen at the table; a seated guest sees it live; stand
   const screen = vic.page.getByTestId("meeting").getByTestId("shared-screen");
   await expect(screen).toHaveAttribute("data-live", "yes", { timeout: 20_000 });
   await expect.poll(() => screen.locator("video").evaluate((v: HTMLVideoElement) => v.videoWidth), { timeout: 20_000 }).toBeGreaterThan(0);
+
+  // M25: the shared screen's sound reaches the seated guest on its own player and volume, not the voice element.
+  const presenterSound = olga.page.getByTestId("present-sound");
+  console.log("screen audio source:", await olga.page.evaluate(() => (window as unknown as { __screenAudio?: string }).__screenAudio ?? "unknown"));
+  await expect(presenterSound).toHaveAttribute("data-sound", "yes");
+  await expect(presenterSound).toContainText("Sharing sound");
+  await expect(olga.page.getByTestId("present-audio")).toHaveCount(0);
+  await expect(vic.page.getByTestId("meeting").getByTestId("present-sound")).toHaveAttribute("data-sound", "yes", { timeout: 20_000 });
+  const vicAudio = vic.page.getByTestId("meeting").getByTestId("present-audio");
+  await expect
+    .poll(
+      () =>
+        vicAudio.evaluate((a: HTMLAudioElement) => {
+          const s = a.srcObject as MediaStream | null;
+          const t = s?.getAudioTracks()[0];
+          return t ? `${t.readyState}/${t.muted ? "muted" : "flowing"}/${a.paused ? "paused" : "playing"}` : "none";
+        }),
+      { timeout: 20_000 },
+    )
+    .toBe("live/flowing/playing");
+  // The voice element of the presenter never plays the screen stream.
+  const screenStreamId = await vicAudio.evaluate((a: HTMLAudioElement) => (a.srcObject as MediaStream).id);
+  const voiceIds = await vic.page.locator("audio[data-voice-peer]").evaluateAll((els) => els.map((a) => ((a as HTMLAudioElement).srcObject as MediaStream | null)?.id ?? null));
+  expect(voiceIds).not.toContain(screenStreamId);
+  await vic.page.getByTestId("present-volume").fill("30");
+  expect(await vicAudio.evaluate((a: HTMLAudioElement) => a.volume)).toBeCloseTo(0.3, 2);
+  await vic.page.getByRole("button", { name: "Mute presentation sound" }).click();
+  expect(await vicAudio.evaluate((a: HTMLAudioElement) => a.muted)).toBe(true);
+  await vic.page.getByRole("button", { name: "Unmute presentation sound" }).click();
   await vic.page.waitForTimeout(900);
   await vic.page.screenshot({ path: `${SHOTS}/desktop-present-screen.png` });
 

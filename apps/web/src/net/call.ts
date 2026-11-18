@@ -1,4 +1,4 @@
-import { CAMERA_CONSTRAINTS, SCREEN_CONSTRAINTS, sceneKeyFor, type CallState, type IceServer, type VoiceSignalData } from "@ghostel/shared";
+import { CAMERA_CONSTRAINTS, SCREEN_AUDIO, SCREEN_CONSTRAINTS, sceneKeyFor, type CallState, type IceServer, type VoiceSignalData } from "@ghostel/shared";
 import type { CallEvent, PresenceClient } from "./presence";
 
 /** What other members share, by member id. */
@@ -22,6 +22,8 @@ export interface CallSnapshot {
   remote: ReadonlyMap<string, RemoteMedia>;
   localCam: MediaStream | null;
   localScreen: MediaStream | null;
+  /** Our screen share includes sound (M25). */
+  localScreenAudio: boolean;
   /** Peers whose WebRTC connection is up. */
   connected: number;
 }
@@ -38,7 +40,7 @@ interface Peer {
   audioStream: MediaStream | null;
   analyser: AnalyserNode | null;
   streams: Map<string, MediaStream>;
-  senders: { mic: RTCRtpSender | null; cam: RTCRtpSender | null; screen: RTCRtpSender | null };
+  senders: { mic: RTCRtpSender | null; cam: RTCRtpSender | null; screen: RTCRtpSender | null; screenAudio: RTCRtpSender | null };
   connected: boolean;
 }
 
@@ -57,6 +59,7 @@ const EMPTY: CallSnapshot = {
   remote: new Map(),
   localCam: null,
   localScreen: null,
+  localScreenAudio: false,
   connected: 0,
 };
 
@@ -193,7 +196,16 @@ export class CallClient {
     }
     this.publish({ starting: "screen", error: null });
     try {
-      this.screenStream = await navigator.mediaDevices.getDisplayMedia({ video: SCREEN_CONSTRAINTS, audio: false });
+      // M25: ask for the tab's or system's sound as well (e.g. a video). The browser's picker decides what is
+      // possible ("Share tab audio" in Chrome); without it the share is video only. The extra fields are hints
+      // that browsers without them ignore.
+      const options = {
+        video: SCREEN_CONSTRAINTS,
+        audio: SCREEN_AUDIO,
+        systemAudio: "include",
+        suppressLocalAudioPlayback: false,
+      } as DisplayMediaStreamOptions;
+      this.screenStream = await navigator.mediaDevices.getDisplayMedia(options);
     } catch (error) {
       this.publish({ starting: null, error: error instanceof DOMException && error.name === "NotAllowedError" ? null : mediaError(error, "Screen sharing") });
       return false;
@@ -205,7 +217,7 @@ export class CallClient {
     // The browser's own "Stop sharing" button ends it too.
     this.screenStream.getVideoTracks()[0]?.addEventListener("ended", () => this.stopScreen());
     for (const peer of this.peers.values()) this.attachTracks(peer);
-    this.publish({ starting: null, screen: true, localScreen: this.screenStream });
+    this.publish({ starting: null, screen: true, localScreen: this.screenStream, localScreenAudio: this.screenStream.getAudioTracks().length > 0 });
     this.sendMedia();
     return true;
   }
@@ -213,7 +225,7 @@ export class CallClient {
   stopScreen(): void {
     if (!this.screenStream) return;
     this.stopStream("screen");
-    this.publish({ screen: false, localScreen: null });
+    this.publish({ screen: false, localScreen: null, localScreenAudio: false });
     this.sendMedia();
   }
 
@@ -286,14 +298,17 @@ export class CallClient {
     const stream = which === "mic" ? this.micStream : which === "cam" ? this.camStream : this.screenStream;
     if (!stream) return;
     for (const peer of this.peers.values()) {
-      const sender = peer.senders[which];
-      if (sender) {
+      // The screen's sound (M25) has its own sender in the same stream.
+      const kinds: (keyof Peer["senders"])[] = which === "screen" ? ["screen", "screenAudio"] : [which];
+      for (const kind of kinds) {
+        const sender = peer.senders[kind];
+        if (!sender) continue;
         try {
           peer.pc.removeTrack(sender);
         } catch {
           // Connection already closed.
         }
-        peer.senders[which] = null;
+        peer.senders[kind] = null;
       }
     }
     for (const t of stream.getTracks()) t.stop();
@@ -308,7 +323,7 @@ export class CallClient {
     this.stopStream("mic");
     this.stopStream("cam");
     this.stopStream("screen");
-    this.publish({ mic: false, cam: false, screen: false, starting: null, localCam: null, localScreen: null });
+    this.publish({ mic: false, cam: false, screen: false, starting: null, localCam: null, localScreen: null, localScreenAudio: false });
   }
 
   private send(to: string, data: VoiceSignalData): void {
@@ -317,14 +332,15 @@ export class CallClient {
 
   /** Adds whatever we share to a connection (negotiation follows automatically). */
   private attachTracks(peer: Peer): void {
-    const add = (which: "mic" | "cam" | "screen", stream: MediaStream | null) => {
-      const track = stream?.getTracks()[0];
+    const add = (which: keyof Peer["senders"], stream: MediaStream | null, track: MediaStreamTrack | undefined) => {
       if (!stream || !track || peer.senders[which]) return;
       peer.senders[which] = peer.pc.addTrack(track, stream);
     };
-    add("mic", this.micStream);
-    add("cam", this.camStream);
-    add("screen", this.screenStream);
+    add("mic", this.micStream, this.micStream?.getTracks()[0]);
+    add("cam", this.camStream, this.camStream?.getTracks()[0]);
+    add("screen", this.screenStream, this.screenStream?.getVideoTracks()[0]);
+    // M25: the screen's sound goes in the screen's own stream, so the receiver keeps it apart from our voice.
+    add("screenAudio", this.screenStream, this.screenStream?.getAudioTracks()[0]);
   }
 
   private createPeer(id: string, selfId: string): Peer {
@@ -345,7 +361,7 @@ export class CallClient {
       audioStream: null,
       analyser: null,
       streams: new Map(),
-      senders: { mic: null, cam: null, screen: null },
+      senders: { mic: null, cam: null, screen: null, screenAudio: null },
       connected: false,
     };
     this.peers.set(id, peer);
@@ -368,14 +384,26 @@ export class CallClient {
     };
     pc.ontrack = (e) => {
       const stream = e.streams[0] ?? new MediaStream([e.track]);
-      if (e.track.kind === "audio") {
+      // M25: an audio track in the presenter's screen stream is presentation sound, not this peer's voice.
+      // That stream carries video too (or is the screen id the member announced).
+      const isMedia = (s: MediaStream) => s.getVideoTracks().length > 0 || this.snapshot.call?.members.find((m) => m.id === id)?.screen === s.id;
+      if (e.track.kind === "audio" && !isMedia(stream)) {
         audio.srcObject = stream;
         void audio.play().catch(() => undefined);
         peer.audioStream = stream;
         peer.analyser = this.analyse(stream);
+        // If video joins this stream later, it was the screen's sound after all: move it off the voice element.
+        stream.addEventListener("addtrack", () => {
+          if (peer.audioStream !== stream || stream.getVideoTracks().length === 0) return;
+          audio.srcObject = null;
+          peer.audioStream = null;
+          peer.analyser = null;
+          peer.streams.set(stream.id, stream);
+          this.publish({ remote: this.remoteMedia(this.snapshot.call) });
+        });
       } else {
         peer.streams.set(stream.id, stream);
-        e.track.addEventListener("ended", () => peer.streams.delete(stream.id));
+        if (e.track.kind === "video") e.track.addEventListener("ended", () => peer.streams.delete(stream.id));
         stream.addEventListener("removetrack", () => {
           if (stream.getTracks().length === 0) {
             peer.streams.delete(stream.id);

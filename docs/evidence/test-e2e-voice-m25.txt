@@ -1,0 +1,8 @@
+# 2026-11-18 19:05:16 +0700 — load at start: 5.48 9.25 9.67 — $ pnpm exec playwright test e2e/voice.spec.ts e2e/oddities.spec.ts --reporter=list
+Running 4 tests using 1 worker
+  ✓  1 [chromium] › e2e/oddities.spec.ts:57:1 › Night Desk: the lobby's 1987 terminal plays a text adventure to the end (6.8s)
+  ✓  2 [chromium] › e2e/oddities.spec.ts:101:1 › Haunted Mirror: the camera shows only after a click, stays local and stops when you walk away (17.4s)
+  ✓  3 [chromium] › e2e/voice.spec.ts:49:1 › a room's meeting is its long table: sit to join (mic and camera only after a click), stand to leave (19.1s)
+  ✓  4 [chromium] › e2e/voice.spec.ts:129:1 › tables in Ghoul's Diner: sit down for a table call, stand up to leave it (18.8s)
+  4 passed (1.1m)
+# exit code: 0

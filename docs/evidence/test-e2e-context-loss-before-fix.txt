@@ -1,0 +1,42 @@
+# 2026-11-18 14:23:49 +0700 — reproduction BEFORE the fix (build from M23) — $ pnpm exec playwright test e2e/context-loss.spec.ts --reporter=list
+[WebServer] Reset ghostel_test
+[WebServer] Ghostel server ready on http://127.0.0.1:2595
+
+Running 1 test using 1 worker
+
+before { mean: 20.303776058703146, spread: 33.42107542016716 }
+lost { mean: 253.08672969154733, spread: 17.75099240089696 }
+  ✘  1 [chromium] › e2e/context-loss.spec.ts:51:1 › the 3D view comes back after the WebGL context is lost (21.5s)
+
+
+  1) [chromium] › e2e/context-loss.spec.ts:51:1 › the 3D view comes back after the WebGL context is lost 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('scene-recovering')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByTestId('scene-recovering') with timeout 15000ms
+      - waiting for getByTestId('scene-recovering')
+
+
+      67 |   console.log("lost", lost);
+      68 |   await page.screenshot({ path: `${SHOTS}/desktop-context-lost.png` });
+    > 69 |   await expect(page.getByTestId("scene-recovering")).toBeVisible();
+         |                                                      ^
+      70 |   await expect(page.getByTestId("scene-recovering")).toHaveCount(0, { timeout: 15_000 });
+      71 |   await page.waitForTimeout(1500);
+      72 |   const recovered = await sceneLuma(page);
+
+    Error Context: test-results/context-loss-the-3D-view-c-eb1ec-r-the-WebGL-context-is-lost-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/context-loss-the-3D-view-c-eb1ec-r-the-WebGL-context-is-lost-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/context-loss-the-3D-view-c-eb1ec-r-the-WebGL-context-is-lost-chromium/trace.zip
+
+# exit code: 1

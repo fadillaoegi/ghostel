@@ -46,6 +46,7 @@ import { Rooftop } from "./floors/Rooftop";
 import { Canteen } from "./floors/Canteen";
 import { Snack } from "./Snack";
 import { TABLE_PALETTES, Tables, type TablePalette } from "./Tables";
+import { useContextGuard } from "./contextGuard";
 
 const FLOOR_PALETTE: Record<1 | 2 | 3 | 5, TablePalette> = {
   1: TABLE_PALETTES.lobby,
@@ -411,10 +412,13 @@ export function WorldScene({
   // M19: render at most 1.5 device pixels per CSS pixel, and step down to 1 when frames come too slowly.
   const maxDpr = typeof window === "undefined" ? 1 : Math.min(window.devicePixelRatio || 1, MAX_DPR);
   const [dpr, setDpr] = useState(maxDpr);
+  // M24: bring the 3D view back if the browser drops its WebGL context.
+  const guard = useContextGuard();
 
   return (
     <div className="lobby-stage">
       <Canvas
+        key={guard.canvasKey}
         className="lobby-canvas"
         dpr={dpr}
         camera={{ fov: 50, position: [0, 10, 18], near: 0.1, far: 320 }}
@@ -422,6 +426,7 @@ export function WorldScene({
         // M18: a little brighter overall. Signs, screens and candles use toneMapped={false}, so they keep their glow.
         onCreated={({ gl }) => {
           gl.toneMappingExposure = 1.15;
+          guard.watch(gl.domElement);
         }}
       >
         <color attach="background" args={["#0b0614"]} />
@@ -458,6 +463,23 @@ export function WorldScene({
         {/* Last, so it projects after the camera and avatars have moved this frame. */}
         <TagProjector registry={tags} />
       </Canvas>
+      {guard.status !== "ok" && (
+        <div className="scene-recovering" data-testid="scene-recovering" role="status">
+          <span className="scene-recovering-candle" aria-hidden="true">
+            🕯️
+          </span>
+          {guard.status === "recovering" ? (
+            <span>Relighting the candles…</span>
+          ) : (
+            <>
+              <span>The lights went out and won't come back on.</span>
+              <button type="button" className="btn btn--primary" onClick={guard.reload}>
+                Reload
+              </button>
+            </>
+          )}
+        </div>
+      )}
       <div className="nametags" aria-label={inLobby ? "Guests in the lobby" : "Guests here"}>
         <div ref={tags.element(SELF_TAG)} className="tag">
           {selfBubble && <SpeechBubble key={selfBubble.id} text={selfBubble.text} />}

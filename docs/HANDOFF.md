@@ -10,6 +10,9 @@ kiro-cli
 Start Kiro from this folder so `.kiro/steering`, `AGENTS.md` and `.kiro/hooks` load.
 
 ## Open items
+- **White screen on Android (M24, 2026-11-18):** fixed by recovering the WebGL context. Check on a real Android phone: open the site, switch apps for a minute, and come back.
+- **Presentation sound (M25, 2026-11-18):** in Chrome or Edge, share a **tab** and tick "Share tab audio". Listen once with two real devices.
+- **Full E2E after M24 (2026-11-18):** 29 of 31. The `rooms.spec.ts` password room test still times out at the elevator when the load climbs (it reached 98 during the re-run). It needs a quiet machine or a look at why the elevator is so slow under load.
 - **Chat (M23, 2026-11-18):** the panel shows 15 messages, has infinite scroll, and resets at 00:00 WIB. The full E2E suite was not run after M23 (only `chat.spec.ts`, 4 of 4).
 - **Calls on the live site (M22, 2026-11-16):** https://ghostel.fldev.co.id showed "0 connected" because production had STUN only. The repo now supports a TURN relay. The owner still has to:
   1. Add DNS `turn.fldev.co.id` → the VPS IP, set to **DNS only** in Cloudflare.

@@ -1,0 +1,9 @@
+# 2026-11-18 18:14:07 +0700 — re-run of the 2 failed specs alone — load at start: 3.54 8.31 12.73 — $ pnpm exec playwright test e2e/rooms.spec.ts --reporter=list
+Running 3 tests using 1 worker
+  ✘  1 [chromium] › e2e/rooms.spec.ts:60:1 › password room behind door 2B: create, unlock, isolated chat, door prompt, lock, leave, delete (1.5m)
+  ✓  2 [chromium] › e2e/rooms.spec.ts:163:1 › phone: create an open ballroom and walk around inside (18.0s)
+  ✓  3 [chromium] › e2e/rooms.spec.ts:187:1 › doors on floor 3: book a vacant door with E, a friend finds it by its code (52.8s)
+  1 failed
+  2 passed (3.4m)
+# exit code: 1
+# load at end: 98.33 43.60 26.36

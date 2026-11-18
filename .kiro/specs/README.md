@@ -26,5 +26,7 @@ One folder per milestone, each with `requirements.md`, `design.md` and `tasks.md
 | 21 Demo video intro and outro (Remotion) | `m21-video-intro-outro` | done (rendered; owner still has to confirm Remotion Free License eligibility) | before code |
 | 22 TURN relay so calls connect across networks (bug report from the live site) | `m22-turn-relay` | done in the repo; the owner deploys coturn on the VPS | before code |
 | 23 Chat shows 15 messages, infinite scroll, daily reset at 00:00 WIB | `m23-chat-paging-daily-reset` | done | before code |
+| 24 Recover the 3D view after the WebGL context is lost (white screen on Android) | `m24-webgl-context-recovery` | done (not yet checked on a real Android device) | after reproducing, before the fix |
+| 25 Share sound with a screen presentation (e.g. a video) | `m25-screen-share-audio` | done (not yet checked by ear in real browsers) | before code |
 
 Milestone 8 of the original brief ("a second game or proximity voice") is covered by M17's second game.

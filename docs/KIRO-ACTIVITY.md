@@ -710,3 +710,17 @@ New screenshots: `desktop-pairs-board.png`, `desktop-pairs-podium.png`, `phone-p
   - Kiro moved `turnCredentials` into a Fastify-free file (`apps/server/src/http/turn.ts`).
   - It recorded the correction in the M22 `tasks.md`, rather than leaving the M22 claim as it was.
 - **Results:** see the M23 `tasks.md`. Typecheck, 138 + 12 unit tests, 103 integration tests and the build pass. `chat.spec.ts` passes 4 of 4, at load average about 2. The full E2E suite was not run.
+
+### Session 4, continued — 2026-11-18: Milestone 24 (white screen on Android) and Milestone 25 (presentation sound)
+
+- **Prompt (owner, Indonesian, with a screenshot from Android Chrome on the live site; a second attachment reached Kiro only as a generic PNG icon):** the screen suddenly went blank white in production; find the bug and fix it.
+- **Diagnosis:**
+  - The screenshot showed the HUD, name tags and meeting still working, so only the 3D canvas had failed.
+  - Kiro searched the web: context loss on Android Chrome is a known three.js issue.
+  - It wrote `e2e/context-loss.spec.ts` first and ran it **before** fixing. The scene went white (luma 20 → 253), the same broken-image icon showed, and nothing recovered. That run's output is kept as `test-e2e-context-loss-before-fix.txt`.
+- **Fix:** `apps/web/src/three/contextGuard.ts` and a recovery layer in `WorldScene.tsx` (spec `m24-webgl-context-recovery`). The test then passed.
+- **Steering message during the work (owner):** "also add the option to share audio when presenting a video, once the bug is fixed". Kiro finished and verified M24 first, then wrote the M25 spec and built it.
+- **M25 design point:** the screen's audio track is sent in the screen's own stream. The receiver therefore tells it apart from the presenter's voice, and the server's existing check of the presenter's screen stream id covers it, with no new protocol.
+- **Owner interaction:** the owner said "lanjut" after a quiet moment.
+- **Machine load:** Kiro waited for a low load before each E2E run (a shell loop on `uptime`). The full run still saw the load rise to 29 and 98, and two `rooms.spec.ts` tests failed under it. They are reported as failures, not explained away.
+- **Results:** see the M24 and M25 `tasks.md` files.

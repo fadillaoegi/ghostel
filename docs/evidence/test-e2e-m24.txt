@@ -1,0 +1,39 @@
+# 2026-11-18 15:32:45 +0700 — full E2E after M23+M24, build from 15:10 — load at start: 1.88 2.09 3.08 — $ pnpm exec playwright test --reporter=list
+Running 31 tests using 1 worker
+  ✓   1 [chromium] › e2e/atmosphere.spec.ts:6:1 › a solo visitor finds ghosts, a greeting and house rooms (8.2s)
+  ✓   2 [chromium] › e2e/atmosphere.spec.ts:65:1 › phone: the HUD shows the room name and ghosts are visible (4.8s)
+  ✓   3 [chromium] › e2e/chat.spec.ts:22:1 › guests chat in the lobby with speech bubbles (39.9s)
+  ✓   4 [chromium] › e2e/chat.spec.ts:70:1 › flooding the chat is stopped by the server (4.1s)
+  ✓   5 [chromium] › e2e/chat.spec.ts:84:1 › phone: chat sheet with unread badge (7.7s)
+  ✓   6 [chromium] › e2e/chat.spec.ts:152:1 › the chat panel shows the newest 15 messages and loads earlier ones by scrolling up (M23) (3.0s)
+  ✓   7 [chromium] › e2e/context-loss.spec.ts:51:1 › the 3D view comes back after the WebGL context is lost (17.3s)
+  ✓   8 [chromium] › e2e/diner.spec.ts:35:1 › Ghoul's Diner: order a snack at the counter, a friend on the floor sees it (16.8s)
+  ✓   9 [chromium] › e2e/floors.spec.ts:22:1 › the elevator connects five floors, each with its own guests, ghosts and chat (37.1s)
+  ✓  10 [chromium] › e2e/floors.spec.ts:87:1 › the welcome candy sits next to the front doors (6.0s)
+  ✓  11 [chromium] › e2e/floors.spec.ts:100:1 › phone: floors through the elevator button (14.1s)
+  ✓  12 [chromium] › e2e/lobby.spec.ts:36:1 › two guests see each other move, rename and leave in realtime (48.7s)
+  ✓  13 [chromium] › e2e/lobby.spec.ts:87:1 › invalid names are rejected with a clear message (2.8s)
+  ✓  14 [chromium] › e2e/lobby.spec.ts:114:1 › phone layout: creator, lobby and joystick movement (9.4s)
+  ✓  15 [chromium] › e2e/lobby.spec.ts:156:1 › monster costume parts are saved by the server and shown to other guests (11.7s)
+  ✓  16 [chromium] › e2e/mobile.spec.ts:33:1 › phone portrait: stick and action button; the action button calls the elevator (3.3s)
+  ✓  17 [chromium] › e2e/mobile.spec.ts:51:1 › phone landscape: creator, lobby HUD, panels and chat all fit the short screen (44.0s)
+  ✓  18 [chromium] › e2e/mobile.spec.ts:102:1 › a physical gamepad walks the character, A does the action, B closes the panel (9.0s)
+  ✓  19 [chromium] › e2e/oddities.spec.ts:57:1 › Night Desk: the lobby's 1987 terminal plays a text adventure to the end (5.6s)
+  ✓  20 [chromium] › e2e/oddities.spec.ts:101:1 › Haunted Mirror: the camera shows only after a click, stays local and stops when you walk away (16.8s)
+  ✓  21 [chromium] › e2e/pairs.spec.ts:48:1 › Monster Pairs: a solo guest plays Jack O'Bot in house room 1B to the podium (18.0s)
+  ✓  22 [chromium] › e2e/pairs.spec.ts:73:1 › phone: flip cards with taps in house room 1B; the room form offers Monster Pairs (4.7s)
+  ✓  23 [chromium] › e2e/present.spec.ts:74:1 › a guest asks to show PDF slides, the owner allows it, everyone at the table follows the pages (42.4s)
+  ✓  24 [chromium] › e2e/present.spec.ts:116:1 › the owner shares a screen at the table; a seated guest sees it live; standing up ends it (43.5s)
+  ✘  25 [chromium] › e2e/rooms.spec.ts:60:1 › password room behind door 2B: create, unlock, isolated chat, door prompt, lock, leave, delete (1.5m)
+  ✓  26 [chromium] › e2e/rooms.spec.ts:163:1 › phone: create an open ballroom and walk around inside (9.5s)
+  ✘  27 [chromium] › e2e/rooms.spec.ts:187:1 › doors on floor 3: book a vacant door with E, a friend finds it by its code (22.2s)
+  ✓  28 [chromium] › e2e/trivia.spec.ts:27:1 › solo guest plays Pumpkin Trivia against the bot to the podium (17.6s)
+  ✓  29 [chromium] › e2e/trivia.spec.ts:61:1 › two guests see the same question and each other's picks after the reveal (11.1s)
+  ✓  30 [chromium] › e2e/voice.spec.ts:49:1 › a room's meeting is its long table: sit to join (mic and camera only after a click), stand to leave (32.3s)
+  ✓  31 [chromium] › e2e/voice.spec.ts:129:1 › tables in Ghoul's Diner: sit down for a table call, stand up to leave it (8.3s)
+    Error: expect(locator).toHaveAttribute(expected) failed
+    Error: element(s) not found
+  2 failed
+  29 passed (10.5m)
+# exit code: 1
+# load at end: 17.92 28.99 20.34

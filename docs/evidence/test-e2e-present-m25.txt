@@ -1,0 +1,13 @@
+# 2026-11-18 18:58:31 +0700 — load at start: 3.90 8.11 9.16 — $ pnpm exec playwright test e2e/present.spec.ts --reporter=list
+[WebServer] Reset ghostel_test
+[WebServer] Ghostel server ready on http://127.0.0.1:2595
+
+Running 2 tests using 1 worker
+
+  ✓  1 [chromium] › e2e/present.spec.ts:100:1 › a guest asks to show PDF slides, the owner allows it, everyone at the table follows the pages (20.6s)
+screen audio source: native
+  ✓  2 [chromium] › e2e/present.spec.ts:142:1 › the owner shares a screen at the table; a seated guest sees it live; standing up ends it (1.0m)
+
+  2 passed (1.4m)
+# exit code: 0
+# load at end: 19.30 11.91 10.50

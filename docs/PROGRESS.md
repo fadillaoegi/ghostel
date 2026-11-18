@@ -267,3 +267,17 @@ The owner deployed Ghostel at https://ghostel.fldev.co.id (behind Cloudflare). A
   - Build exit 0.
   - `chat.spec.ts` 4 of 4, including a new E2E for infinite scroll.
 - Fixed on the way: the M22 typecheck had not really covered `scripts/turn-probe.ts` (see the correction in the M22 `tasks.md`).
+
+## 2026-11-18 — Milestone 24: the 3D view recovers after a lost WebGL context (spec `m24-webgl-context-recovery`, bug on the live site)
+
+- Owner report from Android Chrome: the screen went blank white while the HUD and meeting kept working.
+- Reproduced with `e2e/context-loss.spec.ts`: after `WEBGL_lose_context`, the middle of the screen went from mean luma 20 to 253, and nothing recovered.
+- Fix: `useContextGuard` shows a dark "Relighting the candles…" layer. It waits 2 s for the browser to restore the context, then mounts a fresh canvas. It also checks when the tab becomes visible, and offers "Reload" after 3 failed tries in a minute. No reload is needed: the guest stays connected, seated and in the call.
+- The E2E test passes in both cases (`test-e2e-context-loss.txt`).
+- Full E2E: 29 of 31. The two `rooms.spec.ts` failures came while the load rose to 29 and 98 (details in the M24 `tasks.md`).
+
+## 2026-11-18 — Milestone 25: sound with a screen presentation (spec `m25-screen-share-audio`, owner request)
+
+- Screen sharing asks for the tab's or system's sound too. Guests at the table hear it on their own player, with a volume slider and mute. Voice stays separate.
+- The meeting shows "🔊 Sharing sound" or "🔇 no sound", with a hint to tick "Share tab audio". The frame rate goes up to 15–30 fps for smooth video.
+- `present.spec.ts` 2 of 2, and `voice` and `oddities` 4 of 4. Typecheck, unit tests and build pass.

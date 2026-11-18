@@ -1,0 +1,12 @@
+# 2026-11-18 19:14:57 +0700 — $ pnpm typecheck
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+# exit code: 0
+
+# 2026-11-18 19:15:02 +0700 — $ pnpm test:unit
+ Test Files  13 passed (13)
+      Tests  138 passed (138)
+ Test Files  2 passed (2)
+      Tests  12 passed (12)
+# exit code: 0

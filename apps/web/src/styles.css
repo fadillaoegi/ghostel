@@ -570,6 +570,27 @@ kbd {
   position: absolute;
   inset: 0;
 }
+/* M24: covers the 3D view while a lost WebGL context is being recovered (never a white screen). */
+.scene-recovering {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  background: radial-gradient(ellipse at 50% 45%, #1d1430 0%, var(--night) 70%);
+  color: var(--violet-soft);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-align: center;
+  padding: 1rem;
+}
+.scene-recovering-candle {
+  font-size: 2.4rem;
+  animation: flicker 2.4s infinite;
+}
 .nametags {
   position: absolute;
   inset: 0;
@@ -1873,6 +1894,37 @@ kbd {
   font-weight: 700;
   text-align: center;
   padding: 1rem;
+}
+/* M25: presentation sound status and the viewer's own volume. */
+.stage-sound {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  max-width: calc(100% - 1rem);
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(11, 6, 20, 0.78);
+  color: var(--text);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.stage-sound input[type="range"] {
+  width: 6rem;
+  accent-color: var(--pumpkin);
+}
+.stage-sound-btn {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  padding: 0.1rem 0.2rem;
+}
+.stage-sound-btn.btn {
+  padding: 0.2rem 0.7rem;
 }
 .stage-pager {
   position: absolute;

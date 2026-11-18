@@ -1,0 +1,14 @@
+# 2026-11-18 15:16:52 +0700 — AFTER the fix — load: 3.91 3.96 4.49 — $ pnpm exec playwright test e2e/context-loss.spec.ts --reporter=list
+[WebServer] Reset ghostel_test
+[WebServer] Ghostel server ready on http://127.0.0.1:2595
+
+Running 1 test using 1 worker
+
+before { mean: 41.13722257772414, spread: 65.4355288786817 }
+lost { mean: 30.408728147073642, spread: 44.99255109539244 }
+recovered (new canvas) { mean: 23.487972785444445, spread: 36.464630438889856 }
+restored (same canvas) { mean: 21.88426966966416, spread: 34.474151860281935 }
+  ✓  1 [chromium] › e2e/context-loss.spec.ts:51:1 › the 3D view comes back after the WebGL context is lost (16.5s)
+
+  1 passed (19.7s)
+# exit code: 0
