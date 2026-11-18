@@ -16,6 +16,8 @@ import {
   layoutForPlace,
   sceneKeyFor,
   CHAT_HISTORY,
+  CHAT_PAGE,
+  chatDay,
   CHAT_REFILL_SECONDS,
   CloseCode,
   doorArrival,
@@ -74,6 +76,8 @@ export interface HubOptions {
   chatRefillSeconds: number;
   /** Wall clock for chat timestamps. */
   clock: () => number;
+  /** How often to check for a new chat day (00:00 WIB), in ms. */
+  chatDayCheckMs: number;
   /** Disconnect clients whose send buffer grows beyond this (slow consumers). */
   maxBufferedBytes: number;
   now: () => number;
@@ -90,6 +94,7 @@ export const DEFAULT_HUB_OPTIONS: HubOptions = {
   chatBurst: CHAT_BURST,
   chatRefillSeconds: CHAT_REFILL_SECONDS,
   clock: () => Date.now(),
+  chatDayCheckMs: 10_000,
   maxBufferedBytes: 1_000_000,
   now: () => performance.now(),
 };
@@ -173,6 +178,9 @@ export class PresenceHub {
   private readonly chatBuckets = new Map<string, { tokens: number; at: number }>();
   private readonly histories = new Map<string, ChatMessage[]>();
   private chatSeq = 0;
+  /** The WIB day the histories belong to; null until the first check. */
+  private chatDayNow: number | null = null;
+  private chatDayTimer: NodeJS.Timeout | null = null;
   /** At most one running game per room channel. State is opaque here; only its engine reads it. */
   private readonly games = new Map<string, { engine: AnyGameEngine; state: unknown }>();
   private gameTimer: NodeJS.Timeout | null = null;
@@ -201,12 +209,15 @@ export class PresenceHub {
     this.tickTimer ??= setInterval(() => this.tick(), 1000 / this.opts.snapshotHz);
     this.heartbeatTimer ??= setInterval(() => this.heartbeat(), this.opts.heartbeatMs);
     this.gameTimer ??= setInterval(() => this.tickGames(), 200);
+    this.chatDayTimer ??= setInterval(() => this.rollChatDay(), this.opts.chatDayCheckMs);
   }
 
   stop(): void {
     if (this.tickTimer) clearInterval(this.tickTimer);
     if (this.heartbeatTimer) clearInterval(this.heartbeatTimer);
     if (this.gameTimer) clearInterval(this.gameTimer);
+    if (this.chatDayTimer) clearInterval(this.chatDayTimer);
+    this.chatDayTimer = null;
     this.tickTimer = null;
     this.heartbeatTimer = null;
     this.gameTimer = null;
@@ -349,12 +360,15 @@ export class PresenceHub {
 
   private welcome(conn: Connection): void {
     const players = this.members(conn.channel).map((c) => this.toPublic(c));
-    const chat = [...(this.histories.get(conn.channel) ?? [])];
+    this.rollChatDay();
+    const history = this.histories.get(conn.channel) ?? [];
+    const chat = history.slice(-CHAT_PAGE);
+    const chatMore = history.length > chat.length;
     const game = this.gameView(conn);
     const candies = [...(this.candies.get(conn.guestId) ?? [])];
     const floor = floorOfPlace(conn.place);
     const doors = floor === null ? [] : this.doorsFor(floor);
-    this.send(conn, { t: "welcome", selfId: conn.publicId, epoch: conn.epoch, place: conn.place, players, chat, game, candies, doors });
+    this.send(conn, { t: "welcome", selfId: conn.publicId, epoch: conn.epoch, place: conn.place, players, chat, chatMore, game, candies, doors });
     this.broadcast(conn.channel, { t: "join", player: this.toPublic(conn) }, conn);
   }
 
@@ -449,6 +463,9 @@ export class PresenceHub {
       }
       case "chat":
         this.onChat(conn, msg.text);
+        break;
+      case "chat_older":
+        this.sendChatPage(conn, msg.before);
         break;
       case "enter":
         void this.onEnter(conn, msg.room, msg.password);
@@ -950,7 +967,35 @@ export class PresenceHub {
     return true;
   }
 
+  /**
+   * Up to CHAT_PAGE messages before `before`, from the history of the connection's own channel only
+   * (a room's chat never reaches non-members). Unknown ids (after a reset or a scene change) get an empty page.
+   */
+  private sendChatPage(conn: Connection, before: string): void {
+    this.rollChatDay();
+    const history = this.histories.get(conn.channel) ?? [];
+    const end = history.findIndex((m) => m.id === before);
+    if (end < 0) {
+      this.send(conn, { t: "chat_page", before, msgs: [], more: false });
+      return;
+    }
+    const start = Math.max(0, end - CHAT_PAGE);
+    this.send(conn, { t: "chat_page", before, msgs: history.slice(start, end), more: start > 0 });
+  }
+
+  /** A new WIB day empties every channel's chat and tells everyone (also after the server slept through midnight). */
+  private rollChatDay(): void {
+    const day = chatDay(this.opts.clock());
+    if (this.chatDayNow === day) return;
+    const first = this.chatDayNow === null;
+    this.chatDayNow = day;
+    if (first) return;
+    this.histories.clear();
+    for (const c of this.conns.values()) this.send(c, { t: "chat_reset" });
+  }
+
   private onChat(conn: Connection, raw: string): void {
+    this.rollChatDay();
     const text = validateChat(raw);
     if (!text.ok) {
       this.send(conn, { t: "error", code: "chat_invalid", message: text.message });

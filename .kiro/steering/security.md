@@ -3,7 +3,7 @@
 - The server is the authority for: positions sent to other users, room membership, passwords, turns, timers and game scores.
 - Validate every client input on the server with the schemas in `packages/shared`:
   - Display name: NFC-normalized, trimmed, 2–20 characters, letters/numbers/space and `- _ . '` only.
-  - Chat messages (milestone 3): length limit and rate limit.
+  - Chat messages (milestone 3): length limit and rate limit. Chat history pages (M23) are answered only from the requester's current channel, at most 15 per request.
   - Room capacity: integer 2–8.
   - Seats, snack orders, call and presenter messages: ids and enums from the shared schemas only.
   - Positions: finite numbers, inside building bounds, outside obstacles, max speed.

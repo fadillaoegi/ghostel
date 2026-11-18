@@ -1,7 +1,17 @@
 import type { Result } from "./profile";
 
 export const CHAT_MAX = 200;
-export const CHAT_HISTORY = 50;
+/** Messages kept per channel per day (server memory). */
+export const CHAT_HISTORY = 500;
+/** Messages sent on entering a channel, shown at once, and returned per history page (M23). */
+export const CHAT_PAGE = 15;
+/** The chat is emptied every day at 00:00 in this offset from UTC: WIB (Asia/Jakarta, no daylight saving time). */
+export const CHAT_DAY_UTC_OFFSET_HOURS = 7;
+
+/** Day number (0 = 1970-01-01) of an epoch-milliseconds time in WIB. A new number means a new chat day. */
+export function chatDay(at: number): number {
+  return Math.floor((at + CHAT_DAY_UTC_OFFSET_HOURS * 3_600_000) / 86_400_000);
+}
 /** Per-guest chat token bucket: this many messages at once, then one every CHAT_REFILL_SECONDS. */
 export const CHAT_BURST = 5;
 export const CHAT_REFILL_SECONDS = 2;

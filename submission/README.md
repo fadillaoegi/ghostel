@@ -6,7 +6,7 @@
 | `ghostel-intro.mp4` | 7.0 s (210 frames) | 1920×1080, 30 fps, H.264 yuv420p, AAC 48 kHz stereo |
 | `ghostel-outro.mp4` | 7.0 s (210 frames) | same |
 
-Put the intro before the screen recording and the outro after it. Together they use 14 s of the 3-minute limit.
+Put the intro before the screen recording and the outro after it. Together they use 14 s of the 3-minute limit. The MP4s are gitignored (`*.mp4`), so a fresh clone has to render them first (see "Re-render").
 
 One frame per second of each file: `docs/evidence/screenshots/video-intro-frames.jpg` and `video-outro-frames.jpg`. The render log and `ffprobe` output are in `docs/evidence/video-render.txt`.
 

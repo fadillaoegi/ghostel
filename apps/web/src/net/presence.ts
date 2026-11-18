@@ -1,4 +1,4 @@
-import { SNACKS, type ChatMessage, type DoorInfo, type EnterFailCode, type GameView, type Look, type Place, type PublicPlayer, type ServerMessage, type SnackId, type PresentationView, type PresentMode, type PresentRequest } from "@ghostel/shared";
+import { CHAT_HISTORY, SNACKS, type ChatMessage, type DoorInfo, type EnterFailCode, type GameView, type Look, type Place, type PublicPlayer, type ServerMessage, type SnackId, type PresentationView, type PresentMode, type PresentRequest } from "@ghostel/shared";
 
 export type ConnectionStatus = "connecting" | "online" | "reconnecting";
 
@@ -32,6 +32,10 @@ export interface PresenceSnapshot {
   notice: { id: number; text: string } | null;
   /** ID of the last history line received on (re)connect; older lines are never "unread". */
   historyMark: string | null;
+  /** The server has older chat than the oldest line we have (M23). */
+  chatMore: boolean;
+  /** A chat_older request is on its way. */
+  chatLoading: boolean;
   /** Lobby or the room we are in (null until the first welcome). */
   place: Place | null;
   /** Why the last room entry failed (cleared when an entry succeeds). */
@@ -53,7 +57,7 @@ export interface PresenceSnapshot {
 /** Call messages handled by CallClient (membership and WebRTC signaling). */
 export type CallEvent = Extract<ServerMessage, { t: "call" | "signal" }>;
 
-const MAX_CHAT_LINES = 100;
+const MAX_CHAT_LINES = CHAT_HISTORY + 100;
 const BUBBLE_MS = 6000;
 const NOTICE_MS = 4000;
 
@@ -72,6 +76,8 @@ export class PresenceClient {
     bubbles: new Map(),
     notice: null,
     historyMark: null,
+    chatMore: false,
+    chatLoading: false,
     place: null,
     enterError: null,
     info: null,
@@ -123,6 +129,20 @@ export class PresenceClient {
     if (this.ws?.readyState !== WebSocket.OPEN) return false;
     this.ws.send(JSON.stringify({ t: "chat", text }));
     return true;
+  }
+
+  /** Asks the server for the page of chat before our oldest message (M23). */
+  loadOlderChat(): void {
+    if (!this.snapshot.chatMore || this.snapshot.chatLoading || this.ws?.readyState !== WebSocket.OPEN) return;
+    const oldest = this.oldestChatId();
+    if (oldest === null) return;
+    this.publish({ chatLoading: true });
+    this.ws.send(JSON.stringify({ t: "chat_older", before: oldest }));
+  }
+
+  private oldestChatId(): string | null {
+    const line = this.snapshot.chat.find((l) => l.kind === "chat");
+    return line?.kind === "chat" ? line.msg.id : null;
   }
 
   /** Ask to enter a room. The password is sent once and never stored. */
@@ -227,6 +247,8 @@ export class PresenceClient {
           chat,
           bubbles: new Map(),
           historyMark: chat.at(-1)?.id ?? null,
+          chatMore: msg.chatMore,
+          chatLoading: false,
           place: msg.place,
           enterError: null,
           game: msg.game ? { view: msg.game, receivedAt: performance.now() } : null,
@@ -275,6 +297,21 @@ export class PresenceClient {
         this.publish({ bubbles, chat: this.appendLine({ kind: "notice", id: `n${++this.lineSeq}`, text: `${gone.name} left` }) });
         break;
       }
+      case "chat_page": {
+        // Ignore pages for a history we no longer show (scene change, reset, or a newer request).
+        if (msg.before !== this.oldestChatId()) {
+          this.publish({ chatLoading: false });
+          break;
+        }
+        const have = new Set(this.snapshot.chat.map((l) => l.id));
+        const older: ChatLine[] = msg.msgs.map((m): ChatLine => ({ kind: "chat", id: `c${m.id}`, msg: m })).filter((l) => !have.has(l.id));
+        this.publish({ chat: [...older, ...this.snapshot.chat], chatMore: msg.more, chatLoading: false });
+        break;
+      }
+      case "chat_reset":
+        // A new night (00:00 WIB): the server emptied every chat.
+        this.publish({ chat: [], chatMore: false, chatLoading: false, historyMark: null });
+        break;
       case "chat": {
         const bubble = { id: msg.msg.id, text: msg.msg.text };
         const bubbles = new Map(this.snapshot.bubbles).set(msg.msg.from, bubble);
@@ -393,7 +430,12 @@ export class PresenceClient {
   }
 
   private appendLine(line: ChatLine): ChatLine[] {
-    return [...this.snapshot.chat, line].slice(-MAX_CHAT_LINES);
+    const all = [...this.snapshot.chat, line];
+    // Lines dropped here can be loaded again from the server by scrolling up.
+    if (all.length > MAX_CHAT_LINES && all.slice(0, all.length - MAX_CHAT_LINES).some((l) => l.kind === "chat")) {
+      this.snapshot = { ...this.snapshot, chatMore: true };
+    }
+    return all.slice(-MAX_CHAT_LINES);
   }
 
   private publish(patch: Partial<Omit<PresenceSnapshot, "players">>): void {

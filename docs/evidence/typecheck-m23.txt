@@ -1,0 +1,8 @@
+# 2026-11-18 11:14:06 +0700 — $ pnpm typecheck
+$ pnpm -r --workspace-concurrency=1 typecheck && tsc -p tsconfig.json
+Scope: 4 of 5 workspace projects
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+# exit code: 0

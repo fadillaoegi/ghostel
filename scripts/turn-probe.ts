@@ -11,7 +11,7 @@
 //    config that allows private peers; the VPS config does not.)
 
 import { chromium } from "@playwright/test";
-import { turnCredentials } from "../apps/server/src/http/voice.ts";
+import { turnCredentials } from "../apps/server/src/http/turn.ts";
 
 const urls = (process.env["TURN_URLS"] ?? "").split(",").map((u) => u.trim()).filter(Boolean);
 const secret = process.env["TURN_SECRET"] ?? "";

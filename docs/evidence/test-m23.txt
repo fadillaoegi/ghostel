@@ -1,0 +1,37 @@
+# 2026-11-18 11:15:34 +0700 — $ pnpm test
+ ✓ test/profile.test.ts (27 tests) 30ms
+ ✓ test/trivia.test.ts (13 tests) 53ms
+ ✓ test/rooms.test.ts (14 tests) 93ms
+ ✓ test/movement.test.ts (11 tests) 149ms
+ ✓ test/tables.test.ts (12 tests) 210ms
+ ✓ test/npcs.test.ts (5 tests) 222ms
+ ✓ test/nightdesk.test.ts (12 tests) 19ms
+ ✓ test/voice.test.ts (6 tests) 9ms
+ ✓ test/pairs.test.ts (8 tests) 10ms
+ ✓ test/chat.test.ts (12 tests) 7ms
+ ✓ test/doors.test.ts (4 tests) 6ms
+ ✓ test/protocol.test.ts (5 tests) 5ms
+ ✓ test/floors.test.ts (9 tests) 448ms
+ Test Files  13 passed (13)
+      Tests  138 passed (138)
+ ✓ test/chatView.test.ts (4 tests) 2ms
+ ✓ test/scores.test.ts (8 tests) 7ms
+ Test Files  2 passed (2)
+      Tests  12 passed (12)
+ ✓ test/calls.test.ts (7 tests) 22100ms
+ ✓ test/floors.test.ts (10 tests) 20930ms
+ ✓ test/presentations.test.ts (5 tests) 12048ms
+ ✓ test/games.test.ts (8 tests) 8579ms
+ ✓ test/rooms.test.ts (14 tests) 2553ms
+ ✓ test/chat-paging.test.ts (3 tests) 2267ms
+ ✓ test/presence.test.ts (9 tests) 2000ms
+ ✓ test/chat.test.ts (6 tests) 1802ms
+ ✓ test/doors.test.ts (11 tests) 1612ms
+ ✓ test/session.test.ts (15 tests) 258ms
+ ✓ test/house.test.ts (4 tests) 121ms
+ ✓ test/proxy.test.ts (2 tests) 122ms
+ ✓ test/turn.test.ts (2 tests) 99ms
+ ✓ test/config.test.ts (7 tests) 4ms
+ Test Files  14 passed (14)
+      Tests  103 passed (103)
+# exit code: 0

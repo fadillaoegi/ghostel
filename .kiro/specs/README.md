@@ -25,5 +25,6 @@ One folder per milestone, each with `requirements.md`, `design.md` and `tasks.md
 | 20 Room meetings at the long table (supersedes the M12/M14 room rule) | `m20-room-meetings-at-the-table` | done (no single full E2E pass yet, see its `tasks.md`) | before code |
 | 21 Demo video intro and outro (Remotion) | `m21-video-intro-outro` | done (rendered; owner still has to confirm Remotion Free License eligibility) | before code |
 | 22 TURN relay so calls connect across networks (bug report from the live site) | `m22-turn-relay` | done in the repo; the owner deploys coturn on the VPS | before code |
+| 23 Chat shows 15 messages, infinite scroll, daily reset at 00:00 WIB | `m23-chat-paging-daily-reset` | done | before code |
 
 Milestone 8 of the original brief ("a second game or proximity voice") is covered by M17's second game.

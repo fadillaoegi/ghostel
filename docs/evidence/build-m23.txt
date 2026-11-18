@@ -1,0 +1,14 @@
+# 2026-11-18 11:30:57 +0700 — $ pnpm build
+dist/assets/index-DAAkdPVF.css                                41.81 kB │ gzip:   9.28 kB
+dist/assets/pdf.worker.min-UqOn5EDC.js                         0.06 kB │ gzip:   0.08 kB
+dist/assets/pdf-YwugTw7Y.js                                  444.23 kB │ gzip: 133.64 kB
+dist/assets/index-CSoZdI7Y.js                              1,486.47 kB │ gzip: 409.13 kB
+
+✓ built in 521ms
+$ node build.mjs
+
+  dist/main.js      119.4kb
+  dist/main.js.map  278.0kb
+
+⚡ Done in 19ms
+# exit code: 0

@@ -29,6 +29,8 @@ export const clientMessageSchema = z.discriminatedUnion("t", [
   }),
   // Loose cap here; the real limit (CHAT_MAX characters after normalising) is applied by validateChat.
   z.strictObject({ t: z.literal("chat"), text: z.string().max(1000) }),
+  // M23: the page of chat history just before message `before` (in the sender's current channel only).
+  z.strictObject({ t: z.literal("chat_older"), before: z.string().regex(/^[0-9a-z]{1,16}$/) }),
   // Room ID format and password rules are checked by the server's access check.
   z.strictObject({ t: z.literal("enter"), room: z.string().max(64), password: z.string().max(300).optional() }),
   z.strictObject({ t: z.literal("exit") }),
@@ -98,6 +100,8 @@ export type ServerMessage =
       place: Place;
       players: PublicPlayer[];
       chat: ChatMessage[];
+      /** True when older messages exist than the ones in `chat` (ask with chat_older). */
+      chatMore: boolean;
       game: GameView | null;
       /** Candy ids this guest has found (all floors). */
       candies: string[];
@@ -110,6 +114,10 @@ export type ServerMessage =
   | { t: "profile"; id: string; name: string; look: Look }
   | { t: "correct"; x: number; z: number }
   | { t: "chat"; msg: ChatMessage }
+  /** Answer to chat_older: up to CHAT_PAGE messages before `before`, oldest first. */
+  | { t: "chat_page"; before: string; msgs: ChatMessage[]; more: boolean }
+  /** A new chat day (00:00 WIB): every channel's chat was emptied. */
+  | { t: "chat_reset" }
   | { t: "enter_failed"; code: EnterFailCode; message: string }
   /** Room settings changed while you are inside. */
   | { t: "room"; room: PublicRoom }

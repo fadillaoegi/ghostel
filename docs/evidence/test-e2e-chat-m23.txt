@@ -1,0 +1,14 @@
+# 2026-11-18 11:32:30 +0700 — load: 2.04 2.11 2.50 — $ pnpm exec playwright test e2e/chat.spec.ts --reporter=list
+[WebServer] Reset ghostel_test
+[WebServer] Ghostel server ready on http://127.0.0.1:2595
+
+Running 4 tests using 1 worker
+
+  ✓  1 [chromium] › e2e/chat.spec.ts:22:1 › guests chat in the lobby with speech bubbles (12.7s)
+  ✓  2 [chromium] › e2e/chat.spec.ts:70:1 › flooding the chat is stopped by the server (862ms)
+  ✓  3 [chromium] › e2e/chat.spec.ts:84:1 › phone: chat sheet with unread badge (2.7s)
+chat log was scrollable (scroll path tested)
+  ✓  4 [chromium] › e2e/chat.spec.ts:152:1 › the chat panel shows the newest 15 messages and loads earlier ones by scrolling up (M23) (1.2s)
+
+  4 passed (19.3s)
+# exit code: 0

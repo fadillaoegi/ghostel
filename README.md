@@ -26,7 +26,7 @@ Ghostel is a low-poly 3D haunted hotel in the browser. Guests build a costumed c
 - Monster Pairs (house room 1B, or any room with that activity): a turn-based memory game with the creator's monster heads. Flip two cards; a match keeps your turn. Jack O'Bot plays when you are alone and forgets some cards. The server owns the board and never sends the face of a card that is down.
 - The Ghostel Game Kit: both games run on one `GameEngine` interface, and the server hub has no game-specific code. See [docs/GAME-KIT.md](docs/GAME-KIT.md).
 - Calls in rooms and at tables: unmute to talk, a live "n in call · n connected" pill, and name tags that glow while someone speaks.
-- Lobby chat with speech bubbles above characters, recent history for late arrivals, and a phone chat sheet with an unread badge. The server normalises text, strips control and bidi-override characters and rate-limits each guest across all their tabs.
+- Lobby chat with speech bubbles above characters, recent history for late arrivals, and a phone chat sheet with an unread badge. The panel shows the newest 15 messages; scroll up for earlier ones. Every chat is emptied daily at 00:00 WIB. The server normalises text, strips control and bidi-override characters and rate-limits each guest across all their tabs.
 - The Haunted Mirror (floor 2): at the Mirror of Costumes, click "Look into the mirror" and your own camera appears in the glass as a ghost: mirrored, violet-tinted, rippling, with a faint second figure behind you. The camera stays on your device and turns off when you click again or walk away.
 - The Night Desk (lobby): a 1987 green-screen terminal on a desk next to the reception. Press E to log in and play a short original text adventure ("one guest never checked out of room 13"). `WHO` and `ROOMS` list the guests and doors in the lobby. Quick buttons make it playable on phones.
 
@@ -69,7 +69,7 @@ pnpm dev:lan      # web on https://<this-machine's-LAN-IP>:8109, API still on 12
 ## Checks
 ```sh
 pnpm typecheck
-pnpm test         # 136 shared + 8 web unit + 100 server integration tests (needs pnpm db:up)
+pnpm test         # 138 shared + 12 web unit + 103 server integration tests (needs pnpm db:up)
 pnpm test:e2e     # builds, resets ghostel_test, then 29 Playwright tests (fake microphone, camera and screen; short games)
 pnpm test:prod    # production build with NODE_ENV=production: secure cookie, headers, CSP
 pnpm build

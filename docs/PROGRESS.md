@@ -255,3 +255,15 @@ The owner deployed Ghostel at https://ghostel.fldev.co.id (behind Cloudflare). A
   - `deploy/coturn/`: an example config that blocks relaying to private addresses and sets quotas, plus a compose file. `docs/DEPLOY.md` has a TURN section (Cloudflare "DNS only", firewall, check).
 - **Checks:** 100 integration tests, typecheck and build pass. Against a local coturn, `scripts/turn-probe.ts` got a relay candidate with the right secret, none with a wrong one, and sent data through the relay. Details are in the M22 `tasks.md`.
 - **Open:** the owner deploys coturn on the VPS and tests mobile data against Wi-Fi.
+
+## 2026-11-18 — Milestone 23: chat shows 15 messages, infinite scroll, daily reset (spec `m23-chat-paging-daily-reset`, owner request)
+
+- The chat panel shows the newest 15 messages. Scrolling to the top, or clicking "↑ Earlier messages", loads 15 older ones from the server and keeps the reader's place.
+- The server sends 15 messages on entering a channel and answers page requests only from the guest's own channel. It keeps up to 500 messages per channel per day.
+- Every channel's chat is emptied at 00:00 WIB. Connected guests get `chat_reset` and see an empty panel.
+- Checks:
+  - Typecheck exit 0.
+  - 138 shared + 12 web unit tests, and 103 integration tests (including `chat-paging.test.ts`).
+  - Build exit 0.
+  - `chat.spec.ts` 4 of 4, including a new E2E for infinite scroll.
+- Fixed on the way: the M22 typecheck had not really covered `scripts/turn-probe.ts` (see the correction in the M22 `tasks.md`).

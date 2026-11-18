@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CHAT_MAX, normalizeChat, parseClientMessage, validateChat } from "../src/index";
+import { CHAT_MAX, chatDay, normalizeChat, parseClientMessage, validateChat } from "../src/index";
 
 describe("normalizeChat", () => {
   it("collapses whitespace and newlines into single spaces", () => {
@@ -55,5 +55,24 @@ describe("chat protocol", () => {
     expect(parseClientMessage('{"t":"chat","text":"hi","from":"someone-else"}')).toEqual({ ok: false, reason: "bad_shape" });
     expect(parseClientMessage('{"t":"chat","text":42}')).toEqual({ ok: false, reason: "bad_shape" });
     expect(parseClientMessage('{"t":"chat","text":"<b>x</b>","name":"Admin"}')).toEqual({ ok: false, reason: "bad_shape" });
+  });
+});
+
+describe("chat days (M23, 00:00 WIB)", () => {
+  it("changes at midnight in Jakarta (17:00 UTC), not at midnight UTC", () => {
+    const before = Date.UTC(2026, 10, 16, 16, 59, 59, 999); // 23:59:59.999 WIB on 16 Nov
+    const after = Date.UTC(2026, 10, 16, 17, 0, 0, 0); // 00:00 WIB on 17 Nov
+    expect(chatDay(after)).toBe(chatDay(before) + 1);
+    expect(chatDay(Date.UTC(2026, 10, 16, 0, 0))).toBe(chatDay(Date.UTC(2026, 10, 16, 16, 0)));
+  });
+});
+
+describe("chat_older (M23)", () => {
+  it("accepts a chat id and rejects anything else", () => {
+    expect(parseClientMessage('{"t":"chat_older","before":"1a"}')).toEqual({ ok: true, msg: { t: "chat_older", before: "1a" } });
+    expect(parseClientMessage('{"t":"chat_older","before":""}')).toEqual({ ok: false, reason: "bad_shape" });
+    expect(parseClientMessage('{"t":"chat_older","before":"../x"}')).toEqual({ ok: false, reason: "bad_shape" });
+    expect(parseClientMessage(`{"t":"chat_older","before":"${"a".repeat(17)}"}`)).toEqual({ ok: false, reason: "bad_shape" });
+    expect(parseClientMessage('{"t":"chat_older","before":"1a","channel":"room:x"}')).toEqual({ ok: false, reason: "bad_shape" });
   });
 });

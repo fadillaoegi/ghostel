@@ -107,3 +107,95 @@ test("phone: chat sheet with unread badge", async ({ browser }) => {
   await desk.context.close();
   await phone.context.close();
 });
+
+/**
+ * A guest without the 3D page: checks in over the API and chats over a raw WebSocket from a blank same-origin page.
+ * Each guest may send 5 messages at once (CHAT_BURST), so a few of them fill the history quickly.
+ */
+async function chatBot(browser: Browser, name: string, texts: string[]) {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.goto("/api/health");
+  const origin = new URL(page.url()).origin;
+  const res = await page.request.put("/api/me", {
+    headers: { origin },
+    data: { name, look: { body: "violet", accent: "pumpkin", head: "round", hat: "none", costume: "none" } },
+  });
+  expect(res.status()).toBe(200);
+  const echoed = await page.evaluate(
+    async ({ url, texts }) => {
+      const ws = new WebSocket(url);
+      const got: string[] = [];
+      await new Promise<void>((resolve, reject) => {
+        ws.onopen = () => resolve();
+        ws.onerror = () => reject(new Error("socket failed"));
+      });
+      const done = new Promise<void>((resolve) => {
+        ws.onmessage = (e) => {
+          const msg = JSON.parse(String(e.data)) as { t: string; msg?: { text: string } };
+          if (msg.t === "chat" && msg.msg && texts.includes(msg.msg.text)) got.push(msg.msg.text);
+          if (got.length === texts.length) resolve();
+        };
+        setTimeout(resolve, 5000);
+      });
+      for (const text of texts) ws.send(JSON.stringify({ t: "chat", text }));
+      await done;
+      ws.close();
+      return got.length;
+    },
+    { url: `${origin.replace(/^http/, "ws")}/ws`, texts },
+  );
+  expect(echoed).toBe(texts.length);
+  await context.close();
+}
+
+test("the chat panel shows the newest 15 messages and loads earlier ones by scrolling up (M23)", async ({ browser }) => {
+  const label = (n: number) => `night note ${String(n).padStart(2, "0")}`;
+  for (let bot = 0; bot < 4; bot++) {
+    await chatBot(
+      browser,
+      `Scribe ${bot + 1}`,
+      [1, 2, 3, 4, 5].map((i) => label(bot * 5 + i)),
+    );
+  }
+
+  const reader = await checkIn(browser, "Reader Raven");
+  const log = reader.page.getByTestId("chat-log");
+  await expect(log).toContainText(label(20));
+  await expect(log.locator(".chat-line")).toHaveCount(15);
+  await expect(log).toContainText(label(6));
+  await expect(log).not.toContainText(label(5));
+  await expect(reader.page.getByTestId("chat-more")).toBeVisible();
+  await reader.page.screenshot({ path: `${SHOTS}/desktop-chat-15.png` });
+
+  // Infinite scroll: reaching the top of the log asks the server for the page before the oldest message.
+  const scrollable = await log.evaluate((el) => el.scrollHeight > el.clientHeight);
+  if (scrollable) {
+    await log.evaluate((el) => {
+      el.scrollTop = 0;
+      el.dispatchEvent(new Event("scroll"));
+    });
+  } else {
+    // A short log cannot scroll; the button at its top does the same.
+    await reader.page.getByTestId("chat-more").click();
+  }
+  await expect(log).toContainText(label(1));
+  // Earlier tests in this run chatted in the lobby too, so there are at least our 20.
+  expect(await log.locator(".chat-line").count()).toBeGreaterThanOrEqual(20);
+  // The view stayed where the reader was: the old top message (06) is still on screen.
+  await expect(log.getByText(label(6))).toBeInViewport();
+  console.log(`chat log was ${scrollable ? "scrollable (scroll path tested)" : "not scrollable (button path tested)"}`);
+  // Keep going until the start of the day's history: then the button is gone.
+  for (let i = 0; i < 40 && (await reader.page.getByTestId("chat-more").count()) > 0; i++) {
+    await reader.page.getByTestId("chat-more").click();
+    await reader.page.waitForTimeout(150);
+  }
+  await expect(reader.page.getByTestId("chat-more")).toHaveCount(0);
+
+  // A new message brings the reader back to the newest 15 once they are at the bottom again.
+  await reader.page.getByRole("textbox", { name: "Message" }).fill("back to the present");
+  await reader.page.getByRole("textbox", { name: "Message" }).press("Enter");
+  await expect(log).toContainText("back to the present");
+  await expect(log.locator(".chat-line")).toHaveCount(15);
+  await reader.context.close();
+});

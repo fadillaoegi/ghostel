@@ -361,6 +361,9 @@ function LobbyView({ client, profile, onProfile }: { client: PresenceClient; pro
       onSend={(text) => client.sendChat(text)}
       onClose={variant === "sheet" ? () => setChatOpen(false) : undefined}
       focusOnEnter={variant === "docked" && modal === null}
+      more={presence.chatMore}
+      loading={presence.chatLoading}
+      onLoadOlder={() => client.loadOlderChat()}
     />
   );
 

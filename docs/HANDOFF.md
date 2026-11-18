@@ -10,6 +10,7 @@ kiro-cli
 Start Kiro from this folder so `.kiro/steering`, `AGENTS.md` and `.kiro/hooks` load.
 
 ## Open items
+- **Chat (M23, 2026-11-18):** the panel shows 15 messages, has infinite scroll, and resets at 00:00 WIB. The full E2E suite was not run after M23 (only `chat.spec.ts`, 4 of 4).
 - **Calls on the live site (M22, 2026-11-16):** https://ghostel.fldev.co.id showed "0 connected" because production had STUN only. The repo now supports a TURN relay. The owner still has to:
   1. Add DNS `turn.fldev.co.id` → the VPS IP, set to **DNS only** in Cloudflare.
   2. Open `3478/udp`, `3478/tcp` and `49160-49200/udp`.

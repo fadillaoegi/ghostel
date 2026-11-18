@@ -694,3 +694,19 @@ New screenshots: `desktop-pairs-board.png`, `desktop-pairs-podium.png`, `phone-p
   - All five runs are kept in `docs/evidence/turn-probe.txt`, including the three that failed (two because of bugs in the probe, two because of Docker Desktop's NAT).
 - **Kiro's own fixes:** coturn 4.7 rejected `no-tlsv1` and `no-tlsv1_1` from Kiro's first example config, so they were removed. Kiro started `pnpm db:up` (Ghostel's own container) for the tests. It removed its coturn test containers and the temporary secret afterwards.
 - **Not verified:** anything on the VPS, and a real call between mobile data and Wi-Fi.
+
+### Session 4, continued — 2026-11-17/18: Milestone 23 (chat: 15 messages, infinite scroll, daily reset)
+
+- **Prompt (owner, Indonesian, with a screenshot of the Lobby chat panel):** limit what is shown in the chat to 15, add infinite scroll, and empty it again every day.
+- **Kiro's choices, stated in the spec:**
+  - "Every day" means 00:00 WIB (the owner's time zone).
+  - Notices ("arrived", "left") do not count toward the 15.
+  - A short log that cannot scroll gets an "Earlier messages" button, so phones and keyboards can still reach older messages.
+  - Paging only reads from the guest's current channel, so room chat stays private.
+- **Spec first:** `.kiro/specs/m23-chat-paging-daily-reset/`. `product.md` and `security.md` were updated.
+- **Owner interaction:** the owner rejected two tool calls by mistake and approved them right after ("lanjut approve, tadi tidak sengaja reject", "lanjut approve ya salah oencet tadi").
+- **Agent mistake found and fixed:** the root typecheck failed on `scripts/turn-probe.ts` from M22.
+  - The M22 evidence (`typecheck-m22.txt`) had passed only because Kiro wrote `tsconfig.json` and started the typecheck in the same parallel batch. The file times show that the typecheck ran before the include was saved.
+  - Kiro moved `turnCredentials` into a Fastify-free file (`apps/server/src/http/turn.ts`).
+  - It recorded the correction in the M22 `tasks.md`, rather than leaving the M22 claim as it was.
+- **Results:** see the M23 `tasks.md`. Typecheck, 138 + 12 unit tests, 103 integration tests and the build pass. `chat.spec.ts` passes 4 of 4, at load average about 2. The full E2E suite was not run.

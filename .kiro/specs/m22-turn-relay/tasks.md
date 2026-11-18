@@ -11,7 +11,7 @@
 
 ## Results (2026-11-16)
 - `pnpm test`: exit 0. Integration: 13 files, **100** tests, including the new `turn.test.ts` (2 tests) and 3 new tests in `config.test.ts` (`docs/evidence/test-m22.txt`).
-- `pnpm typecheck` (now also covers `scripts/turn-probe.ts`): exit 0 (`typecheck-m22.txt`). `pnpm build`: exit 0 (`build-m22.txt`).
+- `pnpm typecheck`: exit 0 (`typecheck-m22.txt`). **Correction (2026-11-17):** that run did *not* cover `scripts/turn-probe.ts`. Kiro wrote the new `tsconfig.json` and started the typecheck in the same parallel batch, and the file's modification time (16:59:43) is after the typecheck (16:56:58). The first real run with the probe included (M23) failed: the probe imported `voice.ts`, which pulls in Fastify types without `@fastify/cookie`'s augmentation. Fixed by moving `turnCredentials` into `apps/server/src/http/turn.ts` (no Fastify). See `typecheck-m23.txt`. `pnpm build`: exit 0 (`build-m22.txt`).
 - `docs/evidence/turn-probe.txt`, against `coturn/coturn:4.7` (4.7.0-r4) in Docker on this Mac:
   - Right secret: one `relay` candidate. Wrong secret: none, and coturn logged "Cannot find credentials of user". This happened in every run.
   - Run 5: one relay-only peer and one unrestricted peer exchanged a data-channel message through the relay (`prflx -> relay`, `connected/connected`).

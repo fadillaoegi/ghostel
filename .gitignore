@@ -24,7 +24,5 @@ backups/
 *.m4v
 submission/video/public/*.wav
 submission/video/out/
-# Machine-specific server config. Commit only the *.example templates.
-compose.vps.yaml
-deploy/nginx.conf
+# M22: the filled-in coturn config holds the TURN secret (only the .example is committed).
 deploy/coturn/turnserver.conf
