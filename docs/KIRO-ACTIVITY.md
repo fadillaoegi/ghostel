@@ -724,3 +724,24 @@ New screenshots: `desktop-pairs-board.png`, `desktop-pairs-podium.png`, `phone-p
 - **Owner interaction:** the owner said "lanjut" after a quiet moment.
 - **Machine load:** Kiro waited for a low load before each E2E run (a shell loop on `uptime`). The full run still saw the load rise to 29 and 98, and two `rooms.spec.ts` tests failed under it. They are reported as failures, not explained away.
 - **Results:** see the M24 and M25 `tasks.md` files.
+
+### Session 4, continued — 2026-11-19: footage of the Frankenstein echo (Haunted Mirror)
+
+- **Prompt (owner, Indonesian):** make screen-record footage of using the feature in the Frankenstein category.
+- **Kiro's reading:** the Frankenstein echo is the Haunted Mirror (M16, `docs/CATEGORY-REPORT.md`). No spec was written: this is a recording script for the submission, not an app feature, and no app code changed.
+- **Added:**
+  - `playwright.footage.config.ts`, which reuses the E2E config at 1920×1080.
+  - `footage/record.ts`: Chrome DevTools screencast frames with their timestamps, turned into 30 fps H.264 by ffmpeg.
+  - `footage/frankenstein.footage.ts`: a scripted walk-through.
+  - `pnpm footage`.
+- **Camera:** Chromium's default fake camera is a green test pattern with a timer. Kiro generated a grey head-and-shoulders silhouette with ffmpeg (`geq`) and fed it in with `--use-file-for-fake-video-capture`. No real person is shown. `FOOTAGE_REAL_CAMERA=1` uses the real webcam; it is untested.
+- **Result:** `submission/footage/frankenstein-haunted-mirror.mp4`: 41.1 s, 1920×1080, 30 fps, 1,234 frames, no audio (`docs/evidence/footage-frankenstein.txt`). Kiro reviewed one frame every 2 s and a full frame at 26 s, in which the silhouette is visible in the mirror with the violet ghost tint.
+- **Hook in action:** in the final cleanup, Kiro put `git check-ignore` in a shell command to check whether the MP4 was ignored. The guard hook blocked it (`kiro-hooks.log`, 2026-11-19T03:14:20Z). Kiro ran the check again without git, reading `.gitignore` directly.
+- **Follow-up prompt (owner):** "ya lanjut", to make footage of the Resurrection and Skeleton Crew echoes too.
+  - Added `footage/helpers.ts`, `footage/resurrection.footage.ts` (Night Desk) and `footage/skeleton-crew.footage.ts` (Trivia, then Pairs, on one game kit).
+  - First run: the Night Desk clip passed. The Skeleton Crew MP4 was written, but the test then failed: Chrome delivered one more screencast frame after `stopScreencast`, into the temp folder that had already been deleted (`ENOENT`, a bug in Kiro's `record.ts`). Fixed by ignoring frames after stop, then re-recorded. Both runs are in `docs/evidence/footage-resurrection-skeleton.txt`.
+  - Kiro reviewed one frame every 3 s of both clips, the last frame, and a close-up of the terminal text.
+- **Follow-up prompt (owner):** "also make footage of every floor, looking around the locations".
+  - Kiro planned one route per floor from the obstacle data in `packages/shared` (bounds, fountain, reception, pillars, tables, giant pumpkins, counter, mausoleum, telescope, water tower) at WALK_SPEED 4, in `footage/floors.footage.ts`.
+  - First run: all five passed, at a load of 10–12. Kiro measured distinct frames per second with ffmpeg `mpdecimate`: floors 3 and 4 had only 13 and 16. It waited for a load of 2 and re-recorded those two (25 and 25).
+  - It reviewed a contact sheet of all five floors (one frame every 2.5 s). The routes reached what the descriptions say.

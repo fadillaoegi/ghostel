@@ -1,0 +1,60 @@
+# 2026-11-19 11:38:52 +0700 — load: 13.96 4.86 3.90 — $ pnpm footage footage/resurrection.footage.ts footage/skeleton-crew.footage.ts
+[WebServer] Reset ghostel_test
+[WebServer] Ghostel server ready on http://127.0.0.1:2595
+
+Running 2 tests using 1 worker
+
+footage: submission/footage/resurrection-night-desk.mp4, 2925 frames over 49.2 s
+  ✓  1 [footage] › footage/resurrection.footage.ts:9:1 › Resurrection: the Night Desk terminal (1.2m)
+footage: submission/footage/skeleton-crew-game-kit.mp4, 2872 frames over 48.5 s
+  ✘  2 [footage] › footage/skeleton-crew.footage.ts:53:1 › Skeleton Crew: one game kit, two games (1.1m)
+
+
+  1) [footage] › footage/skeleton-crew.footage.ts:53:1 › Skeleton Crew: one game kit, two games ────
+
+    Error: ENOENT: no such file or directory, open '/tmp/ghostel-footage-skeleton-crew/f002872.jpg'
+
+
+      16 |   cdp.on("Page.screencastFrame", (f) => {
+      17 |     const file = join(dir, `f${String(frames.length).padStart(6, "0")}.jpg`);
+    > 18 |     writeFileSync(file, Buffer.from(f.data, "base64"));
+         |     ^
+      19 |     frames.push({ file, t: f.metadata.timestamp ?? Date.now() / 1000 });
+      20 |     void cdp.send("Page.screencastFrameAck", { sessionId: f.sessionId }).catch(() => undefined);
+      21 |   });
+
+    Error Context: test-results/skeleton-crew.footage.ts-S-26740-Crew-one-game-kit-two-games-footage/error-context.md
+
+  1 failed
+    [footage] › footage/skeleton-crew.footage.ts:53:1 › Skeleton Crew: one game kit, two games ─────
+  1 passed (2.3m)
+[ELIFECYCLE] Command failed with exit code 1.
+# exit code: 1
+
+# Run above: the Skeleton Crew MP4 was written, then a late screencast frame hit the deleted temp folder (record.ts bug). Fixed (frames after stop are ignored). Re-recording that clip:
+# 2026-11-19 11:43:25 +0700 — load: 2.58 4.06 3.84 — $ pnpm footage footage/skeleton-crew.footage.ts
+$ playwright test -c playwright.footage.config.ts footage/skeleton-crew.footage.ts
+[WebServer] Reset ghostel_test
+[WebServer] Ghostel server ready on http://127.0.0.1:2595
+
+Running 1 test using 1 worker
+
+footage: submission/footage/skeleton-crew-game-kit.mp4, 2954 frames over 50.0 s
+  ✓  1 [footage] › footage/skeleton-crew.footage.ts:53:1 › Skeleton Crew: one game kit, two games (1.1m)
+
+  1 passed (1.2m)
+# exit code: 0
+## submission/footage/resurrection-night-desk.mp4 (5107111 bytes)
+codec_name=h264
+width=1920
+height=1080
+r_frame_rate=30/1
+nb_frames=1482
+duration=49.400000
+## submission/footage/skeleton-crew-game-kit.mp4 (7109273 bytes)
+codec_name=h264
+width=1920
+height=1080
+r_frame_rate=30/1
+nb_frames=1506
+duration=50.200000

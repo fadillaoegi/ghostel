@@ -41,3 +41,31 @@ The first render downloads Chrome Headless Shell (about 140 MB). Every frame is 
 ### Licenses
 - Remotion (`remotion`, `@remotion/cli`) uses the **Remotion License**, which is not an open source license. It is free for individuals, for-profit organizations with up to 3 employees, and non-profits. Larger companies need a Company License. `@remotion/three` is MIT. See `docs/ASSETS.md`.
 - Every visual is made in code: three.js primitives, canvas text in Creepster and Nunito (both OFL), and Ghostel's palette. The sound is synthesized by the script above. The video project is MIT like the rest of the repo, and nothing from it ships in the app's production build.
+
+## Feature footage (screen recordings for the demo video)
+Made by scripted browser runs against the production build (`pnpm footage`, config `playwright.footage.config.ts`, scripts in `footage/`). Chrome's screencast is turned into 1920×1080, 30 fps H.264 by ffmpeg. The footage has **no sound**: Chrome's screencast does not record audio. Add music or a voice-over in the edit.
+
+| File | Length | Category echo | What happens |
+| --- | --- | --- | --- |
+| `footage/frankenstein-haunted-mirror.mp4` | 41 s | Frankenstein (M16) | Check in as "Victor" with the Frankenstein head → elevator to floor 2 → walk the Hall of Portraits to the Mirror of Costumes → "Look into the mirror": the camera image appears in the glass as a ghost (violet tint, ripple) → step left and right → one click turns it off again |
+| `footage/resurrection-night-desk.mp4` | 49 s | Resurrection (M16) | In the Grand Lobby, walk to the Night Desk → press E: the 1987 green-screen terminal boots → `WHO` and `ROOMS` list the live hotel → the text adventure is played to "CHECKOUT COMPLETE" → Escape back to the 3D lobby |
+| `footage/skeleton-crew-game-kit.mp4` | 50 s | Skeleton Crew (M17) | One game kit, two games: house room 1A, Pumpkin Trivia against Jack O'Bot (3 short questions, reveal, podium) → leave → house room 1B, Monster Pairs on the same `GameEngine` (cards flipped at a human pace, matches, podium "YOU WIN!") |
+| `footage/floor-1-grand-lobby.mp4` | 19 s | Costume Contest (tour) | From the front doors past the fountain ghost and the reception (neon sign, concierge), along the pillars and room doors 1A–1D, and back to the middle |
+| `footage/floor-2-hall-of-portraits.mp4` | 18 s | Costume Contest (tour) | The elevator ride up, then the whole gallery from west to east: portraits whose eyes follow you, room doors 2A–2F, the runway and the Mirror of Costumes |
+| `footage/floor-3-moonlit-greenhouse.mp4` | 21 s | Costume Contest (tour) | A loop round the bubbling cauldron, past the giant pumpkins that light up as you pass, the fireflies and Gourdon the gardener |
+| `footage/floor-4-ghouls-diner.mp4` | 21 s | Costume Contest (tour) | Along the food counter with the skeleton cook and the menu board, then down between the checkered tables and across the dining room |
+| `footage/floor-5-rooftop-graveyard.mp4` | 28 s | Costume Contest (tour) | Out to the edge above the lit night city, along it past the mausoleum, then back past the telescope, tombstones and water tower |
+
+The games run in their short test form (`TRIVIA_FAST`: 3 questions and 4 pairs), so the clip stays short. Jack O'Bot really wins the trivia round in this recording; nothing is staged. Record when the machine is quiet (`uptime` load below about 4). At a load of 10–12 the first greenhouse take had only 13 distinct frames per second; the re-take at a load of 2 had 25. Record a single clip with `pnpm footage footage/<name>.footage.ts`, or one floor with `pnpm footage footage/floors.footage.ts -g "Floor 3"`.
+
+The `.mp4` files are gitignored (`*.mp4`), so they stay local. Re-record them like this:
+```sh
+pnpm build
+pnpm db:up
+# Placeholder camera (a grey silhouette, made with ffmpeg; no real person):
+ffmpeg -f lavfi -i "color=c=black:s=640x480:r=20:d=8" -vf "format=gray,geq=lum='…'" -f yuv4mpegpipe /tmp/silhouette.y4m   # full filter in docs/evidence/footage-frankenstein.txt
+FOOTAGE_CAMERA=/tmp/silhouette.y4m pnpm footage
+# Or with your real webcam, so the mirror shows you (macOS may ask to allow the camera for the terminal app):
+FOOTAGE_REAL_CAMERA=1 pnpm footage
+```
+Without `FOOTAGE_CAMERA` or `FOOTAGE_REAL_CAMERA`, Chrome's built-in test pattern (a green screen with a timer) appears in the mirror.

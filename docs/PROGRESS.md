@@ -281,3 +281,13 @@ The owner deployed Ghostel at https://ghostel.fldev.co.id (behind Cloudflare). A
 - Screen sharing asks for the tab's or system's sound too. Guests at the table hear it on their own player, with a volume slider and mute. Voice stays separate.
 - The meeting shows "🔊 Sharing sound" or "🔇 no sound", with a hint to tick "Share tab audio". The frame rate goes up to 15–30 fps for smooth video.
 - `present.spec.ts` 2 of 2, and `voice` and `oddities` 4 of 4. Typecheck, unit tests and build pass.
+
+## 2026-11-19 — Demo footage: the Haunted Mirror (Frankenstein echo)
+
+- `pnpm footage` records scripted walk-throughs of the production build as 1080p30 MP4s (`footage/`, `playwright.footage.config.ts`).
+- First clip: `submission/footage/frankenstein-haunted-mirror.mp4`, 41 s, no sound. It goes from check-in as Victor with the Frankenstein head, to floor 2, to the mirror, camera on (ghost reflection), and camera off. See `submission/README.md`.
+- 2026-11-19, later: two more clips for the other category echoes.
+  - `resurrection-night-desk.mp4` (49 s): the Night Desk terminal played to the end.
+  - `skeleton-crew-game-kit.mp4` (50 s): Pumpkin Trivia, then Monster Pairs, on the same game kit.
+  - Evidence: `docs/evidence/footage-resurrection-skeleton.txt`.
+- 2026-11-19, afternoon: a walk-through clip for each floor: `floor-1-grand-lobby.mp4` to `floor-5-rooftop-graveyard.mp4` (18–28 s each, `footage/floors.footage.ts`). Floors 3 and 4 were re-recorded at low load (`docs/evidence/footage-floors.txt`).

@@ -20,7 +20,8 @@
     "build": "pnpm --filter @ghostel/web build && pnpm --filter @ghostel/server build",
     "start": "node --env-file-if-exists=.env apps/server/dist/main.js",
     "test:prod": "pnpm build && playwright test -c playwright.prod.config.ts",
-    "test:hooks": "node --test \"scripts/kiro-hooks/test/*.test.mjs\""
+    "test:hooks": "node --test \"scripts/kiro-hooks/test/*.test.mjs\"",
+    "footage": "playwright test -c playwright.footage.config.ts"
   },
   "devDependencies": {
     "@playwright/test": "1.65.0",

@@ -1,0 +1,39 @@
+# 2026-11-19 13:39:47 +0700 — load: 3.83 5.81 4.11 — $ pnpm footage footage/floors.footage.ts
+$ playwright test -c playwright.footage.config.ts footage/floors.footage.ts
+[WebServer] Reset ghostel_test
+[WebServer] Ghostel server ready on http://127.0.0.1:2595
+
+Running 5 tests using 1 worker
+
+footage: submission/footage/floor-1-grand-lobby.mp4, 592 frames over 18.5 s
+  ✓  1 [footage] › footage/floors.footage.ts:75:3 › Floor 1: Grand Lobby (1.5m)
+footage: submission/footage/floor-2-hall-of-portraits.mp4, 644 frames over 18.2 s
+  ✓  2 [footage] › footage/floors.footage.ts:75:3 › Floor 2: 2F · Hall of Portraits (1.7m)
+footage: submission/footage/floor-3-moonlit-greenhouse.mp4, 476 frames over 25.4 s
+  ✓  3 [footage] › footage/floors.footage.ts:75:3 › Floor 3: 3F · Moonlit Greenhouse (1.9m)
+footage: submission/footage/floor-4-ghouls-diner.mp4, 562 frames over 23.0 s
+  ✓  4 [footage] › footage/floors.footage.ts:75:3 › Floor 4: 4F · Ghoul's Diner (2.5m)
+footage: submission/footage/floor-5-rooftop-graveyard.mp4, 1113 frames over 27.3 s
+  ✓  5 [footage] › footage/floors.footage.ts:75:3 › Floor 5: 5F · Rooftop Graveyard (2.6m)
+
+  Slow test file: [footage] › footage/floors.footage.ts (10.2m)
+  Consider running tests from slow files in parallel. See: https://playwright.dev/docs/test-parallel
+  5 passed (10.3m)
+# exit code: 0
+floor-1-grand-lobby: 19.033333s, 571 frames, 372 unique (~20 distinct fps)
+floor-2-hall-of-portraits: 18.400000s, 552 frames, 391 unique (~21 distinct fps)
+floor-3-moonlit-greenhouse: 25.766667s, 773 frames, 326 unique (~13 distinct fps)
+floor-4-ghouls-diner: 23.666667s, 710 frames, 382 unique (~16 distinct fps)
+floor-5-rooftop-graveyard: 27.666016s, 830 frames, 606 unique (~22 distinct fps)
+
+# Floors 3 and 4 were choppy above (13 and 16 distinct fps; load 10–12 during the run). Re-recorded at low load:
+# 2026-11-19 14:38:09 +0700 — load: 6.34 5.06 7.07 — $ pnpm footage footage/floors.footage.ts -g 'Floor (3|4)'
+footage: submission/footage/floor-3-moonlit-greenhouse.mp4, 1258 frames over 21.1 s
+  ✓  1 [footage] › footage/floors.footage.ts:75:3 › Floor 3: 3F · Moonlit Greenhouse (40.6s)
+footage: submission/footage/floor-4-ghouls-diner.mp4, 1252 frames over 21.4 s
+  ✓  2 [footage] › footage/floors.footage.ts:75:3 › Floor 4: 4F · Ghoul's Diner (41.7s)
+  2 passed (1.4m)
+# exit code: 0
+# load at end: 7.40 5.56 7.06
+floor-3-moonlit-greenhouse: 21.200000s, 529 unique (~25 distinct fps)
+floor-4-ghouls-diner: 21.466016s, 526 unique (~25 distinct fps)

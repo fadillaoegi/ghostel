@@ -5,5 +5,5 @@
     "types": ["node"],
     "allowImportingTsExtensions": true
   },
-  "include": ["e2e", "e2e-prod", "playwright.config.ts", "playwright.prod.config.ts", "scripts/turn-probe.ts"]
+  "include": ["e2e", "e2e-prod", "footage", "playwright.config.ts", "playwright.prod.config.ts", "playwright.footage.config.ts", "scripts/turn-probe.ts"]
 }
