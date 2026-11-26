@@ -90,6 +90,8 @@ export class CallClient {
   private iceTtlMs = Infinity;
   private levelTimer: number | null = null;
   private lastLoud = new Map<string, number>();
+  /** Remote voice elements whose autoplay was refused (iPhone Safari while not capturing); started on the next tap. */
+  private blockedAudio = new Set<HTMLAudioElement>();
   private buffer = new Uint8Array(1024);
   /** Signals are handled strictly in order so ICE never races its description. */
   private queue: Promise<void> = Promise.resolve();
@@ -137,6 +139,21 @@ export class CallClient {
       }
     }
     void this.ctx?.resume().catch(() => undefined);
+    this.resumeBlockedAudio();
+  }
+
+  /** Starts remote voices whose autoplay the browser refused (only those; playing elements are left alone). */
+  private resumeBlockedAudio(): void {
+    for (const el of [...this.blockedAudio]) {
+      if (!el.isConnected || !el.srcObject) {
+        this.blockedAudio.delete(el);
+        continue;
+      }
+      el.play().then(
+        () => this.blockedAudio.delete(el),
+        () => undefined,
+      );
+    }
   }
 
   async toggleMic(): Promise<void> {
@@ -389,7 +406,12 @@ export class CallClient {
       const isMedia = (s: MediaStream) => s.getVideoTracks().length > 0 || this.snapshot.call?.members.find((m) => m.id === id)?.screen === s.id;
       if (e.track.kind === "audio" && !isMedia(stream)) {
         audio.srcObject = stream;
-        void audio.play().catch(() => undefined);
+        // iPhone Safari refuses unmuted autoplay outside a gesture while this page captures nothing (M26):
+        // remember it, and the next tap starts it (resumeBlockedAudio).
+        audio.play().then(
+          () => this.blockedAudio.delete(audio),
+          () => this.blockedAudio.add(audio),
+        );
         peer.audioStream = stream;
         peer.analyser = this.analyse(stream);
         // If video joins this stream later, it was the screen's sound after all: move it off the voice element.
@@ -455,6 +477,7 @@ export class CallClient {
     peer.pc.close();
     peer.audio.srcObject = null;
     peer.audio.remove();
+    this.blockedAudio.delete(peer.audio);
     this.peers.delete(id);
     this.lastLoud.delete(id);
     this.publish({ connected: [...this.peers.values()].filter((p) => p.connected).length, remote: this.remoteMedia(this.snapshot.call) });

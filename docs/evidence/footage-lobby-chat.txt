@@ -1,0 +1,13 @@
+# 2026-11-21 08:51:31 +0700 — load: 3.27 2.88 3.57 — $ pnpm footage footage/lobby-chat.footage.ts
+$ playwright test -c playwright.footage.config.ts footage/lobby-chat.footage.ts
+[WebServer] Reset ghostel_test
+[WebServer] Ghostel server ready on http://127.0.0.1:2595
+
+Running 1 test using 1 worker
+
+footage: submission/footage/lobby-chat-four-guests.mp4, 1138 frames over 37.2 s
+  ✓  1 [footage] › footage/lobby-chat.footage.ts:86:1 › Grand Lobby: live chat with four guests (2.8m)
+
+  1 passed (2.8m)
+# exit code: 0
+submission/footage/lobby-chat-four-guests.mp4: 38.433333s, 744 unique (~19 distinct fps)

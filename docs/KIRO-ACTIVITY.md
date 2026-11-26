@@ -745,3 +745,23 @@ New screenshots: `desktop-pairs-board.png`, `desktop-pairs-podium.png`, `phone-p
   - Kiro planned one route per floor from the obstacle data in `packages/shared` (bounds, fountain, reception, pillars, tables, giant pumpkins, counter, mausoleum, telescope, water tower) at WALK_SPEED 4, in `footage/floors.footage.ts`.
   - First run: all five passed, at a load of 10–12. Kiro measured distinct frames per second with ffmpeg `mpdecimate`: floors 3 and 4 had only 13 and 16. It waited for a load of 2 and re-recorded those two (25 and 25).
   - It reviewed a contact sheet of all five floors (one frame every 2.5 s). The routes reached what the descriptions say.
+- **Follow-up prompt (owner, 2026-11-21):** footage of live chat in the global lobby with 4 players. "Can you do it?"
+  - Kiro's approach: one guest uses the real UI and is recorded. The three others are real guests: each checks in with `PUT /api/me` (vampire, werewolf and skeleton looks), opens the WebSocket from a blank same-origin page, walks with 10 Hz `move` messages under the server's speed limit, and chats with `chat` messages. Only one 3D scene has to render.
+  - First run at load 3.3: pass, 38.4 s, about 19 distinct fps.
+  - Kiro reviewed a contact sheet (one frame every 3 s) and a full frame at 17 s: four name tags, three speech bubbles and the chat panel with the conversation.
+
+### Session 4, continued — 2026-11-21 to 2026-11-25: camera on the live site, the iPhone, and an A/B test (M26)
+
+- **Prompts (owner):**
+  - "the camera doesn't show". The console showed the Cloudflare Insights beacon blocked by the CSP and a three.js deprecation warning, and the screenshot reached Kiro only as a generic PNG icon.
+  - Then: "does it matter if one uses a phone and one a laptop?" and "my friend's phone is an iPhone".
+- **Diagnosis:**
+  - Kiro made read-only requests to the live site: the served bundle contains M22–M25, `Permissions-Policy` allows the camera, and Cloudflare injects the beacon (harmless, CSP blocks it).
+  - It explained that "0 connected" between mobile data and Wi-Fi needs the TURN relay, and gave the owner `/api/voice` to check himself, instead of checking in on production.
+  - In the code it found an iPhone-specific gap: refused voice autoplay was swallowed, and priming listened to `pointerdown` only.
+- **Mistake and how it was found:**
+  - Kiro's first fix broke `voice.spec` and `present.spec` in 4 runs. At first Kiro blamed the load, which did reach 61.
+  - Because the failures repeated, it ran an A/B control without the change (passed), then a bisect (the gesture events alone passed). That showed its broad `play()` retry was the cause.
+  - The final fix retries only refused elements. Every run, including the failing ones, is in `docs/evidence/test-e2e-ios-audio-prime.txt`.
+  - The spec was written after the first attempt; it says so at the top.
+- **Process slip:** one test command waited 27 minutes for low load inside a single tool call and hit the 30-minute limit. The killed run left its E2E server on :2595 (PID 12945/12947). Kiro found it on the next run's port error and stopped it.

@@ -291,3 +291,10 @@ The owner deployed Ghostel at https://ghostel.fldev.co.id (behind Cloudflare). A
   - `skeleton-crew-game-kit.mp4` (50 s): Pumpkin Trivia, then Monster Pairs, on the same game kit.
   - Evidence: `docs/evidence/footage-resurrection-skeleton.txt`.
 - 2026-11-19, afternoon: a walk-through clip for each floor: `floor-1-grand-lobby.mp4` to `floor-5-rooftop-graveyard.mp4` (18–28 s each, `footage/floors.footage.ts`). Floors 3 and 4 were re-recorded at low load (`docs/evidence/footage-floors.txt`).
+- 2026-11-21: `lobby-chat-four-guests.mp4` (38 s). Live lobby chat with four costumed guests, three of them scripted friends over WebSocket (`footage/lobby-chat.footage.ts`, `docs/evidence/footage-lobby-chat.txt`).
+
+## 2026-11-24/25 — Milestone 26: iPhone listeners hear the call (spec `m26-iphone-voice-autoplay`, owner report)
+
+- The owner's friend on an iPhone saw no camera and heard nothing. The main cause between mobile data and Wi-Fi is the missing TURN relay on the VPS (M22, a deployment step).
+- Code fix for iPhones: remote voices whose autoplay Safari refuses are started on the next tap. Ghostel also listens to `touchend` and `click`, which WebKit needs for user activation.
+- A first, broader attempt broke two call E2E tests. An A/B control and a bisect found the cause, and the narrower fix passes (see the M26 `tasks.md`).

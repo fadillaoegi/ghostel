@@ -1,0 +1,105 @@
+# 2026-11-24 17:22:29 +0700 — after the iPhone audio-prime change — load: 4.91 5.62 8.45 — $ pnpm exec playwright test e2e/voice.spec.ts e2e/present.spec.ts e2e/mobile.spec.ts --reporter=list
+Running 7 tests using 1 worker
+  ✓  1 [chromium] › e2e/mobile.spec.ts:33:1 › phone portrait: stick and action button; the action button calls the elevator (10.1s)
+  ✓  2 [chromium] › e2e/mobile.spec.ts:51:1 › phone landscape: creator, lobby HUD, panels and chat all fit the short screen (20.0s)
+  ✓  3 [chromium] › e2e/mobile.spec.ts:102:1 › a physical gamepad walks the character, A does the action, B closes the panel (18.1s)
+  ✓  4 [chromium] › e2e/present.spec.ts:100:1 › a guest asks to show PDF slides, the owner allows it, everyone at the table follows the pages (25.8s)
+  ✘  5 [chromium] › e2e/present.spec.ts:142:1 › the owner shares a screen at the table; a seated guest sees it live; standing up ends it (55.9s)
+  ✘  6 [chromium] › e2e/voice.spec.ts:49:1 › a room's meeting is its long table: sit to join (mic and camera only after a click), stand to leave (1.1m)
+  ✘  7 [chromium] › e2e/voice.spec.ts:129:1 › tables in Ghoul's Diner: sit down for a table call, stand up to leave it (27.8s)
+    Error: expect(locator).toHaveAttribute(expected) failed
+    Error: expect(locator).toBeVisible() failed
+    Error: element(s) not found
+    Error: expect(received).toBe(expected) // Object.is equality
+  3 failed
+  4 passed (4.7m)
+# exit code: 1
+
+# Re-run of the same 3 specs at lower load (WITH the change):
+# 2026-11-24 18:18:33 +0700 — load: 3.07 3.89 4.19
+Running 4 tests using 1 worker
+  ✓  1 [chromium] › e2e/present.spec.ts:100:1 › a guest asks to show PDF slides, the owner allows it, everyone at the table follows the pages (37.6s)
+  ✘  2 [chromium] › e2e/present.spec.ts:142:1 › the owner shares a screen at the table; a seated guest sees it live; standing up ends it (1.5m)
+  ✘  3 [chromium] › e2e/voice.spec.ts:49:1 › a room's meeting is its long table: sit to join (mic and camera only after a click), stand to leave (1.5m)
+  ✓  4 [chromium] › e2e/voice.spec.ts:129:1 › tables in Ghoul's Diner: sit down for a table call, stand up to leave it (27.4s)
+    Error: expect(locator).toHaveAttribute(expected) failed
+  2 failed
+  2 passed (4.8m)
+# exit code: 1
+# load at end: 44.45 34.66 18.78
+
+# Third run (WITH the change), waited for load < 3:
+# 2026-11-24 19:52:40 +0700 — load: 9.38 6.22 4.98
+# (the third run was killed by the agent's 30-minute command limit after a 27-minute wait for low load; no result)
+
+# Fourth run, one test (WITH the change):
+# 2026-11-24 21:04:35 +0700 — load: 5.07 4.75 4.80
+Error: http://127.0.0.1:2595/api/health is already used, make sure that nothing is running on the port/url or set reuseExistingServer:true in config.webServer.
+# exit code: 1
+# load at end: 4.91 4.72 4.79
+# The killed third run left its E2E server (PID 12945/12947, started 19:52:42) on :2595; the agent stopped it.
+
+# Fourth run, retried:
+# 2026-11-24 21:07:00 +0700 — load: 4.23 4.54 4.70
+Running 4 tests using 1 worker
+  ✓  1 [chromium] › e2e/present.spec.ts:100:1 › a guest asks to show PDF slides, the owner allows it, everyone at the table follows the pages (28.0s)
+  ✘  2 [chromium] › e2e/present.spec.ts:142:1 › the owner shares a screen at the table; a seated guest sees it live; standing up ends it (1.5m)
+  ✘  3 [chromium] › e2e/voice.spec.ts:49:1 › a room's meeting is its long table: sit to join (mic and camera only after a click), stand to leave (1.5m)
+  ✓  4 [chromium] › e2e/voice.spec.ts:129:1 › tables in Ghoul's Diner: sit down for a table call, stand up to leave it (33.3s)
+  2 failed
+  2 passed (5.3m)
+# exit code: 1
+# load at end: 61.58 53.17 28.10
+
+# A/B CONTROL: the change temporarily removed (code as before), rebuilt, same 2 specs:
+# 2026-11-25 07:56:13 +0700 — load: 4.83 7.28 6.55
+Running 4 tests using 1 worker
+  ✓  1 [chromium] › e2e/present.spec.ts:100:1 › a guest asks to show PDF slides, the owner allows it, everyone at the table follows the pages (55.0s)
+  ✓  2 [chromium] › e2e/present.spec.ts:142:1 › the owner shares a screen at the table; a seated guest sees it live; standing up ends it (46.9s)
+  ✓  3 [chromium] › e2e/voice.spec.ts:49:1 › a room's meeting is its long table: sit to join (mic and camera only after a click), stand to leave (30.3s)
+  ✓  4 [chromium] › e2e/voice.spec.ts:129:1 › tables in Ghoul's Diner: sit down for a table call, stand up to leave it (11.2s)
+  4 passed (2.5m)
+# exit code: 0
+# load at end: 33.29 20.36 12.13
+
+# BISECT 1: only the Lobby.tsx part (extra gesture events), call.ts as before:
+# 2026-11-25 08:43:57 +0700 — load: 2.52 2.91 3.48
+Running 4 tests using 1 worker
+  ✓  1 [chromium] › e2e/present.spec.ts:100:1 › a guest asks to show PDF slides, the owner allows it, everyone at the table follows the pages (41.4s)
+  ✓  2 [chromium] › e2e/present.spec.ts:142:1 › the owner shares a screen at the table; a seated guest sees it live; standing up ends it (45.7s)
+  ✓  3 [chromium] › e2e/voice.spec.ts:49:1 › a room's meeting is its long table: sit to join (mic and camera only after a click), stand to leave (29.6s)
+  ✓  4 [chromium] › e2e/voice.spec.ts:129:1 › tables in Ghoul's Diner: sit down for a table call, stand up to leave it (12.6s)
+  4 passed (2.2m)
+# exit code: 0
+# load at end: 31.92 16.17 8.81
+
+# FIX v2: gesture events kept; call.ts retries only voice elements whose autoplay was refused (not every paused one):
+# 2026-11-25 09:35:26 +0700 — load: 4.68 4.27 3.76
+Running 4 tests using 1 worker
+  ✓  1 [chromium] › e2e/present.spec.ts:100:1 › a guest asks to show PDF slides, the owner allows it, everyone at the table follows the pages (26.1s)
+  ✓  2 [chromium] › e2e/present.spec.ts:142:1 › the owner shares a screen at the table; a seated guest sees it live; standing up ends it (39.1s)
+  ✓  3 [chromium] › e2e/voice.spec.ts:49:1 › a room's meeting is its long table: sit to join (mic and camera only after a click), stand to leave (52.1s)
+  ✓  4 [chromium] › e2e/voice.spec.ts:129:1 › tables in Ghoul's Diner: sit down for a table call, stand up to leave it (19.2s)
+  4 passed (2.3m)
+# exit code: 0
+# load at end: 33.08 15.94 8.52
+
+# FIX v2, confirmation run with mobile.spec:
+# 2026-11-25 10:26:01 +0700 — load: 3.06 3.31 3.41
+Running 7 tests using 1 worker
+  ✓  1 [chromium] › e2e/mobile.spec.ts:33:1 › phone portrait: stick and action button; the action button calls the elevator (8.2s)
+  ✓  2 [chromium] › e2e/mobile.spec.ts:51:1 › phone landscape: creator, lobby HUD, panels and chat all fit the short screen (18.1s)
+  ✓  3 [chromium] › e2e/mobile.spec.ts:102:1 › a physical gamepad walks the character, A does the action, B closes the panel (11.3s)
+  ✓  4 [chromium] › e2e/present.spec.ts:100:1 › a guest asks to show PDF slides, the owner allows it, everyone at the table follows the pages (29.2s)
+  ✓  5 [chromium] › e2e/present.spec.ts:142:1 › the owner shares a screen at the table; a seated guest sees it live; standing up ends it (42.3s)
+  ✓  6 [chromium] › e2e/voice.spec.ts:49:1 › a room's meeting is its long table: sit to join (mic and camera only after a click), stand to leave (56.7s)
+  ✘  7 [chromium] › e2e/voice.spec.ts:129:1 › tables in Ghoul's Diner: sit down for a table call, stand up to leave it (26.9s)
+  1 failed
+  6 passed (3.5m)
+# exit code: 1
+# load at end: 46.35 24.31 12.25
+
+# 2026-11-25 10:29:32 +0700 — $ pnpm test:unit && pnpm typecheck
+      Tests  138 passed (138)
+      Tests  12 passed (12)
+# typecheck exit code: 0

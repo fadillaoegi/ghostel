@@ -28,5 +28,6 @@ One folder per milestone, each with `requirements.md`, `design.md` and `tasks.md
 | 23 Chat shows 15 messages, infinite scroll, daily reset at 00:00 WIB | `m23-chat-paging-daily-reset` | done | before code |
 | 24 Recover the 3D view after the WebGL context is lost (white screen on Android) | `m24-webgl-context-recovery` | done (not yet checked on a real Android device) | after reproducing, before the fix |
 | 25 Share sound with a screen presentation (e.g. a video) | `m25-screen-share-audio` | done (not yet checked by ear in real browsers) | before code |
+| 26 iPhone listeners hear the call (retry refused voice autoplay on the next tap) | `m26-iphone-voice-autoplay` | done (not yet checked on a real iPhone) | after a first attempt, see the spec |
 
 Milestone 8 of the original brief ("a second game or proximity voice") is covered by M17's second game.

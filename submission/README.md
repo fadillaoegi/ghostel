@@ -55,6 +55,9 @@ Made by scripted browser runs against the production build (`pnpm footage`, conf
 | `footage/floor-3-moonlit-greenhouse.mp4` | 21 s | Costume Contest (tour) | A loop round the bubbling cauldron, past the giant pumpkins that light up as you pass, the fireflies and Gourdon the gardener |
 | `footage/floor-4-ghouls-diner.mp4` | 21 s | Costume Contest (tour) | Along the food counter with the skeleton cook and the menu board, then down between the checkered tables and across the dining room |
 | `footage/floor-5-rooftop-graveyard.mp4` | 28 s | Costume Contest (tour) | Out to the edge above the lit night city, along it past the mausoleum, then back past the telescope, tombstones and water tower |
+| `footage/lobby-chat-four-guests.mp4` | 38 s | Costume Contest (social) | Four guests in the Grand Lobby: Pumpkin Pete (recorded, real UI) and three friends in costume (Vlad the vampire, Luna Howl the werewolf, Mr Bones the skeleton pirate) walk up, chat with speech bubbles and the lobby chat panel, then race off to door 1A |
+
+The three friends in the chat clip are real guests (cookie session, WebSocket, moves and chat checked by the server), driven from blank pages by `footage/lobby-chat.footage.ts`, so only one 3D page renders. Their lines are scripted.
 
 The games run in their short test form (`TRIVIA_FAST`: 3 questions and 4 pairs), so the clip stays short. Jack O'Bot really wins the trivia round in this recording; nothing is staged. Record when the machine is quiet (`uptime` load below about 4). At a load of 10–12 the first greenhouse take had only 13 distinct frames per second; the re-take at a load of 2 had 25. Record a single clip with `pnpm footage footage/<name>.footage.ts`, or one floor with `pnpm footage footage/floors.footage.ts -g "Floor 3"`.
 

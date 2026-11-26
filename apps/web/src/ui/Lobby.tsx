@@ -193,14 +193,14 @@ function LobbyView({ client, profile, onProfile }: { client: PresenceClient; pro
     call.attach();
     return () => call.detach();
   }, [call]);
-  // Browsers only let audio analysis start after a gesture: the first tap or key press does it.
+  // Browsers only let audio analysis and unmuted playback start after a gesture: the first tap or key press does it.
+  // iPhone Safari counts the end of a touch (touchend / click), not pointerdown, so listen to all of them.
   useEffect(() => {
     const prime = () => call.prime();
-    window.addEventListener("pointerdown", prime);
-    window.addEventListener("keydown", prime);
+    const events = ["pointerdown", "pointerup", "touchend", "click", "keydown"] as const;
+    for (const e of events) window.addEventListener(e, prime, { passive: true });
     return () => {
-      window.removeEventListener("pointerdown", prime);
-      window.removeEventListener("keydown", prime);
+      for (const e of events) window.removeEventListener(e, prime);
     };
   }, [call]);
   const callState = useCall(call);

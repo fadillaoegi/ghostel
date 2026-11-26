@@ -10,11 +10,13 @@ kiro-cli
 Start Kiro from this folder so `.kiro/steering`, `AGENTS.md` and `.kiro/hooks` load.
 
 ## Open items
-- **Demo footage (2026-11-19):** eight clips in `submission/footage/`.
+- **Demo footage (2026-11-19, chat clip 2026-11-21):** nine clips in `submission/footage/`.
   - The three category echoes: `frankenstein-haunted-mirror.mp4` (41 s), `resurrection-night-desk.mp4` (49 s), `skeleton-crew-game-kit.mp4` (50 s).
   - A tour of each floor: `floor-1` to `floor-5` (18–28 s each).
+  - `lobby-chat-four-guests.mp4` (38 s).
   - None has sound.
   - The owner records the meeting footage himself (2026-11-19): table call, camera, presentation with tab audio. Two real people are needed for that. The mirror clip uses a placeholder silhouette camera; re-record with the owner's real webcam via `FOOTAGE_REAL_CAMERA=1 pnpm footage footage/frankenstein.footage.ts` (untested). The MP4s are gitignored.
+- **iPhone voice (M26, 2026-11-25):** an iPhone guest who only listens should now hear the call after one tap. Check it with a real iPhone (Safari) against a laptop. Also turn off Cloudflare Web Analytics / Browser Insights for the domain: its beacon is blocked by the CSP (harmless, but it adds console noise).
 - **White screen on Android (M24, 2026-11-18):** fixed by recovering the WebGL context. Check on a real Android phone: open the site, switch apps for a minute, and come back.
 - **Presentation sound (M25, 2026-11-18):** in Chrome or Edge, share a **tab** and tick "Share tab audio". Listen once with two real devices.
 - **Full E2E after M24 (2026-11-18):** 29 of 31. The `rooms.spec.ts` password room test still times out at the elevator when the load climbs (it reached 98 during the re-run). It needs a quiet machine or a look at why the elevator is so slow under load.
